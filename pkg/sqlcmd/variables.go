@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 	"unicode"
+
+	"github.com/microsoft/go-sqlcmd/internal/util"
 )
 
 // Variables provides set and get of sqlcmd scripting variables
@@ -111,7 +113,7 @@ func (v Variables) SQLCmdUser() string {
 // SQLCmdServer returns the server connection parameters derived from the SQLCMDSERVER variable value
 func (v Variables) SQLCmdServer() (serverName string, instance string, port uint64, err error) {
 	serverName = v[SQLCMDSERVER]
-	return splitServer(serverName)
+	return util.SplitServer(serverName)
 }
 
 // SQLCmdDatabase returns the SQLCMDDBNAME variable value

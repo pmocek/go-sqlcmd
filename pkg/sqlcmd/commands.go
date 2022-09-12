@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/alecthomas/kong"
+	"github.com/microsoft/go-sqlcmd/internal/util"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
@@ -284,7 +285,7 @@ func listVarCommand(s *Sqlcmd, args []string, line uint) error {
 	vars := s.vars.All()
 	keys := make([]string, 0, len(vars))
 	for k := range vars {
-		if !contains(builtinVariables, k) {
+		if !util.Contains(builtinVariables, k) {
 			keys = append(keys, k)
 		}
 	}
