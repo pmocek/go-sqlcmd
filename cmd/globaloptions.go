@@ -22,7 +22,7 @@ type GlobalOptionsType struct {
 var GlobalOptions = &GlobalOptionsType{}
 
 func init() {
-	rootCmd.Flags().Bool()
+	//rootCmd.Flags().Bool()
 	rootCmd.PersistentFlags().BoolVarP(&GlobalOptions.TrustServerCertificate, "trust-server-certificate", "C", false, "Whether to trust the certificate presented by the endpoint for encryptoin")
 	rootCmd.PersistentFlags().StringVarP(&GlobalOptions.DatabaseName, "database-name", "d", "", "The initial database for the connection")
 	rootCmd.PersistentFlags().BoolVarP(&GlobalOptions.UseTrustedConnection, "use-trusted-connection", "E", false, "Whether to use integrated security")

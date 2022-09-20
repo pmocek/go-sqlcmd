@@ -56,7 +56,5 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.AddCommand(bulkcopyCmd)
 
-	bulkcopyCmd.PersistentFlags().StringVarP(&bcpArguments.DatabaseName, "database-name", "d", "", "Database name")
-	bulkcopyCmd.PersistentFlags().
-
+	//bulkcopyCmd.PersistentFlags().StringVarP(&bcpArguments.DatabaseName, "database-name", "d", "", "Database name")
 }
