@@ -40,13 +40,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "sqlcmd-config", "", "config file (default is $HOME/.sqlcmd/config.yaml).")
-
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -61,7 +55,8 @@ func initConfig() {
 
 		viper.AddConfigPath(filepath.Join(home, ".sqlcmd"))
 		viper.SetConfigType("yaml")
-		viper.SetConfigName("config")
+		viper.SetConfigName("sqlconfig")
+		err = viper.ReadInConfig()
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

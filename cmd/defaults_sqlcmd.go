@@ -1,4 +1,4 @@
-//go:build sqlcmd
+//go:build !bcp
 
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
