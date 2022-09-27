@@ -102,8 +102,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var imageName =  "mcr.microsoft.com/mssql/server:2022-latest"
 
+		var imageName =  "mcr.microsoft.com/mssql/server:2022-latest"
 		// Generate 100 character sa Password
 		rand.Seed(time.Now().Unix())
 		password := generatePassword(100, 2, 2, 2)
@@ -114,6 +114,8 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			fmt.Println(err)
 		}
+
+		fmt.Printf("Installing SQL Server ('2022-latest')\n")
 
 		err = c.EnsureImage(imageName)
 		if err != nil {
@@ -127,7 +129,7 @@ to quickly create a Cobra application.`,
 
 		updateConfig(id, password)
 
-		fmt.Printf("SQL Server installed (id: '%s', current context: 'sa@sql1')\n", id)
+		fmt.Printf("SQL Server installed (id: '%s', current context: 'sa@sql1')\n", id[len(id)-12:])
 	},
 }
 

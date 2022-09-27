@@ -41,7 +41,7 @@ var bcpArguments BcpArguments
 // bulkcopyCmd represents the bulkcopy command
 var bulkcopyCmd = &cobra.Command{
 	Use:   "bulkcopy",
-	Short: "A brief description of your command",
+	Short: "Bulk import or export data",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 

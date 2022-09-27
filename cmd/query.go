@@ -64,7 +64,7 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			fmt.Println(err)
 		}
-		s.Query = queryArguments.QueryText
+		s.Query = args[0]
 		s.Format = sqlcmd.NewSQLCmdDefaultFormatter(false)
 		s.SetOutput(os.Stdout)
 
@@ -73,7 +73,7 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	queryCmd.Flags().StringVarP(&queryArguments.QueryText, "text", "t", "Command text", "Command/Query text.")
+	// queryCmd.Flags().StringVarP(&queryArguments.QueryText, "text", "t", "Command text", "Command/Query text.")
 	rootCmd.AddCommand(queryCmd)
 }
 
