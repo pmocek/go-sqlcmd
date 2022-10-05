@@ -4,6 +4,7 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/base64"
@@ -15,6 +16,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -53,14 +55,14 @@ func (c *Controller) EnsureImage(image string) (err error) {
 	return nil
 }
 
-func (c *Controller) ContainerRun(image string, env[] string, command []string) (id string, err error) {
+func (c *Controller) ContainerRun(image string, env[] string, port int, command []string) (id string, err error) {
 
 	hostConfig := &container.HostConfig{
 		PortBindings: nat.PortMap{
-			"1433/tcp": []nat.PortBinding{
+			nat.Port("1433/tcp"): []nat.PortBinding{
 				{
 					HostIP:   "0.0.0.0",
-					HostPort: "1433",
+					HostPort: strconv.Itoa(port),
 				},
 			},
 		},
@@ -79,10 +81,56 @@ func (c *Controller) ContainerRun(image string, env[] string, command []string) 
 
 	err = c.cli.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
 	if err != nil {
-		return "", err
+		return resp.ID, err
 	}
 
 	return resp.ID, nil
+}
+
+func (c *Controller) ContainerWaitForLogEntry(id string, text string) (err error) {
+	// Wait for "SQL Server is now ready for client connections"
+	options := types.ContainerLogsOptions{
+		ShowStdout: true,
+		ShowStderr: false,
+		Since:      "",
+		Until:      "",
+		Timestamps: false,
+		Follow:     true,
+		Tail:       "",
+		Details:    false,
+	}
+
+	// Wait for server to start up
+	reader, err := c.cli.ContainerLogs(context.Background(), id, options)
+	cobra.CheckErr(err)
+	defer reader.Close()
+
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		if strings.Contains(scanner.Text(), text) {
+			break
+		}
+	}
+
+	return
+}
+
+func (c *Controller) ContainerStop(id string) (err error) {
+	err = c.cli.ContainerStop(context.Background(), id, nil)
+	return
+}
+
+func (c *Controller) ContainerRemove(id string) (err error) {
+
+	options := types.ContainerRemoveOptions{
+		RemoveVolumes: false,
+		RemoveLinks:   false,
+		Force:         false,
+	}
+
+	err = c.cli.ContainerRemove(context.Background(),id, options)
+
+	return
 }
 
 type InstallArguments struct {
@@ -102,6 +150,11 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var config Sqlconfig
+
+		viper.Unmarshal(&config)
+
+		port := findFreePortForTds(config)
 
 		var imageName =  "mcr.microsoft.com/mssql/server:2022-latest"
 		// Generate 100 character sa Password
@@ -111,23 +164,25 @@ to quickly create a Cobra application.`,
 		env := []string{"ACCEPT_EULA=Y", fmt.Sprintf("SA_PASSWORD=%s", password)}
 
 		c, err := NewController()
-		if err != nil {
-			fmt.Println(err)
-		}
+		cobra.CheckErr(err)
 
 		fmt.Printf("Installing SQL Server ('2022-latest')\n")
 
 		err = c.EnsureImage(imageName)
-		if err != nil {
-			fmt.Println(err)
-		}
+		cobra.CheckErr(err)
 
-		 id, err := c.ContainerRun(imageName, env, []string{})
+		id, err := c.ContainerRun(imageName, env, port, []string{})
 		if err != nil {
-			fmt.Println(err)
+			// Remove the container, because we haven't persisted to config yet, so
+			// uninstall won't work yet
+			c.ContainerRemove(id)
 		}
+		cobra.CheckErr(err)
 
-		updateConfig(id, password)
+		updateConfig(id, port, password)
+
+		err = c.ContainerWaitForLogEntry(id, "SQL Server is now ready for client connections")
+		cobra.CheckErr(err)
 
 		fmt.Printf("SQL Server installed (id: '%s', current context: 'sa@sql1')\n", id[len(id)-12:])
 	},
@@ -137,56 +192,124 @@ func init() {
 	rootCmd.AddCommand(installCmd)
 }
 
-func updateConfig(id string, password string) {
+func updateConfig(id string, portNumber int, password string) {
 	var config Sqlconfig
+
+	viper.Unmarshal(&config)
+
+	endPointName := findEndpointName(config)
 
 	config.ApiVersion = "v1"
 	config.Kind = "Config"
-	config.CurrentContext = "sa@sql1"
+	config.CurrentContext = "sa@" + endPointName
 
-	config.Endpoints = []Endpoint{
-		{Name: "sql1",
-			DockerDetails: DockerDetails{
-				ContainerId: id},
-			EndpointDetails: EndpointDetails{
-				Address: "localhost",
-				Port:    1433}}}
+	config.Endpoints = append(config.Endpoints, Endpoint{
+		DockerDetails:   DockerDetails{ContainerId: id},
+		EndpointDetails: EndpointDetails{
+			Address: "localhost",
+			Port:    portNumber,
+		},
+		Name:            endPointName,
+	})
 
-	config.Contexts = []Context{
-		{Name: "sa@sql1",
-			ContextDetails: ContextDetails{
-				Endpoint: "localhost",
-				User:     "sa"}}}
+	config.Contexts = append(config.Contexts, Context{
+		ContextDetails: ContextDetails{
+			Endpoint: endPointName,
+			User:     "sa@" + endPointName,
+		},
+		Name:           "sa@" + endPointName,
+	})
 
-	config.Users = []User{
-		{Name: "sa", Password: base64.StdEncoding.EncodeToString([]byte(password)),
-			UserDetails: UserDetails{
-				Username: "sa",
-				Password: base64.StdEncoding.EncodeToString([]byte(password))}}}
+	config.Users = append(config.Users, User{
+		UserDetails: UserDetails{
+			Username: "sa",
+			Password: base64.StdEncoding.EncodeToString([]byte(password)),
+		},
+		Name:        "sa@" + endPointName,
+	})
 
+	err := saveConfig(config)
+	cobra.CheckErr(err)
+}
+
+func findFreePortForTds(config Sqlconfig) (portNumber int) {
+	const startingPortNumber = 1433
+
+	portNumber = startingPortNumber
+
+	for {
+		foundFreePortNumber := true
+		for _, endpoint := range config.Endpoints {
+			if endpoint.Port == portNumber {
+				foundFreePortNumber = false
+				break
+			}
+		}
+
+		if foundFreePortNumber == true {
+			break
+		}
+
+		portNumber++
+
+		if portNumber == 5000 {
+			panic("Did not find an available port")
+		}
+	}
+
+	return
+}
+
+func findEndpointName(config Sqlconfig) (endPointName string) {
+	var postfixNumber = 1
+
+	for {
+		endPointName = fmt.Sprintf("sql%v", strconv.Itoa(postfixNumber))
+		foundAvailableEndpointName := true
+		for _, endpoint := range config.Endpoints {
+			if endpoint.Name == endPointName {
+				foundAvailableEndpointName = false
+				break
+			}
+		}
+
+		if foundAvailableEndpointName == true {
+			break
+		}
+
+		postfixNumber++
+
+		if postfixNumber == 5000 {
+			panic("Did not find an available endpoint name")
+		}
+	}
+
+	return endPointName
+}
+
+func saveConfig(config Sqlconfig) (err error) {
 	b, err := yaml.Marshal(&config)
+	cobra.CheckErr(err)
 
-	// BUGBUG: Should be able to get tihs from viper, viper.ConfigFileUsed() is
+	// BUGBUG: Should be able to get this from viper, viper.ConfigFileUsed() is
 	// returning empty
 	var configFile = os.Getenv("USERPROFILE")
 	configFile = filepath.Join(configFile, ".sqlcmd", "sqlconfig")
+
+	viper.ReadConfig(bytes.NewReader(b))
 
 	// File has to exist for WriteConfig to work
 	if !fileExists(configFile) {
 		mkdirDir(filepath.Join(os.Getenv("USERPROFILE"), ".sqlcmd"))
 		f, err := os.Create(configFile)
-		if err != nil {
-			fmt.Println(err)
-		}
-		f.Close()
+		defer f.Close()
+		cobra.CheckErr(err)
 	}
-
-	viper.ReadConfig(bytes.NewReader(b))
 
 	err = viper.WriteConfig()
-	if err != nil {
-		fmt.Println(err)
-	}
+	cobra.CheckErr(err)
+
+	return
 }
 
 func fileExists(filename string) (exists bool) {
@@ -205,9 +328,7 @@ func mkdirDir(folder string) {
 	}
 	if _, err := os.Stat(folder); os.IsNotExist(err) {
 		err := os.MkdirAll(folder, os.ModePerm)
-		if err != nil {
-			panic(fmt.Sprintf("Unable to create folder '%v'. %v", folder, err))
-		}
+		cobra.CheckErr(err)
 	}
 }
 
