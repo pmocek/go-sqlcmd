@@ -36,9 +36,9 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(
 		&cfgFile,
-		"sqlcmd-config",
+		"sqlconfig",
 		"",
-		"config file (default is $HOME/.sqlcmd/config.yaml).",
+		"config file (default is $HOME/.sqlcmd/sqlconfig).",
 	)
 }
 

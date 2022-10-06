@@ -16,6 +16,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -25,6 +26,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/billgraziano/dpapi"
 
 	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 )
@@ -184,7 +187,9 @@ to quickly create a Cobra application.`,
 		err = c.ContainerWaitForLogEntry(id, "SQL Server is now ready for client connections")
 		cobra.CheckErr(err)
 
-		fmt.Printf("SQL Server installed (id: '%s', current context: 'sa@sql1')\n", id[len(id)-12:])
+		fmt.Printf("SQL Server installed (id: '%s', current context: '%v')\n",
+			id[len(id)-12:],
+			config.CurrentContext)
 	},
 }
 
@@ -194,8 +199,16 @@ func init() {
 
 func updateConfig(id string, portNumber int, password string) {
 	var config Sqlconfig
+	err := viper.Unmarshal(&config)
+	cobra.CheckErr(err)
 
-	viper.Unmarshal(&config)
+	encryptedPassword := password
+	if runtime.GOOS == "windows" {
+		encryptedPassword, err= dpapi.Encrypt(password)
+		cobra.CheckErr(err)
+	} else {
+		// TODO: MacOS (keychain) and Linux (not sure?)
+	}
 
 	endPointName := findEndpointName(config)
 
@@ -223,12 +236,12 @@ func updateConfig(id string, portNumber int, password string) {
 	config.Users = append(config.Users, User{
 		UserDetails: UserDetails{
 			Username: "sa",
-			Password: base64.StdEncoding.EncodeToString([]byte(password)),
+			Password: base64.StdEncoding.EncodeToString([]byte(encryptedPassword)),
 		},
 		Name:        "sa@" + endPointName,
 	})
 
-	err := saveConfig(config)
+	err = saveConfig(config)
 	cobra.CheckErr(err)
 }
 

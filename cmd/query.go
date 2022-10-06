@@ -5,8 +5,10 @@ package cmd
 
 import (
 	"encoding/base64"
+	"github.com/billgraziano/dpapi"
 	"github.com/spf13/viper"
 	"os"
+	"runtime"
 	"strconv"
 
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
@@ -34,8 +36,16 @@ var queryCmd = &cobra.Command{
 
 		endpoint, user := getCurrentContext(config)
 
-		password, err := base64.StdEncoding.DecodeString(user.UserDetails.Password)
+		encryptedPassword, err := base64.StdEncoding.DecodeString(user.UserDetails.Password)
 		cobra.CheckErr(err)
+
+		password := string(encryptedPassword)
+		if runtime.GOOS == "windows" {
+			password, err = dpapi.Decrypt(string(encryptedPassword))
+			cobra.CheckErr(err)
+		} else {
+			// TODO: MacOS (keychain) and Linux (not sure?)
+		}
 
 		v := InitializeVariables(false)
 		s := sqlcmd.New(nil, "", v)
@@ -43,7 +53,7 @@ var queryCmd = &cobra.Command{
 		connect.ServerName = endpoint.EndpointDetails.Address + "," + strconv.Itoa(endpoint.EndpointDetails.Port)
 		connect.UseTrustedConnection = false
 		connect.UserName = user.UserDetails.Username
-		connect.Password = string(password)
+		connect.Password = password
 		err = s.ConnectDb(&connect, true)
 		cobra.CheckErr(err)
 
