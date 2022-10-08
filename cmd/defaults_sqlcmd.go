@@ -1,7 +1,7 @@
-//go:build !bcp
-
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+
+//go:build !bcp
 
 package cmd
 

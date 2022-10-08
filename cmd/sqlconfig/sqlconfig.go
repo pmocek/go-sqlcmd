@@ -1,7 +1,5 @@
-/*
- * // Copyright (c) Microsoft Corporation.
- * // Licensed under the MIT license.
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
 package sqlconfig
 
@@ -12,6 +10,7 @@ type EndpointDetails struct {
 
 type DockerDetails struct {
 	ContainerId string `mapstructure:"containerId"`
+	Image string `mapstructure:"image"`
 }
 
 type Endpoint struct {

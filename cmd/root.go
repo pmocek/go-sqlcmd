@@ -4,64 +4,67 @@
 package cmd
 
 import (
-	"os"
-	"path/filepath"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/docker"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/secret"
+	"github.com/microsoft/go-sqlcmd/cmd/root"
+	. "github.com/spf13/cobra"
 )
 
-var cfgFile string
-
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
+const short = "sqlcmd: a command line interface for SQL Server and Azure SQL Database."
+var command = &Command{
 	Use:   appName,
-	Short: "sqlcmd: a command line interface for SQL Server and Azure SQL Database.",
-	Long: `sqlcmd: a command line interface for SQL Server and Azure SQL Database.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Short: short,
+	Long: short,
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		os.Exit(1)
-	}
+	err := command.Execute()
+	checkErr(err)
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(
-		&cfgFile,
+	addFlags()
+	OnInitialize(initializeCobra)
+	addCommands()
+}
+
+func addFlags() {
+	command.PersistentFlags().StringP(
+		"output",
+		"o",
+		"yaml",
+		"output type (text, json or yaml)",
+	)
+
+	command.PersistentFlags().String(
 		"sqlconfig",
 		"",
-		"config file (default is $HOME/.sqlcmd/sqlconfig).",
+		"config file (default is ~/.sqlcmd/sqlconfig).",
 	)
 }
 
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-		viper.AddConfigPath(filepath.Join(home, ".sqlcmd"))
-		viper.SetConfigType("yaml")
-		viper.SetConfigName("sqlconfig")
-		err = viper.ReadInConfig()
-		cobra.CheckErr(err)
+func initializeCobra() {
+	configFile, err := command.Flags().GetString("sqlconfig")
+	checkErr(err)
+	outputType, err := command.Flags().GetString("output")
+	checkErr(err)
+
+	output.Initialize(outputType, checkErr)
+	config.Initialize(configFile, checkErr)
+	docker.Initialize(checkErr)
+	secret.Initialize(checkErr)
+
+	addGlobalOptions(command)
+}
+
+func addCommands() {
+	for _, c := range root.Commands {
+		command.AddCommand(c.GetCommand())
 	}
+}
 
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	err := viper.ReadInConfig()
-	cobra.CheckErr(err)
-	//fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+func checkErr(err error) {
+	CheckErr(err)
 }

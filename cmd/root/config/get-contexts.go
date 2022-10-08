@@ -1,17 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package cmd
+package config
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
+	. "github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 )
 
-func init() {
+type GetContexts struct {
+	command Command
+}
+
+func (c *GetContexts) GetCommand() (*Command) {
 	const use = "get-contexts [CONTEXT_NAME]"
 	const short = "Display one or many contexts from the sqlconfig file."
 	const long = short
@@ -21,18 +25,18 @@ func init() {
   # Describe one context in your sqlconfig file
   sqlcmd config get-contexts my-context`
 
-	var run = func(cmd *cobra.Command, args []string) {
+	var run = func(cmd *Command, args []string) {
 		var config Sqlconfig
 		viper.Unmarshal(&config)
 
 		if len(args) > 0 {
 			name := args[0]
 
-			if userExists(config, name) {
-				context := getUser(config, name)
+			if contextExists(config, name) {
+				context := getContext(config, name)
 				fmt.Println(context)
 			} else {
-				fmt.Printf("error: no user exists with the name: \"%v\"", name)
+				fmt.Printf("error: no context exists with the name: \"%v\"", name)
 			}
 		} else {
 			for _, v := range config.Contexts {
@@ -41,11 +45,13 @@ func init() {
 		}
 	}
 
-	configCmd.AddCommand(&cobra.Command{
+	c.command = Command{
 		Use:   use,
 		Short: short,
 		Long: long,
 		Example: example,
-		Args: cobra.MaximumNArgs(1),
-		Run: run})
+		Args: MaximumNArgs(1),
+		Run: run}
+
+	return &c.command
 }

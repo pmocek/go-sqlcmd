@@ -1,17 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package cmd
+package config
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
+	. "github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 )
 
-func init() {
+type GetEndpoints struct {
+	command Command
+}
+
+func (c *GetEndpoints) GetCommand() (*Command) {
 	const use = "get-endpoints [ENDPOINT_NAME]"
 	const short = "Display one or many endpoints from the sqlconfig file."
 	const long = short
@@ -21,7 +25,7 @@ func init() {
   # Describe one endpoint in your sqlconfig file
   sqlcmd config get-endpoints my-endpoint`
 
-	var run = func(cmd *cobra.Command, args []string) {
+	var run = func(cmd *Command, args []string) {
 		var config Sqlconfig
 		viper.Unmarshal(&config)
 
@@ -41,11 +45,13 @@ func init() {
 		}
 	}
 
-	configCmd.AddCommand(&cobra.Command{
+	c.command = Command{
 		Use:   use,
 		Short: short,
 		Long: long,
 		Example: example,
-		Args: cobra.MaximumNArgs(1),
-		Run: run})
+		Args: MaximumNArgs(1),
+		Run: run}
+
+	return &c.command
 }
