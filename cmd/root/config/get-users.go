@@ -4,11 +4,9 @@
 package config
 
 import (
-	"fmt"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	. "github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
-	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 )
 
 type GetUsers struct {
@@ -26,22 +24,20 @@ func (c *GetUsers) GetCommand() (*Command) {
   sqlcmd config get-contexts my-context`
 
 	var run = func(cmd *Command, args []string) {
-		var config Sqlconfig
-		viper.Unmarshal(&config)
-
 		if len(args) > 0 {
 			name := args[0]
 
-			if userExists(config, name) {
-				context := getUser(config, name)
-				fmt.Println(context)
+			if config.UserExists(name) {
+				user := config.GetUser(name)
+				output.Struct(user)
 			} else {
-				fmt.Printf("error: no user exists with the name: \"%v\"", name)
+				output.FatalfWithHints(
+					[]string{"To view available users run `sqlcmd config get-users"},
+					"error: no user exists with the name: \"%v\"",
+					name)
 			}
 		} else {
-			for _, v := range config.Contexts {
-				fmt.Println(v)
-			}
+			output.Struct(config.GetUsers())
 		}
 	}
 

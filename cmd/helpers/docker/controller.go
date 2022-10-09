@@ -7,8 +7,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
-	"io"
-	"os"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	"strconv"
 	"strings"
 )
@@ -31,11 +30,10 @@ func (c *Controller) EnsureImage(image string) {
 	checkErr(err)
 	defer reader.Close()
 
-	io.Copy(os.Stdout, reader)
+	//io.Copy(os.Stdout, reader)
 }
 
 func (c *Controller) ContainerRun(image string, env[] string, port int, command []string) (id string, err error) {
-
 	hostConfig := &container.HostConfig{
 		PortBindings: nat.PortMap{
 			nat.Port("1433/tcp"): []nat.PortBinding{
@@ -66,8 +64,8 @@ func (c *Controller) ContainerRun(image string, env[] string, port int, command 
 	return resp.ID, nil
 }
 
+// ContainerWaitForLogEntry waits for text substring in containers logs
 func (c *Controller) ContainerWaitForLogEntry(id string, text string) {
-	// Wait for "SQL Server is now ready for client connections"
 	options := types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: false,
@@ -86,6 +84,7 @@ func (c *Controller) ContainerWaitForLogEntry(id string, text string) {
 
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
+		output.Tracef("ERRORLOG: " + scanner.Text())
 		if strings.Contains(scanner.Text(), text) {
 			break
 		}

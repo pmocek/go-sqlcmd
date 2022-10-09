@@ -7,6 +7,7 @@ import (
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/docker"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/output/verbosity"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/secret"
 	"github.com/microsoft/go-sqlcmd/cmd/root"
 	. "github.com/spf13/cobra"
@@ -43,6 +44,13 @@ func addFlags() {
 		"",
 		"config file (default is ~/.sqlcmd/sqlconfig).",
 	)
+
+	command.PersistentFlags().IntP(
+		"verbosity",
+		"v",
+		2,
+		"Logging verbosity. 0 = error, 1 warn, 2 = info, 3 = debug, 4 = trace",
+	)
 }
 
 func initializeCobra() {
@@ -50,8 +58,10 @@ func initializeCobra() {
 	checkErr(err)
 	outputType, err := command.Flags().GetString("output")
 	checkErr(err)
+	loggingLevel, err := command.Flags().GetInt("verbosity")
+	checkErr(err)
 
-	output.Initialize(outputType, checkErr)
+	output.Initialize(outputType, verbosity.Enum(loggingLevel), checkErr, displayHints)
 	config.Initialize(configFile, checkErr)
 	docker.Initialize(checkErr)
 	secret.Initialize(checkErr)
@@ -67,4 +77,15 @@ func addCommands() {
 
 func checkErr(err error) {
 	CheckErr(err)
+}
+
+func displayHints(hints []string) {
+	if len(hints) > 0 {
+		output.Info()
+		output.Info("HINT:")
+		for i, hint := range hints {
+			output.Infof("  %d. %v\n", i+1, hint)
+		}
+		output.Info()
+	}
 }

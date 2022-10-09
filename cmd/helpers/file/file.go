@@ -3,6 +3,7 @@ package file
 import (
 	"bufio"
 	"fmt"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/folder"
 	"io/ioutil"
 	"log"
 	"os"
@@ -12,7 +13,6 @@ import (
 )
 
 func (f *fh) AssertExists(filename string, minSize int64) {
-
 	fi, err := os.Stat(filename)
 
 	if  os.IsNotExist(err) {
@@ -20,6 +20,16 @@ func (f *fh) AssertExists(filename string, minSize int64) {
 	}
 	if fi.Size() < minSize {
 		panic("filename: " + filename + " is not large enough")
+	}
+}
+
+func (f *fh) CreateEmptyIfNotExists(filename string) {
+	if !f.Exists(filename) {
+		folder := folder.GetInstance()
+		folder.MkdirAll(filepath.Base(filename))
+		f, err := os.Create(filename)
+		defer f.Close()
+		checkErr(err)
 	}
 }
 

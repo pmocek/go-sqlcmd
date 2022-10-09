@@ -7,6 +7,7 @@ import (
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/secret"
 	. "github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 type Mssql struct {
@@ -64,8 +65,11 @@ func (c *Mssql) GetCommand() *Command {
 func (c *Mssql) run(cmd *Command, args []string) {
 	var imageName string
 
-	if !c.acceptEula {
-		output.Linef("ERROR: Please accept the EULA by adding flag --accept-eula")
+	if !c.acceptEula && viper.Get("ACCEPT_EULA") == ""  {
+		output.FatalWithHints(
+			[]string{"Either, add the --accept-eula flag to the command-line",
+				"Or, set the environment variable SQLCMD_ACCEPT_EULA=YES "},
+			"EULA not accepted")
 	}
 
 	switch c.installType {
@@ -86,31 +90,23 @@ func (c *Mssql) run(cmd *Command, args []string) {
 			c.contextName = "emulator"
 		}
 	default:
-		output.Linef("ERROR: '%v' is not a valid install type")
-
-		// TODO: Need to exit with a non-zero error code
+		output.FatalWithHints([]string{"Specify one of the valid install types, e.g. --type mssql or --type edge"},
+		"'%v' is not a valid install type", c.installType)
 	}
 
 	installDockerImage(imageName, c.contextName)
-
-	output.Linef(
-		"SQL Server installed (id: '%s', current context: '%v')\n",
-		config.GetContainerShortId(),
-		config.GetCurrentContextName())
 }
 
 func installDockerImage(imageName string, contextName string) {
 	password := secret.Generate(
 		100, 2, 2, 2)
-
-	// TODO: Probably can't accept EULA here,
-	// probably require a --accept-eula switch or an ACCEPT_EULA env var
 	env := []string{"ACCEPT_EULA=Y", fmt.Sprintf("SA_PASSWORD=%s", password)}
 	port := config.FindFreePortForTds()
 	controller  := docker.NewController()
-	output.Linef("Installing SQL Server ('2022-latest')\n")
+	output.Infof("Downloading %v", imageName)
 	controller.EnsureImage(imageName)
 
+	output.Infof("Starting %v", imageName)
 	id, err := controller.ContainerRun(imageName, env, port, []string{})
 	if err != nil {
 		// Remove the container, because we haven't persisted to config yet, so
@@ -118,10 +114,28 @@ func installDockerImage(imageName string, contextName string) {
 		controller.ContainerRemove(id)
 	}
 
+	previousContextName := config.GetCurrentContextName()
+
 	// Save the config now, so user can uninstall, even if mssql in the container
 	// fails to start
 	config.Update(id, imageName, port, password, contextName)
 
+	output.Infof(
+		"Context %s starting (id: %s)",
+		config.GetCurrentContextName(),
+		config.GetContainerShortId(),
+	)
 	controller.ContainerWaitForLogEntry(
 		id, "SQL Server is now ready for client connections")
+
+	hints := []string {"To run a query:    sqlcmd query \"SELECT @@version\""}
+	if previousContextName != "" {
+		hints = append(hints, "To change context: sqlcmd config use-context " + previousContextName)
+	}
+	hints = append(hints, "To remove:         sqlcmd uninstall")
+
+	output.InfofWithHints(hints,
+		"Now ready for client connections on port %d",
+		port,
+	)
 }

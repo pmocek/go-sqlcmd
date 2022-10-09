@@ -21,7 +21,7 @@ func (c *CurrentContext) GetCommand() *Command {
 	sqlcmd config current-context`
 
 	var run = func(cmd *Command, args []string) {
-		output.PrintString(config.GetCurrentContextName())
+		output.Info(config.GetCurrentContextName())
 	}
 
 	c.command = Command{

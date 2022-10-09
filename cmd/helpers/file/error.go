@@ -1,7 +1,6 @@
 package file
 
-type errorHandlerService func(err error)
-var errorHandlerCallback errorHandlerService
+var errorHandlerCallback  func(err error)
 
 func checkErr(err error) {
 	if errorHandlerCallback == nil {

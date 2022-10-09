@@ -43,5 +43,5 @@ func (c *View) GetCommand() (*Command) {
 
 func (c *View) run(cmd *Command, args []string) {
 	config := config.GetRedactedConfig(c.raw)
-	output.Print(config)
+	output.Struct(config)
 }

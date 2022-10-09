@@ -13,11 +13,16 @@ type Install struct {
 
 func (c *Install) GetCommand() (command *Command) {
 	const use = "install"
-	const short = "Install the #SQLFamliy and Tools"
+	const short = "Install/Create #SQLFamliy and Tools"
 	command = &Command{
 		Use:   use,
 		Short: short,
 		Long:  short,
+		Example: `# Install SQL Server in a docker container
+  sqlcmd install mssql
+
+# Install SQL Server Edge in a docker container
+  sqlcmd instasll mssql --type edge`,
 		Aliases: []string{"create"},
 	}
 

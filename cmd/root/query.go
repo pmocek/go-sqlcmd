@@ -19,9 +19,13 @@ func (c *Query) GetCommand() (command *Command) {
 	const short = "Run a query against the current context"
 
 	command = &Command{
-		Use:   "query",
+		Use:   "query TEXT",
 		Short: short,
 		Long: short,
+		Example: `Run a query
+  # sqlcmd query "SELECT @@SERVERNAME"`,
+		ArgAliases: []string{"text"},
+		Args: ExactArgs(1),
 		Run: runQuery,
 	}
 

@@ -13,10 +13,12 @@ import (
 type Uninstall struct {}
 
 func (c *Uninstall) GetCommand() (command *Command) {
+	const short = "Uninstall/Delete the current context"
 	command = &Command{
 		Use:   "uninstall",
-		Short: "Uninstall SQL Server and Tools",
-		Long:  `TODO.`,
+		Short: short,
+		Long:  short,
+		Args: MaximumNArgs(0),
 		Aliases: []string{"delete"},
 		Run: runUninstall,
 	}
@@ -29,16 +31,25 @@ func runUninstall(cmd *Command, args []string) {
 		controller := docker.NewController()
 		id := config.GetContainerId()
 		shortId := config.GetContainerShortId()
-		output.Line("Stopping SQL Server")
+		endpoint, _ := config.GetCurrentContext()
+		output.Infof(
+			"Stopping %s (id: %s)",
+			endpoint.DockerDetails.Image,
+			shortId,
+		)
 		controller.ContainerStop(id)
+
+		output.Infof("Removing context %s", config.GetCurrentContextName())
 		controller.ContainerRemove(id)
 		config.RemoveCurrentContext()
 		config.Save()
-		output.Linef(
-			"SQL Server uninstalled (id: %s). Current context is now: '%s'\n",
-			shortId,
-			config.GetCurrentContextName(),
-		)
+
+		newContextName := config.GetCurrentContextName()
+		if  newContextName != "" {
+			output.Infof("Current context is now %s", newContextName)
+		} else {
+			output.Info("Operation completed successfully")
+		}
 	}
 }
 
@@ -46,12 +57,12 @@ func currentContextEndPointExists() (exists bool) {
 	exists = true
 
 	if config.GetCurrentContextName() == "" {
-		output.Line("No current context")
+		output.FatalWithHints([]string{"To create a context use `sqlcmd install ...`, e.g. `sqlcmd install mssql`"},"No current context")
 		exists = false
 	}
 
 	if !config.EndpointsExists() {
-		output.Line("No endpoints to uninstall")
+		output.Fatal("No endpoints to uninstall")
 		exists = false
 	}
 

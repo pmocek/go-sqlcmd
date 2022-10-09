@@ -1,6 +1,6 @@
 package docker
 
-func Initialize(handler errorHandlerService) {
+func Initialize(handler  func(err error)) {
 	if handler == nil {
 		panic("Please provide an error handler")
 	}

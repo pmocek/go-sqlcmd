@@ -4,11 +4,9 @@
 package config
 
 import (
-	"fmt"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	. "github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
-	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 )
 
 type GetEndpoints struct {
@@ -26,22 +24,20 @@ func (c *GetEndpoints) GetCommand() (*Command) {
   sqlcmd config get-endpoints my-endpoint`
 
 	var run = func(cmd *Command, args []string) {
-		var config Sqlconfig
-		viper.Unmarshal(&config)
-
 		if len(args) > 0 {
 			name := args[0]
 
-			if endpointExists(config, name) {
-				context := getEndpoint(config, name)
-				fmt.Println(context)
+			if config.EndpointExists(name) {
+				context := config.GetEndpoint(name)
+				output.Struct(context)
 			} else {
-				fmt.Printf("error: no endpoint exists with the name: \"%v\"", name)
+				output.FatalfWithHints(
+					[]string{"To view available endpoints run `sqlcmd config get-endpoints"},
+				"error: no endpoint exists with the name: \"%v\"",
+				name)
 			}
 		} else {
-			for _, v := range config.Endpoints {
-				fmt.Println(v)
-			}
+			output.Struct(config.GetEndpoints())
 		}
 	}
 
