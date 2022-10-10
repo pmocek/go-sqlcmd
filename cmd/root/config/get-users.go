@@ -14,14 +14,14 @@ type GetUsers struct {
 }
 
 func (c *GetUsers) GetCommand() (*Command) {
-	const use = "get-contexts [CONTEXT_NAME]"
-	const short = "Display one or many contexts from the sqlconfig file."
+	const use = "get-users [USER_NAME]"
+	const short = "Display one or many users from the sqlconfig file."
 	const long = short
-	const example = `# List all the contexts in your sqlconfig file
-  sqlcmd config get-contexts
+	const example = `# List all the users in your sqlconfig file
+  sqlcmd config get-users
 
-  # Describe one context in your sqlconfig file
-  sqlcmd config get-contexts my-context`
+  # Describe one user in your sqlconfig file
+  sqlcmd config get-users myalias`
 
 	var run = func(cmd *Command, args []string) {
 		if len(args) > 0 {
@@ -37,7 +37,7 @@ func (c *GetUsers) GetCommand() (*Command) {
 					name)
 			}
 		} else {
-			output.Struct(config.GetUsers())
+			config.OutputUsers(output.Struct)
 		}
 	}
 

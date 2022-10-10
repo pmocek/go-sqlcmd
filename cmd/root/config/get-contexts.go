@@ -37,7 +37,7 @@ func (c *GetContexts) GetCommand() (*Command) {
 					name)
 			}
 		} else {
-			output.Struct(config.GetConfig())
+			config.OutputContexts(output.Struct)
 		}
 	}
 

@@ -1,4 +1,4 @@
-package secret
+package file
 
 func Initialize(handler func(err error)) {
 	if handler == nil {

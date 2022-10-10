@@ -10,15 +10,6 @@ import (
 
 var config Sqlconfig
 
-func Initialize(handler func(err error), configFile string) {
-	if handler == nil {
-		panic("Please provide an error handler")
-	}
-	errorHandlerCallback = handler
-	configureViper(configFile)
-	load()
-}
-
 func Update(
 	id string,
 	imageName string,
@@ -95,14 +86,14 @@ func GetRedactedConfig(raw bool) (c Sqlconfig) {
 	return
 }
 
-func GetConfig() Sqlconfig {
-	return config
+func OutputUsers(formatter func(interface{})) {
+	formatter(config.Users)
 }
 
-func GetUsers() []User {
-	return config.Users
+func OutputEndpoints(formatter func(interface{})) {
+	formatter(config.Endpoints)
 }
 
-func GetEndpoints() []Endpoint {
-	return config.Endpoints
+func OutputContexts(formatter func(interface{})) {
+	formatter(config.Contexts)
 }

@@ -40,6 +40,7 @@ func (c *Mssql) GetCommand() *Command {
 		Short: short,
 		Long: long,
 		Example: example,
+		Args: MaximumNArgs(0),
 		Run: c.run}
 
 	c.command.PersistentFlags().StringVarP(
@@ -60,10 +61,10 @@ func (c *Mssql) GetCommand() *Command {
 
 	c.command.PersistentFlags().StringVarP(
 		&c.defaultDatabase,
-		"default-database",
-		"d",
+		"user-database",
+		"u",
 		"",
-		"Context name (a default context name will be created if not provided)",
+		"Create a user database and set it as the default for the user login",
 	)
 
 	c.command.PersistentFlags().BoolVar(
@@ -146,7 +147,7 @@ func (c *Mssql) installDockerImage(imageName string, contextName string) {
 	config.Update(id, imageName, port, userName, password, contextName)
 
 	output.Infof(
-		"Created configuration context '%s' in %s",
+		"Created context '%s' in %s",
 		config.GetCurrentContextName(),
 		config.GetConfigFileUsed(),
 	)
@@ -167,7 +168,6 @@ func (c *Mssql) installDockerImage(imageName string, contextName string) {
 		},
 		Name:        "sa",
 	})
-	fmt.Println("Connected")
 	c.createNonSaUser(s, userName, password)
 
 	hints := []string{"To run a query:    sqlcmd query \"SELECT @@version\""}

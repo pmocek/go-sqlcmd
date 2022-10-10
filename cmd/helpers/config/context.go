@@ -6,23 +6,12 @@ import (
 	"strconv"
 )
 
-func ContextNameExists(name string) (exists bool) {
-	for _, v := range config.Contexts {
-		if v.Name == name {
-			exists = true
-			break
-		}
-	}
-
-	return
-}
-
 // FindUniqueContextName finds a unique context name, that is both a
 // unique context name, but also a unique sa@context name.  If the name passed
 // in is unique then this is returned, else we look for the name with a numeral
 // postfix, starting at 2
 func FindUniqueContextName(name string, username string) (uniqueContextName string) {
-	if !ContextNameExists(name) &&
+	if !ContextExists(name) &&
 		!UserNameExists(username + "@" + name) {
 		uniqueContextName = name
 	} else {
@@ -33,7 +22,7 @@ func FindUniqueContextName(name string, username string) (uniqueContextName stri
 				name,
 				strconv.Itoa(postfixNumber),
 			)
-			if !ContextNameExists(uniqueContextName) {
+			if !ContextExists(uniqueContextName) {
 				if !UserNameExists(username + "@" + uniqueContextName) {
 					break
 				}
@@ -50,45 +39,6 @@ func FindUniqueContextName(name string, username string) (uniqueContextName stri
 	return
 }
 
-func RemoveCurrentContext() {
-	currentContextName := config.CurrentContext
-
-	for i, c := range config.Contexts {
-		if c.Name == currentContextName {
-			for ei, e := range config.Endpoints {
-				if e.Name == c.Endpoint {
-					config.Endpoints = append(
-						config.Endpoints[:ei],
-						config.Endpoints[ei+1:]...)
-					break
-				}
-			}
-
-			for ii, u := range config.Users {
-				if u.Name == c.User {
-					config.Users = append(
-						config.Users[:ii],
-						config.Users[ii+1:]...)
-					break
-				}
-			}
-
-			config.Contexts = append(
-				config.Contexts[:i],
-				config.Contexts[i+1:]...)
-			break
-		}
-	}
-
-	if len(config.Contexts) > 0 {
-		config.CurrentContext = config.Contexts[0].Name
-	} else {
-		config.CurrentContext = ""
-	}
-
-	return
-}
-
 func GetCurrentContextName() (name string) {
 	name = config.CurrentContext
 
@@ -99,6 +49,45 @@ func SetCurrentContextName(name string) {
 	if ContextExists(name) {
 		config.CurrentContext = name
 		Save()
+	}
+
+	return
+}
+
+func RemoveCurrentContext() {
+	currentContextName := config.CurrentContext
+
+	for ci, c := range config.Contexts {
+		if c.Name == currentContextName {
+			for ei, e := range config.Endpoints {
+				if e.Name == c.Endpoint {
+					config.Endpoints = append(
+						config.Endpoints[:ei],
+						config.Endpoints[ei+1:]...)
+					break
+				}
+			}
+
+			for ui, u := range config.Users {
+				if u.Name == c.User {
+					config.Users = append(
+						config.Users[:ui],
+						config.Users[ui+1:]...)
+					break
+				}
+			}
+
+			config.Contexts = append(
+				config.Contexts[:ci],
+				config.Contexts[ci+1:]...)
+			break
+		}
+	}
+
+	if len(config.Contexts) > 0 {
+		config.CurrentContext = config.Contexts[0].Name
+	} else {
+		config.CurrentContext = ""
 	}
 
 	return

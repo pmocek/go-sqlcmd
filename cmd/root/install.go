@@ -22,8 +22,9 @@ func (c *Install) GetCommand() (command *Command) {
   sqlcmd install mssql
 
 # Install SQL Server Edge in a docker container
-  sqlcmd instasll mssql --type edge`,
-		Aliases: []string{"create"},
+  sqlcmd install mssql --type edge`,
+		Args: ExactArgs(1),
+  		Aliases: []string{"create"},
 	}
 
 	// TODO: Push into base class

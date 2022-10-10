@@ -6,13 +6,6 @@ import (
 	"path/filepath"
 )
 
-func Initialize(handler func(err error)) {
-	if handler == nil {
-		panic("Please provide an error handler")
-	}
-	errorHandlerCallback = handler
-}
-
 func CreateEmptyIfNotExists(filename string) {
 	if !Exists(filename) {
 		folder.MkdirAll(filepath.Base(filename))

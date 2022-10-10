@@ -37,7 +37,7 @@ func (c *GetEndpoints) GetCommand() (*Command) {
 				name)
 			}
 		} else {
-			output.Struct(config.GetEndpoints())
+			config.OutputEndpoints(output.Struct)
 		}
 	}
 

@@ -4,14 +4,8 @@
 package cmd
 
 import (
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/docker"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/file"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/folder"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/mssql"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output/verbosity"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/secret"
 	"github.com/microsoft/go-sqlcmd/cmd/root"
 	. "github.com/spf13/cobra"
 )
@@ -29,9 +23,11 @@ func Execute() {
 }
 
 func init() {
-	addFlags()
 	OnInitialize(initializeCobra)
+
+	addFlags()
 	addCommands()
+	addGlobalOptions(command)
 }
 
 func addFlags() {
@@ -64,15 +60,13 @@ func initializeCobra() {
 	loggingLevel, err := command.Flags().GetInt("verbosity")
 	checkErr(err)
 
-	file.Initialize(checkErr)
-	folder.Initialize(checkErr)
-	mssql.Initialize(checkErr)
-	output.Initialize(checkErr, displayHints, outputType, verbosity.Enum(loggingLevel))
-	config.Initialize(checkErr, configFile)
-	docker.Initialize(checkErr)
-	secret.Initialize(checkErr)
-
-	addGlobalOptions(command)
+	helpers.Initialize(
+		checkErr,
+		displayHints,
+		configFile,
+		outputType,
+		loggingLevel,
+	)
 }
 
 func addCommands() {

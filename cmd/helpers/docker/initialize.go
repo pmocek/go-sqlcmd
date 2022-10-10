@@ -1,4 +1,4 @@
-package secret
+package docker
 
 func Initialize(handler func(err error)) {
 	if handler == nil {

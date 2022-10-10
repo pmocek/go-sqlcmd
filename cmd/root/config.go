@@ -20,6 +20,7 @@ func (c *Config) GetCommand() (command *Command) {
 		Use:   "config",
 		Short: short,
 		Long: short,
+		Args: ExactArgs(1),
 	}
 
 	for _, subCommand := range config.Commands {
