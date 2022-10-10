@@ -22,7 +22,6 @@ func configureViper(configFile string) {
 	viper.SetEnvPrefix("SQLCMD")
 	viper.SetConfigFile(configFile)
 
-	file := file.GetInstance()
 	file.CreateEmptyIfNotExists(configFile)
 }
 
@@ -45,8 +44,11 @@ func Save() {
 	checkErr(err)
 	err = viper.ReadConfig(bytes.NewReader(b))
 	checkErr(err)
-	file := file.GetInstance()
 	file.CreateEmptyIfNotExists(viper.ConfigFileUsed())
 	err = viper.WriteConfig()
 	checkErr(err)
+}
+
+func GetConfigFileUsed() string {
+	return viper.ConfigFileUsed()
 }

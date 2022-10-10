@@ -1,6 +1,7 @@
-package folder
+package mssql
 
-var errorHandlerCallback  func(err error)
+type errorHandlerService func(err error)
+var errorHandlerCallback errorHandlerService
 
 func checkErr(err error) {
 	if errorHandlerCallback == nil {

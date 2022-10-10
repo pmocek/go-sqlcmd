@@ -8,6 +8,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
+	"io"
 	"strconv"
 	"strings"
 )
@@ -25,12 +26,21 @@ func NewController() (c *Controller) {
 	return
 }
 
-func (c *Controller) EnsureImage(image string) {
-	reader, err := c.cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
-	checkErr(err)
-	defer reader.Close()
+func (c *Controller) EnsureImage(image string) (err error){
+	var reader io.ReadCloser
 
-	//io.Copy(os.Stdout, reader)
+	output.Tracef("Running ImagePull for image %s", image)
+	reader, err = c.cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
+	if reader != nil {
+		defer reader.Close()
+
+		scanner := bufio.NewScanner(reader)
+		for scanner.Scan() {
+			output.Trace(scanner.Text())
+		}
+	}
+
+	return
 }
 
 func (c *Controller) ContainerRun(image string, env[] string, port int, command []string) (id string, err error) {

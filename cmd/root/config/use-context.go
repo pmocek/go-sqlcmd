@@ -24,7 +24,10 @@ func (c *UseContext) GetCommand() (*Command) {
 		var name = args[0]
 		if config.ContextExists(name) {
 			config.SetCurrentContextName(name)
-			output.Infof("Switched to context \"%v\".", name)
+			output.InfofWithHints([]string{
+				"To run a query:    sqlcmd query \"SELECT @@SERVERNAME\"",
+				"To remove:         sqlcmd uninstall"},
+			"Switched to context \"%v\".", name)
 		} else {
 			output.FatalfWithHints([]string{"To view available contexts run `sqlcmd config get-contexts`"},
 			"No context exists with the name: \"%v\"", name)

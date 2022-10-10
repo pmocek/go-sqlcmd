@@ -19,7 +19,7 @@ func (c *Uninstall) GetCommand() (command *Command) {
 		Short: short,
 		Long:  short,
 		Args: MaximumNArgs(0),
-		Aliases: []string{"delete"},
+		Aliases: []string{"delete", "drop"},
 		Run: runUninstall,
 	}
 
@@ -30,12 +30,10 @@ func runUninstall(cmd *Command, args []string) {
 	if currentContextEndPointExists() {
 		controller := docker.NewController()
 		id := config.GetContainerId()
-		shortId := config.GetContainerShortId()
 		endpoint, _ := config.GetCurrentContext()
 		output.Infof(
-			"Stopping %s (id: %s)",
+			"Stopping %s",
 			endpoint.DockerDetails.Image,
-			shortId,
 		)
 		controller.ContainerStop(id)
 

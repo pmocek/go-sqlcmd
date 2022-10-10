@@ -10,12 +10,11 @@ import (
 
 var config Sqlconfig
 
-func Initialize(configFile string, handler func(err error)) {
+func Initialize(handler func(err error), configFile string) {
 	if handler == nil {
 		panic("Please provide an error handler")
 	}
 	errorHandlerCallback = handler
-
 	configureViper(configFile)
 	load()
 }
@@ -24,6 +23,7 @@ func Update(
 	id string,
 	imageName string,
 	portNumber int,
+	username string,
 	password string,
 	contextName string,
 ) {
@@ -43,9 +43,9 @@ func Update(
 		panic("contextName must be provided")
 	}
 
-	contextName = FindUniqueContextName(contextName)
+	contextName = FindUniqueContextName(contextName, username)
 	endPointName := FindUniqueEndpointName(contextName)
-	userName := "sa@" + contextName // This is the name of the user config entry, not the mssql user 'sa'
+	userName := username + "@" + contextName // This is the name of the user config entry, not the mssql user 'sa'
 
 	config.ApiVersion = "v1"
 	config.Kind = "Config"
@@ -65,14 +65,14 @@ func Update(
 	config.Contexts = append(config.Contexts, Context{
 		ContextDetails: ContextDetails{
 			Endpoint: endPointName,
-			User:     "sa@" + contextName,
+			User:    username + "@" + contextName,
 		},
 		Name:           contextName,
 	})
 
 	config.Users = append(config.Users, User{
 		UserDetails: UserDetails{
-			Username: "sa",
+			Username: username,
 			Password: secret.Encrypt(password),
 		},
 		Name:        userName,

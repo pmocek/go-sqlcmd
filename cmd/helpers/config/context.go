@@ -18,26 +18,32 @@ func ContextNameExists(name string) (exists bool) {
 }
 
 // FindUniqueContextName finds a unique context name, that is both a
-// unique context name, but also a unique sa@context name
-func FindUniqueContextName(name string) (uniqueContextName string) {
-	var postfixNumber = 1
-
-	for {
-		uniqueContextName = fmt.Sprintf(
-			"%v%v",
-			name,
-			strconv.Itoa(postfixNumber),
-		)
-		if !ContextNameExists(uniqueContextName) {
-			if !UserNameExists("sa@" + uniqueContextName) {
-				break
+// unique context name, but also a unique sa@context name.  If the name passed
+// in is unique then this is returned, else we look for the name with a numeral
+// postfix, starting at 2
+func FindUniqueContextName(name string, username string) (uniqueContextName string) {
+	if !ContextNameExists(name) &&
+		!UserNameExists(username + "@" + name) {
+		uniqueContextName = name
+	} else {
+		var postfixNumber = 2
+		for {
+			uniqueContextName = fmt.Sprintf(
+				"%v%v",
+				name,
+				strconv.Itoa(postfixNumber),
+			)
+			if !ContextNameExists(uniqueContextName) {
+				if !UserNameExists(username + "@" + uniqueContextName) {
+					break
+				}
+			} else {
+				postfixNumber++
 			}
-		} else {
-			postfixNumber++
-		}
 
-		if postfixNumber == 5000 {
-			panic("Did not an available context name")
+			if postfixNumber == 5000 {
+				panic("Did not an available context name")
+			}
 		}
 	}
 

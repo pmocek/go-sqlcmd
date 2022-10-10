@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 package file
 
 var errorHandlerCallback  func(err error)

@@ -6,6 +6,9 @@ package cmd
 import (
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/docker"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/file"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/folder"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/mssql"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output/verbosity"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/secret"
@@ -49,7 +52,7 @@ func addFlags() {
 		"verbosity",
 		"v",
 		2,
-		"Logging verbosity. 0 = error, 1 warn, 2 = info, 3 = debug, 4 = trace",
+		"Logging verbosity. error = 0, warn = 1, info = 2, debug = 3, trace = 4",
 	)
 }
 
@@ -61,8 +64,11 @@ func initializeCobra() {
 	loggingLevel, err := command.Flags().GetInt("verbosity")
 	checkErr(err)
 
-	output.Initialize(outputType, verbosity.Enum(loggingLevel), checkErr, displayHints)
-	config.Initialize(configFile, checkErr)
+	file.Initialize(checkErr)
+	folder.Initialize(checkErr)
+	mssql.Initialize(checkErr)
+	output.Initialize(checkErr, displayHints, outputType, verbosity.Enum(loggingLevel))
+	config.Initialize(checkErr, configFile)
 	docker.Initialize(checkErr)
 	secret.Initialize(checkErr)
 

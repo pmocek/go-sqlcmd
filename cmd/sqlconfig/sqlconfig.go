@@ -14,8 +14,8 @@ type DockerDetails struct {
 }
 
 type Endpoint struct {
-	DockerDetails   `mapstructure:"dockerDetails"`
-	EndpointDetails `mapstructure:"endpointDetails"`
+	DockerDetails   `mapstructure:"docker"  yaml:"docker""`
+	EndpointDetails `mapstructure:"endpoint"  yaml:"endpoint""`
 	Name            string          `mapstructure:"name"`
 }
 
@@ -25,7 +25,7 @@ type ContextDetails struct {
 }
 
 type Context struct {
-	ContextDetails `mapstructure:"contextDetails"`
+	ContextDetails `mapstructure:"context"  yaml:"context""`
 	Name           string         `mapstructure:"name"`
 }
 
@@ -35,13 +35,8 @@ type UserDetails struct {
 }
 
 type User struct {
-	UserDetails `mapstructure:"userDetails"`
+	UserDetails `mapstructure:"user" yaml:"user"`
 	Name        string      `mapstructure:"name"`
-
-	// BUGBUG: Cannot get the nested struct (UserDetails) to
-	// viper.Unmarshall (it comes back empty), putting password here
-	// temporarily
-	//Password string `mapstructure:"password-temp"`
 }
 
 type Sqlconfig struct {

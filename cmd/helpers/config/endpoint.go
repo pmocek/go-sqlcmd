@@ -26,22 +26,26 @@ func EndpointNameExists(name string) (exists bool) {
 	return
 }
 
-func FindUniqueEndpointName(contextName string) (uniqueEndpointName string) {
-	var postfixNumber = 1
+func FindUniqueEndpointName(name string) (uniqueEndpointName string) {
+	if !EndpointNameExists(name) {
+		uniqueEndpointName = name
+	} else {
+		var postfixNumber = 2
 
-	for {
-		uniqueEndpointName = fmt.Sprintf(
-			"%v%v",
-			contextName,
-			strconv.Itoa(postfixNumber),
-		)
-		if !EndpointNameExists(uniqueEndpointName) {
-			break
-		} else {
-			postfixNumber++
-		}
-		if postfixNumber == 5000 {
-			panic("Did not find an available endpoint name")
+		for {
+			uniqueEndpointName = fmt.Sprintf(
+				"%v%v",
+				name,
+				strconv.Itoa(postfixNumber),
+			)
+			if !EndpointNameExists(uniqueEndpointName) {
+				break
+			} else {
+				postfixNumber++
+			}
+			if postfixNumber == 5000 {
+				panic("Did not find an available endpoint name")
+			}
 		}
 	}
 

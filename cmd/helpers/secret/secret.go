@@ -16,14 +16,6 @@ func init() {
 	rand.Seed(time.Now().Unix())
 }
 
-func Initialize(handler errorHandlerService) {
-	if handler == nil {
-		panic("Please provide an error handler")
-	}
-
-	errorHandlerCallback = handler
-}
-
 func Decrypt(ciperText string) (secret string) {
 
 	// Show password encrypted (so it can be used in other tools)
