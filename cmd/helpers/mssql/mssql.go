@@ -8,40 +8,9 @@ import (
 	"strconv"
 )
 
-// TODO: Copy and Paste below, refactor
-
-// Built-in scripting variables
-const (
-	SQLCMDHEADERS           = "SQLCMDHEADERS"
-	SQLCMDCOLWIDTH          = "SQLCMDCOLWIDTH"
-	SQLCMDMAXVARTYPEWIDTH   = "SQLCMDMAXVARTYPEWIDTH"
-	SQLCMDMAXFIXEDTYPEWIDTH = "SQLCMDMAXFIXEDTYPEWIDTH"
-)
-
-// defaultVariables defines variables that cannot be removed from the map, only reset
-// to their default values.
-var defaultVariables = sqlcmd.Variables{
-	SQLCMDCOLWIDTH:          "0",
-	SQLCMDHEADERS:           "0",
-	SQLCMDMAXFIXEDTYPEWIDTH: "0",
-	SQLCMDMAXVARTYPEWIDTH:   "256",
-}
-
-// InitializeVariables initializes variables with default values.
-// When fromEnvironment is true, then loads from the runtime environment
-func InitializeVariables(fromEnvironment bool) *sqlcmd.Variables {
-	variables := sqlcmd.Variables{
-		SQLCMDCOLWIDTH:          defaultVariables[SQLCMDCOLWIDTH],
-		SQLCMDHEADERS:           defaultVariables[SQLCMDHEADERS],
-		SQLCMDMAXFIXEDTYPEWIDTH: defaultVariables[SQLCMDMAXFIXEDTYPEWIDTH],
-		SQLCMDMAXVARTYPEWIDTH:   defaultVariables[SQLCMDMAXVARTYPEWIDTH],
-	}
-
-	return &variables
-}
-
 func Connect(endpoint sqlconfig.Endpoint, user sqlconfig.User) *sqlcmd.Sqlcmd {
-	v := InitializeVariables(false)
+	// BUG(stuartpa): Check what the value of fromEnvironment should be here
+	v := sqlcmd.InitializeVariables(false)
 	s := sqlcmd.New(nil, "", v)
 	connect := sqlcmd.ConnectSettings{}
 	connect.ServerName = endpoint.EndpointDetails.Address + "," +

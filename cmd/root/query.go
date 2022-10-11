@@ -4,18 +4,21 @@
 package root
 
 import (
+	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/mssql"
 	. "github.com/spf13/cobra"
 )
 
-type Query struct {}
+type Query struct {
+	AbstractBase
+}
 
 func (c *Query) GetCommand() (command *Command) {
 	const short = "Run a query against the current context"
 
 	command = &Command{
-		Use:   "query TEXT",
+		Use:   "query COMMAND_TEXT",
 		Short: short,
 		Long: short,
 		Example: `Run a query

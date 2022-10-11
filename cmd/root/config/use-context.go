@@ -4,13 +4,14 @@
 package config
 
 import (
+	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	. "github.com/spf13/cobra"
 )
 
 type UseContext struct {
-	command Command
+	AbstractBase
 }
 
 func (c *UseContext) GetCommand() (*Command) {
@@ -34,7 +35,7 @@ func (c *UseContext) GetCommand() (*Command) {
 		}
 	}
 
-	c.command = Command{
+	c.Command = &Command{
 		Use:   use,
 		Short: short,
 		Long: long,
@@ -44,5 +45,5 @@ func (c *UseContext) GetCommand() (*Command) {
 		Aliases: []string{"use", "change-context"},
 		Run: run}
 
-	return &c.command
+	return c.Command
 }

@@ -4,13 +4,14 @@
 package config
 
 import (
+	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	. "github.com/spf13/cobra"
 )
 
 type CurrentContext struct {
-	command Command
+	AbstractBase
 }
 
 func (c *CurrentContext) GetCommand() *Command {
@@ -24,12 +25,12 @@ func (c *CurrentContext) GetCommand() *Command {
 		output.Info(config.GetCurrentContextName())
 	}
 
-	c.command = Command{
+	c.Command = &Command{
 		Use:   use,
 		Short: short,
 		Long: long,
 		Example: example,
 		Run: run}
 
-	return &c.command
+	return c.Command
 }

@@ -2,6 +2,7 @@ package install
 
 import (
 	"fmt"
+	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/docker"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/mssql"
@@ -15,6 +16,8 @@ import (
 )
 
 type Mssql struct {
+	AbstractBase
+
 	command Command
 	installType string
 	acceptEula bool
@@ -202,7 +205,7 @@ CHECK_POLICY=OFF`
 @loginame = N'%s',
 @rolename = N'sysadmin'`
 
-	// TODO: These can be a single call to query as array of strings
+	// BUG(stuartpa): Error checking needs to be added
 	mssql.Query(s, []string{
 		fmt.Sprintf(createLogin, userName, password, defaultDatabase)})
 

@@ -5,20 +5,22 @@ package root
 
 import (
 	"fmt"
-
+	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	. "github.com/spf13/cobra"
 )
 
-type Bulkcopy struct {}
+type Bulk struct {
+	AbstractBase
+}
 
-func (c *Bulkcopy) GetCommand() (command *Command) {
-
+func (c *Bulk) GetCommand() (command *Command) {
+	const short = "Bulk import or export data"
 	command = &Command{
-		Use:   "bulkcopy",
-		Short: "Bulk import or export data",
-		Long:  `TODO.`,
+		Use:   "bulk",
+		Short: short,
+		Long:  short,
 		Run: func(cmd *Command, args []string) {
-			fmt.Println("bulkcopy called")
+			fmt.Println("bulk called")
 		},
 	}
 

@@ -6,4 +6,5 @@ import (
 
 type Commander interface {
 	GetCommand() *Command
+	AddSubCommands()
 }

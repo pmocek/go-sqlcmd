@@ -4,16 +4,17 @@
 package config
 
 import (
+	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	. "github.com/spf13/cobra"
 )
 
 type GetUsers struct {
-	command Command
+	AbstractBase
 }
 
-func (c *GetUsers) GetCommand() (*Command) {
+func (c *GetUsers) GetCommand() *Command {
 	const use = "get-users [USER_NAME]"
 	const short = "Display one or many users from the sqlconfig file."
 	const long = short
@@ -41,7 +42,7 @@ func (c *GetUsers) GetCommand() (*Command) {
 		}
 	}
 
-	c.command = Command{
+	c.Command = &Command{
 		Use:   use,
 		Short: short,
 		Long: long,
@@ -49,5 +50,5 @@ func (c *GetUsers) GetCommand() (*Command) {
 		Args: MaximumNArgs(1),
 		Run: run}
 
-	return &c.command
+	return c.Command
 }

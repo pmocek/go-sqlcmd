@@ -4,28 +4,25 @@
 package root
 
 import (
-	"github.com/microsoft/go-sqlcmd/cmd/commander"
-	"github.com/microsoft/go-sqlcmd/cmd/root/config"
+	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	. "github.com/spf13/cobra"
 )
 
 type Config struct {
-	commander.Commander
+	AbstractBase
 }
 
-func (c *Config) GetCommand() (command *Command) {
+func (c *Config) GetCommand() *Command {
 	const short = "Modify sqlconfig files using subcommands like \"sqlcmd config use-context sa@sql1\""
 
-	command = &Command{
+	c.Command = &Command{
 		Use:   "config",
 		Short: short,
 		Long: short,
 		Args: ExactArgs(1),
 	}
 
-	for _, subCommand := range config.Commands {
-		command.AddCommand(subCommand.GetCommand())
-	}
+	c.AddSubCommands()
 
-	return
+	return c.Command
 }

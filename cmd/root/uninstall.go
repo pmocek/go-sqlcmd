@@ -4,14 +4,16 @@
 package root
 
 import (
+	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/docker"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/mssql"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	. "github.com/spf13/cobra"
 )
 
-type Uninstall struct {}
+type Uninstall struct {
+	AbstractBase
+}
 
 func (c *Uninstall) GetCommand() (command *Command) {
 	const short = "Uninstall/Delete the current context"
@@ -31,13 +33,12 @@ func runUninstall(cmd *Command, args []string) {
 	if currentContextEndPointExists() {
 		controller := docker.NewController()
 		id := config.GetContainerId()
-		endpoint, user := config.GetCurrentContext()
+		endpoint, _ := config.GetCurrentContext()
 
 		// Verify there are no user databases
 		//
-		s := mssql.Connect(endpoint, user)
-
-		mssql.Query(s, []string{"SELECT count(database_id) from sys.databases where database_id > 4"})
+		// s := mssql.Connect(endpoint, user)
+		// mssql.Query(s, []string{"SELECT count(database_id) from sys.databases where database_id > 4"})
 
 		output.Infof(
 			"Stopping %s",

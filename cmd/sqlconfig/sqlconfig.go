@@ -14,8 +14,8 @@ type DockerDetails struct {
 }
 
 type Endpoint struct {
-	DockerDetails   `mapstructure:"docker"  yaml:"docker""`
-	EndpointDetails `mapstructure:"endpoint"  yaml:"endpoint""`
+	DockerDetails   `mapstructure:"docker" yaml:"docker""`
+	EndpointDetails `mapstructure:"endpoint" yaml:"endpoint""`
 	Name            string          `mapstructure:"name"`
 }
 
@@ -25,7 +25,7 @@ type ContextDetails struct {
 }
 
 type Context struct {
-	ContextDetails `mapstructure:"context"  yaml:"context""`
+	ContextDetails `mapstructure:"context" yaml:"context""`
 	Name           string         `mapstructure:"name"`
 }
 

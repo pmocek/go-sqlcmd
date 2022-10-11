@@ -3,8 +3,6 @@
 
 package cmd
 
-import . "github.com/spf13/cobra"
-
 type GlobalOptionsType struct {
 	TrustServerCertificate bool
 	DatabaseName           string
@@ -23,26 +21,46 @@ type GlobalOptionsType struct {
 
 var GlobalOptions = &GlobalOptionsType{}
 
-func addGlobalOptions(command *Command) {
-	command.PersistentFlags().BoolVarP(
+func addGlobalFlags() {
+	rootCmd.PersistentFlags().BoolVarP(
 		&GlobalOptions.TrustServerCertificate,
 		"trust-server-certificate",
 		"C",
 		false,
 		"Whether to trust the certificate presented by the endpoint for encryption",
 	)
-	command.PersistentFlags().StringVarP(
+	rootCmd.PersistentFlags().StringVarP(
 		&GlobalOptions.DatabaseName,
 		"database-name",
 		"d",
 		"",
 		"The initial database for the connection",
 	)
-	command.PersistentFlags().BoolVarP(
+	rootCmd.PersistentFlags().BoolVarP(
 		&GlobalOptions.UseTrustedConnection,
 		"use-trusted-connection",
 		"E",
 		false,
 		"Whether to use integrated security",
+	)
+
+	rootCmd.PersistentFlags().StringP(
+		"output",
+		"o",
+		"yaml",
+		"output type (text, json or yaml)",
+	)
+
+	rootCmd.PersistentFlags().String(
+		"sqlconfig",
+		"",
+		"config file (default is ~/.sqlcmd/sqlconfig).",
+	)
+
+	rootCmd.PersistentFlags().IntP(
+		"verbosity",
+		"v",
+		2,
+		"Logging verbosity. error = 0, warn = 1, info = 2, debug = 3, trace = 4",
 	)
 }

@@ -106,6 +106,12 @@ func (c *Controller) ContainerStop(id string) (err error) {
 	return
 }
 
+func (c *Controller) ContainerExists(id string) (exists bool) {
+	// TODO
+		exists = false
+	return
+}
+
 func (c *Controller) ContainerRemove(id string) (err error) {
 	options := types.ContainerRemoveOptions{
 		RemoveVolumes: false,

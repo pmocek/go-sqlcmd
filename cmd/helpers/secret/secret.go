@@ -26,7 +26,7 @@ func Decrypt(ciperText string) (secret string) {
 		secret, err = dpapi.Decrypt(string(password))
 		checkErr(err)
 	} else {
-		// TODO: MacOS (keychain) and Linux (not sure?)
+		// BUG(stuartpa): MacOS (keychain) and Linux (not sure?)
 		decoded, err := base64.StdEncoding.DecodeString(ciperText)
 		checkErr(err)
 
@@ -42,7 +42,7 @@ func Encrypt(plainText string) (cyperText string) {
 		cyperText, err = dpapi.Encrypt(plainText)
 		checkErr(err)
 	} else {
-		// TODO: MacOS (keychain) and Linux (not sure?)
+		// BUG(stuartpa): MacOS (keychain) and Linux (not sure?)
 		cyperText = plainText
 	}
 

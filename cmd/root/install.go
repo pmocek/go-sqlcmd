@@ -4,11 +4,13 @@
 package root
 
 import (
+	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/root/install"
 	. "github.com/spf13/cobra"
 )
 
 type Install struct {
+	AbstractBase
 }
 
 func (c *Install) GetCommand() (command *Command) {
@@ -27,7 +29,7 @@ func (c *Install) GetCommand() (command *Command) {
   		Aliases: []string{"create"},
 	}
 
-	// TODO: Push into base class
+	// BUG(stuartpa): DRY out, push into a base
 	for _, subCommand := range install.Commands {
 		command.AddCommand(subCommand.GetCommand())
 	}

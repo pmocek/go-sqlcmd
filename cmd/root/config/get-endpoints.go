@@ -4,13 +4,14 @@
 package config
 
 import (
+	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	. "github.com/spf13/cobra"
 )
 
 type GetEndpoints struct {
-	command Command
+	AbstractBase
 }
 
 func (c *GetEndpoints) GetCommand() (*Command) {
@@ -41,7 +42,7 @@ func (c *GetEndpoints) GetCommand() (*Command) {
 		}
 	}
 
-	c.command = Command{
+	c.Command = &Command{
 		Use:   use,
 		Short: short,
 		Long: long,
@@ -49,5 +50,5 @@ func (c *GetEndpoints) GetCommand() (*Command) {
 		Args: MaximumNArgs(1),
 		Run: run}
 
-	return &c.command
+	return c.Command
 }
