@@ -13,9 +13,9 @@ type Bulk struct {
 	AbstractBase
 }
 
-func (c *Bulk) GetCommand() (command *Command) {
+func (c *Bulk) GetCommand() *Command {
 	const short = "Bulk import or export data"
-	command = &Command{
+	c.Command = &Command{
 		Use:   "bulk",
 		Short: short,
 		Long:  short,
@@ -24,7 +24,7 @@ func (c *Bulk) GetCommand() (command *Command) {
 		},
 	}
 
-	return
+	return c.Command
 }
 
 type BcpArguments struct {

@@ -14,10 +14,10 @@ type Query struct {
 	AbstractBase
 }
 
-func (c *Query) GetCommand() (command *Command) {
+func (c *Query) GetCommand() *Command {
 	const short = "Run a query against the current context"
 
-	command = &Command{
+	c.Command = &Command{
 		Use:   "query COMMAND_TEXT",
 		Short: short,
 		Long: short,
@@ -28,12 +28,12 @@ func (c *Query) GetCommand() (command *Command) {
 		Run: runQuery,
 	}
 
-	return
+	return c.Command
 }
 
 func runQuery(cmd *Command, args []string) {
 	endpoint, user := config.GetCurrentContext()
 
 	s := mssql.Connect(endpoint, user)
-	mssql.Query(s, args)
+	mssql.Query(s, args[0])
 }

@@ -18,11 +18,11 @@ func configureViper(configFile string) {
 		configFile = filepath.Join(home, ".sqlcmd", "sqlconfig")
 	}
 
+	file.CreateEmptyIfNotExists(configFile)
+
 	viper.SetConfigType("yaml")
 	viper.SetEnvPrefix("SQLCMD")
 	viper.SetConfigFile(configFile)
-
-	file.CreateEmptyIfNotExists(configFile)
 }
 
 func load() {

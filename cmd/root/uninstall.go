@@ -4,41 +4,93 @@
 package root
 
 import (
+	"fmt"
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/docker"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	. "github.com/spf13/cobra"
+	"path/filepath"
+	"strings"
 )
 
 type Uninstall struct {
 	AbstractBase
+
+	force bool
+	yes bool
 }
 
-func (c *Uninstall) GetCommand() (command *Command) {
+// systemDatabases are the list of non-user databases, used to do a safety check
+// when doing a delete/drop/uninstall
+var systemDatabases = [...]string{
+	"/var/opt/mssql/data/msdbdata.mdf",
+	"/var/opt/mssql/data/tempdb.mdf",
+	"/var/opt/mssql/data/model.mdf",
+	"/var/opt/mssql/data/model_msdbdata.mdf",
+	"/var/opt/mssql/data/model_replicatedmaster.mdf",
+	"/var/opt/mssql/data/master.mdf",
+}
+
+func (c *Uninstall) GetCommand() *Command {
 	const short = "Uninstall/Delete the current context"
-	command = &Command{
+
+	c.Command = &Command{
 		Use:   "uninstall",
 		Short: short,
 		Long:  short,
+		Example: `# Uninstall/Delete the current context (includes the endpoint and user)
+  sqlcmd uninstall
+
+# Uninstall/Delete the current context, no user prompt
+  sqlcmd uninstall --yes
+
+# Uninstall/Delete the current context, no user prompt and override safety check for user databases
+  sqlcmd uninstall --yes --force`,
 		Args: MaximumNArgs(0),
 		Aliases: []string{"delete", "drop"},
-		Run: runUninstall,
+		Run: c.run,
 	}
 
-	return
+	c.Command.PersistentFlags().BoolVar(
+		&c.yes,
+		"yes",
+		false,
+		"Quiet mode (do not stop for user input to confirm the operation)",
+	)
+
+	c.Command.PersistentFlags().BoolVar(
+		&c.force,
+		"force",
+		false,
+		"Complete the operation even if non-system (user) database files are present",
+	)
+
+	return c.Command
 }
 
-func runUninstall(cmd *Command, args []string) {
+func (c *Uninstall) run(cmd *Command, args []string) {
 	if currentContextEndPointExists() {
 		controller := docker.NewController()
 		id := config.GetContainerId()
 		endpoint, _ := config.GetCurrentContext()
 
-		// Verify there are no user databases
-		//
-		// s := mssql.Connect(endpoint, user)
-		// mssql.Query(s, []string{"SELECT count(database_id) from sys.databases where database_id > 4"})
+		var input string
+		if !c.yes {
+			output.Infof(
+				"Current context is '%s'. Do you want to continue? (Y/N)",
+				config.GetCurrentContextName(),
+			)
+			fmt.Scanln(&input)
+
+			if strings.ToLower(input) != "yes" && strings.ToLower(input) != "y" {
+				output.Fatal("Operation cancelled.")
+			}
+		}
+		if !c.force {
+			output.Infof("Verifying no user (non-system) database (.mdf) files")
+			userDatabaseSafetyCheck(controller, id)
+		}
 
 		output.Infof(
 			"Stopping %s",
@@ -52,10 +104,34 @@ func runUninstall(cmd *Command, args []string) {
 		config.Save()
 
 		newContextName := config.GetCurrentContextName()
-		if  newContextName != "" {
+		if newContextName != "" {
 			output.Infof("Current context is now %s", newContextName)
 		} else {
 			output.Info("Operation completed successfully")
+		}
+	}
+}
+
+func userDatabaseSafetyCheck(controller *docker.Controller, id string) {
+	files := controller.ContainerFiles(id, "*.mdf")
+	for _, databaseFile := range files {
+		if strings.HasSuffix(databaseFile, ".mdf") {
+			isSystemDatabase := false
+			for _, systemDatabase := range systemDatabases {
+				if databaseFile == systemDatabase {
+					isSystemDatabase = true
+					break
+				}
+			}
+
+			if !isSystemDatabase {
+				output.FatalfWithHints([]string{
+					fmt.Sprintf(
+						"If the database is mounted, run `sqlcmd query \"use master; DROP DATABASE [%s]\"`",
+						strings.TrimSuffix(filepath.Base(databaseFile), ".mdf")),
+					"Pass in the flag --force to override this safety check for user (non-system) databases"},
+					"Unable to continue, a user (non-system) database (%s) is present", databaseFile)
+			}
 		}
 	}
 }

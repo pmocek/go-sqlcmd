@@ -2,13 +2,17 @@ package docker
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	"io"
+	"io/ioutil"
 	"strconv"
 	"strings"
 )
@@ -106,9 +110,58 @@ func (c *Controller) ContainerStop(id string) (err error) {
 	return
 }
 
+func (c *Controller) ContainerFiles(id string, filespec string) (files []string) {
+	cmd := []string{"find", "/" , "-iname", filespec}
+	response, err := c.cli.ContainerExecCreate(context.Background(), id, types.ExecConfig{
+		AttachStderr: false,
+		AttachStdout: true,
+		Cmd:          cmd,
+	})
+
+	checkErr(err)
+	r, err := c.cli.ContainerExecAttach(context.Background(), response.ID, types.ExecStartCheck{})
+	checkErr(err)
+	defer r.Close()
+
+	// read the output
+	var outBuf, errBuf bytes.Buffer
+	outputDone := make(chan error)
+
+	go func() {
+		// StdCopy demultiplexes the stream into two buffers
+		_, err = stdcopy.StdCopy(&outBuf, &errBuf, r.Reader)
+		outputDone <- err
+	}()
+
+	select {
+	case err := <-outputDone:
+		checkErr(err)
+		break
+	case <-context.Background().Done():
+		checkErr(context.Background().Err())
+		break
+	}
+	stdout, err := ioutil.ReadAll(&outBuf)
+	checkErr(err)
+
+	return strings.Split(string(stdout), "\n")
+}
+
 func (c *Controller) ContainerExists(id string) (exists bool) {
-	// TODO
-		exists = false
+	filters := filters.NewArgs()
+	filters.Add(
+		"id", id,
+	)
+	resp, err := c.cli.ContainerList(context.Background(), types.ContainerListOptions{Filters: filters})
+	checkErr(err)
+	if len(resp) > 0 {
+		output.Struct(resp)
+		containerStatus := strings.Split(resp[0].Status, " ")
+		status := containerStatus[0]
+		output.Struct(status)
+		exists = true
+	}
+
 	return
 }
 

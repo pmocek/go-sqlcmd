@@ -5,7 +5,6 @@ package root
 
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	"github.com/microsoft/go-sqlcmd/cmd/root/install"
 	. "github.com/spf13/cobra"
 )
 
@@ -13,10 +12,10 @@ type Install struct {
 	AbstractBase
 }
 
-func (c *Install) GetCommand() (command *Command) {
+func (c *Install) GetCommand() *Command {
 	const use = "install"
 	const short = "Install/Create #SQLFamliy and Tools"
-	command = &Command{
+	c.Command = &Command{
 		Use:   use,
 		Short: short,
 		Long:  short,
@@ -29,10 +28,7 @@ func (c *Install) GetCommand() (command *Command) {
   		Aliases: []string{"create"},
 	}
 
-	// BUG(stuartpa): DRY out, push into a base
-	for _, subCommand := range install.Commands {
-		command.AddCommand(subCommand.GetCommand())
-	}
+	c.AddSubCommands()
 
-	return
+	return c.Command
 }

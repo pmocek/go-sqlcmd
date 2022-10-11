@@ -7,8 +7,15 @@ import (
 )
 
 func CreateEmptyIfNotExists(filename string) {
+	if filename == "" {
+		panic("filename must not be empty")
+	}
+
+	d, _ := filepath.Split(filename)
+	if !Exists(d) {
+		folder.MkdirAll(d)
+	}
 	if !Exists(filename) {
-		folder.MkdirAll(filepath.Base(filename))
 		handle, err := os.Create(filename)
 		checkErr(err)
 		defer handle.Close()
@@ -16,6 +23,10 @@ func CreateEmptyIfNotExists(filename string) {
 }
 
 func Exists(filename string) (exists bool) {
+	if filename == "" {
+		panic("filename must not be empty")
+	}
+
 	if _, err := os.Stat(filename); err == nil {
 		return true
 	} else if os.IsNotExist(err) {

@@ -18,7 +18,6 @@ import (
 type Mssql struct {
 	AbstractBase
 
-	command Command
 	installType string
 	acceptEula bool
 	contextName string
@@ -38,7 +37,7 @@ func (c *Mssql) GetCommand() *Command {
 # Install SQL Server in a container and specify a context-name
   sqlcmd install mssql --type --context-name my-server`
 
-	c.command = Command{
+	c.Command = &Command{
 		Use:   use,
 		Short: short,
 		Long: long,
@@ -46,7 +45,7 @@ func (c *Mssql) GetCommand() *Command {
 		Args: MaximumNArgs(0),
 		Run: c.run}
 
-	c.command.PersistentFlags().StringVarP(
+	c.Command.PersistentFlags().StringVarP(
 		&c.installType,
 		"type",
 		"t",
@@ -54,7 +53,7 @@ func (c *Mssql) GetCommand() *Command {
 		"Member of #SQLFamily to install (server, edge)",
 	)
 
-	c.command.PersistentFlags().StringVarP(
+	c.Command.PersistentFlags().StringVarP(
 		&c.contextName,
 		"context-name",
 		"c",
@@ -62,7 +61,7 @@ func (c *Mssql) GetCommand() *Command {
 		"Context name (a default context name will be created if not provided)",
 	)
 
-	c.command.PersistentFlags().StringVarP(
+	c.Command.PersistentFlags().StringVarP(
 		&c.defaultDatabase,
 		"user-database",
 		"u",
@@ -70,14 +69,14 @@ func (c *Mssql) GetCommand() *Command {
 		"Create a user database and set it as the default for the user login",
 	)
 
-	c.command.PersistentFlags().BoolVar(
+	c.Command.PersistentFlags().BoolVar(
 		&c.acceptEula,
 		"accept-eula",
 		false,
 		"Accept the SQL Server EULA",
 	)
 
-	return &c.command
+	return c.Command
 }
 
 func (c *Mssql) run(cmd *Command, args []string) {
@@ -124,7 +123,7 @@ func (c *Mssql) installDockerImage(imageName string, contextName string) {
 			err,
 			[]string{
 				"Is docker installed on this machine?  If not, download from: https://docs.docker.com/get-docker/",
-			"Is docker running.  Try `docker ps` (list containers), does it return without error?",
+			"Is docker running. Try `docker ps` (list containers), does it return without error?",
 			fmt.Sprintf("If `docker ps` works, try `docker pull %s`", imageName)},
 			"Unable to download image %s", imageName)
 	}
@@ -155,14 +154,13 @@ func (c *Mssql) installDockerImage(imageName string, contextName string) {
 		config.GetConfigFileUsed(),
 	)
 
-	// BUGBUG:"SQL Server is now ready for client connections", oh no it isn't!!
+	// BUG(stuartpa): SQL Server bug: "SQL Server is now ready for client connections", oh no it isn't!!
 	// Wait for "Server name is" instead!  Nope, that doesn't work on edge
-	// Wait for "The default lanugage" instead
+	// Wait for "The default language" instead
 	controller.ContainerWaitForLogEntry(
 		id, "The default language")
 
-	//time.Sleep(10 *time.Second)
-	output.Infof("Disabling 'sa' account, creating user '%s'", userName)
+	output.Infof("Rotating 'sa' password and disabling account, creating user '%s'", userName)
 	endpoint, _ := config.GetCurrentContext()
 	s := mssql.Connect(endpoint, sqlconfig.User{
 		UserDetails: sqlconfig.UserDetails{
@@ -192,8 +190,7 @@ func (c *Mssql) createNonSaUser(s *sqlcmd.Sqlcmd, userName string, password stri
 	if c.defaultDatabase != "" {
 		defaultDatabase = c.defaultDatabase
 		output.Infof("Creating default database [%s]", defaultDatabase)
-		mssql.Query(s,  []string{
-			fmt.Sprintf("CREATE DATABASE [%s]", defaultDatabase)})
+		mssql.Query(s, fmt.Sprintf("CREATE DATABASE [%s]", defaultDatabase))
 	}
 
 	const createLogin = `CREATE LOGIN [%s]
@@ -205,20 +202,18 @@ CHECK_POLICY=OFF`
 @loginame = N'%s',
 @rolename = N'sysadmin'`
 
-	// BUG(stuartpa): Error checking needs to be added
-	mssql.Query(s, []string{
-		fmt.Sprintf(createLogin, userName, password, defaultDatabase)})
-
-	mssql.Query(s, []string{
-		fmt.Sprintf(addSrvRoleMember, userName)})
-
-	mssql.Query(s, []string{"ALTER LOGIN [sa] DISABLE"})
+	mssql.Query(s, fmt.Sprintf(createLogin, userName, password, defaultDatabase))
+	mssql.Query(s, fmt.Sprintf(addSrvRoleMember, userName))
+	// Correct safety protocol is to rotate the sa password, because the first
+	// sa password has been in the docker environment (as SA_PASSWORD)
+	rotateSaPassword := secret.Generate(
+		100, 2, 2, 2)
+	mssql.Query(s, fmt.Sprintf("ALTER LOGIN [sa] WITH PASSWORD = '%s';", rotateSaPassword))
+	mssql.Query(s, "ALTER LOGIN [sa] DISABLE")
 
 	if c.defaultDatabase != "" {
-		mssql.Query(s, []string{fmt.Sprintf(
-			"ALTER AUTHORIZATION ON DATABASE::%s TO %s",
+		mssql.Query(s, fmt.Sprintf("ALTER AUTHORIZATION ON DATABASE::%s TO %s",
 			defaultDatabase,
-			userName)})
+			userName))
 	}
-
 }

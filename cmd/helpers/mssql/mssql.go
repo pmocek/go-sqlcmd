@@ -24,7 +24,15 @@ func Connect(endpoint sqlconfig.Endpoint, user sqlconfig.User) *sqlcmd.Sqlcmd {
 	return s
 }
 
-func Query(s *sqlcmd.Sqlcmd, args []string) {
+func Query(s *sqlcmd.Sqlcmd, text string) {
+	s.Query = text
+	s.Format = sqlcmd.NewSQLCmdDefaultFormatter(false)
+	s.SetOutput(os.Stdout)
+	s.Run(true, false)
+}
+
+
+func QueryScalar(s *sqlcmd.Sqlcmd, args []string) {
 	s.Query = args[0]
 	s.Format = sqlcmd.NewSQLCmdDefaultFormatter(false)
 	s.SetOutput(os.Stdout)

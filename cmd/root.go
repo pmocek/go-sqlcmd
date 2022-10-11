@@ -12,7 +12,7 @@ type Root struct {
 	AbstractBase
 }
 
-func (c *Root) GetCommand() (*Command) {
+func (c *Root) GetCommand() *Command {
 	const short = "sqlcmd: a command-line interface for the #SQLFamily."
 
 	c.Command = &Command{
