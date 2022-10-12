@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 //go:generate go-winres make --file-version=git-tag --product-version=git-tag
-package main
+package legacyMain
 
 import (
 	"fmt"
@@ -102,7 +102,11 @@ func (a SQLCmdArguments) authenticationMethod(hasPassword bool) string {
 	return a.AuthenticationMethod
 }
 
-func main() {
+//func main() {
+//	LegacyMode()
+//}
+
+func LegacyMode() {
 	ctx := kong.Parse(&args, kong.NoDefaultHelp())
 	if args.Help {
 		_ = ctx.PrintUsage(false)

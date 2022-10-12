@@ -139,11 +139,6 @@ func userDatabaseSafetyCheck(controller *docker.Controller, id string) {
 func currentContextEndPointExists() (exists bool) {
 	exists = true
 
-	if config.GetCurrentContextName() == "" {
-		output.FatalWithHints([]string{"To create a context use `sqlcmd install ...`, e.g. `sqlcmd install mssql`"},"No current context")
-		exists = false
-	}
-
 	if !config.EndpointsExists() {
 		output.Fatal("No endpoints to uninstall")
 		exists = false

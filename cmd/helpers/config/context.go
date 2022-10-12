@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 	"strconv"
 )
@@ -42,6 +43,14 @@ func FindUniqueContextName(name string, username string) (uniqueContextName stri
 func GetCurrentContextName() (name string) {
 	name = config.CurrentContext
 
+	return
+}
+
+func GetCurrentContextOrFatal() (currentContextName string) {
+	currentContextName = GetCurrentContextName()
+	if currentContextName == "" {
+		output.FatalWithHints([]string{"To create a context use `sqlcmd install`, e.g. `sqlcmd install mssql`"}, "No current context")
+	}
 	return
 }
 
@@ -104,7 +113,7 @@ func ContextExists(name string) (exists bool) {
 }
 
 func GetCurrentContext() (endpoint Endpoint, user User){
-	currentContextName := config.CurrentContext
+	currentContextName := GetCurrentContextOrFatal()
 
 	for _, c := range config.Contexts {
 		if c.Name == currentContextName {

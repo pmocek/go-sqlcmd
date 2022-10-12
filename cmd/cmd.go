@@ -9,6 +9,7 @@ import (
 )
 
 var rootCmd  *Command
+var loggingLevel int
 
 // init initializes the command-line interface
 func init() {
@@ -16,7 +17,6 @@ func init() {
 	rootCmd = r.GetCommand()
 
 	OnInitialize(initializeCobra)
-	addGlobalFlags()
 }
 
 // ExecuteCommandLine runs the application based on the command-line
@@ -31,7 +31,7 @@ func initializeCobra() {
 	checkErr(err)
 	outputType, err := rootCmd.Flags().GetString("output")
 	checkErr(err)
-	loggingLevel, err := rootCmd.Flags().GetInt("verbosity")
+	loggingLevel, err = rootCmd.Flags().GetInt("verbosity")
 	checkErr(err)
 
 	helpers.Initialize(
@@ -47,6 +47,11 @@ func initializeCobra() {
 // nil.  Pass (inject) checkErr into all dependencies (helpers etc.) as an
 // errorHandler
 func checkErr(err error) {
+	if loggingLevel > 2 {
+		if err != nil {
+			panic(err)
+		}
+	}
 	CheckErr(err)
 }
 
@@ -61,4 +66,20 @@ func displayHints(hints []string) {
 		}
 		output.Info()
 	}
+}
+
+func IsValidRootCommand(command string) (valid bool) {
+	for _, c := range root.Commands {
+		if command == c.GetCommand().Name() {
+			valid = true
+			break
+		}
+		for _, alias := range c.GetCommand().Aliases {
+			if alias == command {
+				valid = true
+				break
+			}
+		}
+	}
+	return
 }

@@ -7,4 +7,5 @@ import (
 type Commander interface {
 	GetCommand() *Command
 	AddSubCommands()
+	//Run(cmd *Command, args []string)
 }

@@ -112,14 +112,22 @@ func (c *Controller) ContainerStop(id string) (err error) {
 
 func (c *Controller) ContainerFiles(id string, filespec string) (files []string) {
 	cmd := []string{"find", "/" , "-iname", filespec}
-	response, err := c.cli.ContainerExecCreate(context.Background(), id, types.ExecConfig{
-		AttachStderr: false,
-		AttachStdout: true,
-		Cmd:          cmd,
-	})
+	response, err := c.cli.ContainerExecCreate(
+		context.Background(),
+		id,
+		types.ExecConfig{
+			AttachStderr: false,
+			AttachStdout: true,
+			Cmd:          cmd,
+		},
+	)
 
 	checkErr(err)
-	r, err := c.cli.ContainerExecAttach(context.Background(), response.ID, types.ExecStartCheck{})
+	r, err := c.cli.ContainerExecAttach(
+		context.Background(),
+		response.ID,
+		types.ExecStartCheck{},
+	)
 	checkErr(err)
 	defer r.Close()
 
@@ -152,7 +160,10 @@ func (c *Controller) ContainerExists(id string) (exists bool) {
 	filters.Add(
 		"id", id,
 	)
-	resp, err := c.cli.ContainerList(context.Background(), types.ContainerListOptions{Filters: filters})
+	resp, err := c.cli.ContainerList(
+		context.Background(),
+		types.ContainerListOptions{Filters: filters},
+	)
 	checkErr(err)
 	if len(resp) > 0 {
 		output.Struct(resp)

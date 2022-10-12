@@ -21,7 +21,8 @@ func (c *Query) GetCommand() *Command {
 		Use:   "query COMMAND_TEXT",
 		Short: short,
 		Long: short,
-		Example: `Run a query
+		Example: `
+Run a query
   # sqlcmd query "SELECT @@SERVERNAME"`,
 		ArgAliases: []string{"text"},
 		Args: ExactArgs(1),

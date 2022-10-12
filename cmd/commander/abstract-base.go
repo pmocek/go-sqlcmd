@@ -1,6 +1,6 @@
 package commander
 
-import 	. "github.com/spf13/cobra"
+import . "github.com/spf13/cobra"
 
 func (c *AbstractBase) GetCommand() *Command {
 	panic("Must implement")
@@ -14,4 +14,8 @@ func (c *AbstractBase) AddSubCommands() {
 			}
 		}
 	}
+}
+
+func (c *AbstractBase) Run(cmd *Command, args []string) {
+	panic("Must implement")
 }

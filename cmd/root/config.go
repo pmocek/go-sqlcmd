@@ -13,7 +13,7 @@ type Config struct {
 }
 
 func (c *Config) GetCommand() *Command {
-	const short = "Modify sqlconfig files using subcommands like \"sqlcmd config use-context sa@sql1\""
+	const short = "Modify sqlconfig files using subcommands like \"sqlcmd config use-context mssql\""
 
 	c.Command = &Command{
 		Use:   "config",
