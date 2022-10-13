@@ -17,7 +17,7 @@ type ConnectionStrings struct {
 	AbstractBase
 }
 
-func (c *ConnectionStrings) GetCommand() *Command {
+func (c *ConnectionStrings) GetCommand() (command *Command) {
 	const use = "connection-strings"
 	const short = "Display connections strings for the current context."
 	const long = short
@@ -27,16 +27,16 @@ func (c *ConnectionStrings) GetCommand() *Command {
 # Or
   sqlcmd config cs`
 
-	c.Command = &Command{
+	command = c.AddCommand(Command{
 		Use:   use,
 		Short: short,
 		Long: long,
 		Example: example,
 		Aliases: []string{"cs"},
 		Args: MaximumNArgs(1),
-		Run: c.Run}
+		Run: c.Run})
 
-	return c.Command
+	return
 }
 
 func (c *ConnectionStrings) Run(cmd *Command, args []string) {

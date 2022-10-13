@@ -33,45 +33,34 @@ type Base struct {
 }
 
 func (c *Base) addFlags(
-	use string,
-	short string,
-	long string,
-	example string,
+	command *Command,
 	repo string,
 	defaultContextName string,
 ) {
 	c.defaultContextName = defaultContextName
 
-	c.Command = &Command{
-		Use:     use,
-		Short:   short,
-		Long:    long,
-		Example: example,
-		Args:    MaximumNArgs(2),
-		Run:     c.run}
-
-	c.Command.PersistentFlags().StringVar(
+	command.PersistentFlags().StringVar(
 		&c.registry,
 		"registry",
 		"mcr.microsoft.com",
 		"Docker registry",
 	)
 
-	c.Command.PersistentFlags().StringVar(
+	command.PersistentFlags().StringVar(
 		&c.repo,
 		"repo",
 		repo,
 		"Registry repository",
 	)
 
-	c.Command.PersistentFlags().StringVar(
+	command.PersistentFlags().StringVar(
 		&c.tag,
 		"tag",
 		"latest",
 		"Use `sqlcmd install mssql get-tags` to see full list of options",
 	)
 
-	c.Command.PersistentFlags().StringVarP(
+	command.PersistentFlags().StringVarP(
 		&c.contextName,
 		"context-name",
 		"c",
@@ -79,7 +68,7 @@ func (c *Base) addFlags(
 		"Context name (a default context name will be created if not provided)",
 	)
 
-	c.Command.PersistentFlags().StringVarP(
+	command.PersistentFlags().StringVarP(
 		&c.defaultDatabase,
 		"user-database",
 		"u",
@@ -87,7 +76,7 @@ func (c *Base) addFlags(
 		"Create a user database and set it as the default for the user login",
 	)
 
-	c.Command.PersistentFlags().BoolVar(
+	command.PersistentFlags().BoolVar(
 		&c.acceptEula,
 		"accept-eula",
 		false,

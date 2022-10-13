@@ -13,18 +13,19 @@ type Bulk struct {
 	AbstractBase
 }
 
-func (c *Bulk) GetCommand() *Command {
+func (c *Bulk) GetCommand() (command *Command) {
 	const short = "Bulk import or export data"
-	c.Command = &Command{
+
+	command = c.AddCommand(Command{
 		Use:   "bulk",
 		Short: short,
 		Long:  short,
 		Run: func(cmd *Command, args []string) {
 			fmt.Println("bulk called")
 		},
-	}
+	})
 
-	return c.Command
+	return
 }
 
 type BcpArguments struct {

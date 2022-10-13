@@ -11,7 +11,7 @@ type Server struct {
 	Base
 }
 
-func (c *Server) GetCommand() *Command {
+func (c *Server) GetCommand() (command *Command) {
 	const repo = "mssql/server"
 
 	const use = "server"
@@ -20,8 +20,15 @@ func (c *Server) GetCommand() *Command {
 	const example = `# Install SQL Server in a docker container
   sqlcmd install mssql server`
 
-	c.addFlags(use, short, long, example, repo ,"mssql")
-	c.AddSubCommands()
+	command = c.AddCommand(Command{
+		Use:     use,
+		Short:   short,
+		Long:    long,
+		Example: example,
+		Args:    MaximumNArgs(2),
+		Run:     c.run})
 
-	return c.Command
+	c.addFlags(command, repo ,"mssql")
+
+	return
 }

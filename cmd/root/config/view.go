@@ -16,7 +16,7 @@ type View struct {
 	raw bool
 }
 
-func (c *View) GetCommand() *Command {
+func (c *View) GetCommand() (command *Command) {
 	const short = "Display merged sqlconfig settings or a specified sqlconfig file.."
 	const long = short
 	const example = `# Show merged sqlconfig settings
@@ -25,22 +25,22 @@ func (c *View) GetCommand() *Command {
   # Show merged sqlconfig settings and raw authentication data
   sqlcmd config view --raw`
 
-	c.Command = &Command{
+	command = c.AddCommand(Command{
 		Use:   "view",
 		Short: short,
 		Long: long,
 		Example: example,
 		Run: c.run,
-	}
+	})
 
-	c.Command.PersistentFlags().BoolVar(
+	command.PersistentFlags().BoolVar(
 		&c.raw,
 		"raw",
 		false,
 		"Display raw byte data",
 	)
 
-	return c.Command
+	return
 }
 
 func (c *View) run(cmd *Command, args []string) {

@@ -14,7 +14,7 @@ type GetEndpoints struct {
 	AbstractBase
 }
 
-func (c *GetEndpoints) GetCommand() (*Command) {
+func (c *GetEndpoints) GetCommand() (command *Command) {
 	const use = "get-endpoints [ENDPOINT_NAME]"
 	const short = "Display one or many endpoints from the sqlconfig file."
 	const long = short
@@ -42,13 +42,13 @@ func (c *GetEndpoints) GetCommand() (*Command) {
 		}
 	}
 
-	c.Command = &Command{
+	command = c.AddCommand(Command{
 		Use:   use,
 		Short: short,
 		Long: long,
 		Example: example,
 		Args: MaximumNArgs(1),
-		Run: run}
+		Run: run})
 
-	return c.Command
+	return
 }

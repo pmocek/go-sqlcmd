@@ -14,7 +14,7 @@ type UseContext struct {
 	AbstractBase
 }
 
-func (c *UseContext) GetCommand() (*Command) {
+func (c *UseContext) GetCommand() (command *Command) {
 	const use = "use-context CONTEXT_NAME"
 	const short = "Set the current-context in a sqlconfig file."
 	const long = short
@@ -35,7 +35,7 @@ func (c *UseContext) GetCommand() (*Command) {
 		}
 	}
 
-	c.Command = &Command{
+	command = c.AddCommand(Command{
 		Use:   use,
 		Short: short,
 		Long: long,
@@ -43,7 +43,7 @@ func (c *UseContext) GetCommand() (*Command) {
 		Args: ExactArgs(1),
 		ArgAliases: []string{"context_name"},
 		Aliases: []string{"use", "change-context"},
-		Run: run}
+		Run: run})
 
-	return c.Command
+	return
 }

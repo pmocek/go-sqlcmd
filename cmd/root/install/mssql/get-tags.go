@@ -16,23 +16,23 @@ type GetTags struct {
 	installType string
 }
 
-func (c *GetTags) GetCommand() *Command {
+func (c *GetTags) GetCommand() (command *Command) {
 	const use = "get-tags"
 	const short = "Get tags available for install."
 	const long = short
 	const example = `# List tags
 sqlcmd install get-tags`
 
-	c.Command = &Command{
+	command = c.AddCommand(Command{
 		Use:   use,
 		Short: short,
 		Long: long,
 		Example: example,
 		Aliases: []string{"lt"},
 		Args: MaximumNArgs(0),
-		Run: c.Run}
+		Run: c.Run})
 
-	c.Command.PersistentFlags().StringVarP(
+	command.PersistentFlags().StringVarP(
 		&c.installType,
 		"type",
 		"t",
@@ -40,7 +40,7 @@ sqlcmd install get-tags`
 		"server = SQL Server, edge = SQL Server Edge",
 	)
 
-	return c.Command
+	return
 }
 
 func (c *GetTags) Run(cmd *Command, args []string) {

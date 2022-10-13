@@ -12,23 +12,20 @@ type Install struct {
 	AbstractBase
 }
 
-func (c *Install) GetCommand() *Command {
-	const use = "install"
+func (c *Install) GetCommand() (command *Command) {
 	const short = "Install/Create #SQLFamliy and Tools"
-	c.Command = &Command{
-		Use:   use,
+
+	command = c.AddCommand(Command{
+		Use:   "install",
 		Short: short,
 		Long:  short,
+		Args: ExactArgs(1),
+		Aliases: []string{"create"},
 		Example: `# Install SQL Server in a docker container
   sqlcmd install mssql
 
 # Install SQL Server Edge in a docker container
-  sqlcmd install mssql --type edge`,
-		Args: ExactArgs(1),
-  		Aliases: []string{"create"},
-	}
+  sqlcmd install mssql --type edge`})
 
-	c.AddSubCommands()
-
-	return c.Command
+	return
 }

@@ -9,16 +9,19 @@ func (c *AbstractBase) GetCommand() *Command {
 	panic("Must implement")
 }
 
-func (c *AbstractBase) AddSubCommands() {
+func  (c *AbstractBase)  AddCommand(command Command) *Command {
+	c.command = &command
+	c.addSubCommands()
+
+	return c.command
+}
+
+func (c *AbstractBase) addSubCommands() {
 	if c.SubCommands != nil {
 		for _, sc := range c.SubCommands {
-			if c.Command != nil { // BUG(stuartpa): why would this be nil?
-				c.Command.AddCommand(sc.GetCommand())
+			if c.command != nil {
+				c.command.AddCommand(sc.GetCommand())
 			}
 		}
 	}
-}
-
-func (c *AbstractBase) Run(cmd *Command, args []string) {
-	panic("Must implement")
 }

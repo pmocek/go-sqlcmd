@@ -12,55 +12,36 @@ type Root struct {
 	AbstractBase
 }
 
-type GlobalOptionsType struct {
-	TrustServerCertificate bool
-	DatabaseName           string
-	UseTrustedConnection   bool
-	UserName               string
-	Endpoint               string
-	AuthenticationMethod   string
-	UseAad                 bool
-	PacketSize             int
-	LoginTimeout           int
-	WorkstationName        string
-	ApplicationIntent      string
-	Encrypt                string
-	DriverLogLevel         int
-}
-
-var GlobalOptions = &GlobalOptionsType{}
-
-func (c *Root) GetCommand() *Command {
+func (c *Root) GetCommand() (command *Command) {
 	const short = "sqlcmd: a command-line interface for the #SQLFamily."
 
-	c.Command = &Command{
-		Use:   appName,
+	command = c.AddCommand(Command{
+		Use:appName,
 		Short: short,
 		Long: short,
-	}
+	})
 
-	c.addGlobalFlags()
-	c.AddSubCommands()
+	c.addGlobalFlags(command)
 
-	return c.Command
+	return
 }
 
-func (c *Root) addGlobalFlags() {
-	c.Command.PersistentFlags().BoolVarP(
+func (c *Root) addGlobalFlags(command *Command) {
+	command.PersistentFlags().BoolVarP(
 		&GlobalOptions.TrustServerCertificate,
 		"trust-server-certificate",
 		"C",
 		false,
 		"Whether to trust the certificate presented by the endpoint for encryption",
 	)
-	c.Command.PersistentFlags().StringVarP(
+	command.PersistentFlags().StringVarP(
 		&GlobalOptions.DatabaseName,
 		"database-name",
 		"d",
 		"",
 		"The initial database for the connection",
 	)
-	c.Command.PersistentFlags().BoolVarP(
+	command.PersistentFlags().BoolVarP(
 		&GlobalOptions.UseTrustedConnection,
 		"use-trusted-connection",
 		"E",
@@ -68,20 +49,20 @@ func (c *Root) addGlobalFlags() {
 		"Whether to use integrated security",
 	)
 
-	c.Command.PersistentFlags().String(
+	command.PersistentFlags().String(
 		"sqlconfig",
 		"",
 		"config file (default is ~/.sqlcmd/sqlconfig).",
 	)
 
-	c.Command.PersistentFlags().StringP(
+	command.PersistentFlags().StringP(
 		"output",
 		"o",
 		"yaml",
 		"output type (text, json or yaml)",
 	)
 
-	c.Command.PersistentFlags().IntP(
+	command.PersistentFlags().IntP(
 		"verbosity",
 		"v",
 		2,

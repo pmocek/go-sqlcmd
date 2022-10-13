@@ -1,7 +1,6 @@
 package secret
 
 import (
-	"encoding/base64"
 	"github.com/billgraziano/dpapi"
 )
 
@@ -15,10 +14,9 @@ func encrypt(plainText string) (cypherText string) {
 }
 
 func decrypt(cypherText string) (secret string) {
-	password, err := base64.StdEncoding.DecodeString(cypherText)
-	checkErr(err)
+	var err error
 
-	secret, err = dpapi.Decrypt(string(password))
+	secret, err = dpapi.Decrypt(cypherText)
 	checkErr(err)
 
 	return

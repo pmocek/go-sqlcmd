@@ -32,10 +32,10 @@ var systemDatabases = [...]string{
 	"/var/opt/mssql/data/master.mdf",
 }
 
-func (c *Uninstall) GetCommand() *Command {
+func (c *Uninstall) GetCommand() (command *Command) {
 	const short = "Uninstall/Delete the current context"
 
-	c.Command = &Command{
+	command = c.AddCommand(Command{
 		Use:   "uninstall",
 		Short: short,
 		Long:  short,
@@ -50,23 +50,23 @@ func (c *Uninstall) GetCommand() *Command {
 		Args: MaximumNArgs(0),
 		Aliases: []string{"delete", "drop"},
 		Run: c.run,
-	}
+	})
 
-	c.Command.PersistentFlags().BoolVar(
+	command.PersistentFlags().BoolVar(
 		&c.yes,
 		"yes",
 		false,
 		"Quiet mode (do not stop for user input to confirm the operation)",
 	)
 
-	c.Command.PersistentFlags().BoolVar(
+	command.PersistentFlags().BoolVar(
 		&c.force,
 		"force",
 		false,
 		"Complete the operation even if non-system (user) database files are present",
 	)
 
-	return c.Command
+	return
 }
 
 func (c *Uninstall) run(cmd *Command, args []string) {

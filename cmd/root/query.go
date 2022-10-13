@@ -16,10 +16,10 @@ type Query struct {
 	AbstractBase
 }
 
-func (c *Query) GetCommand() *Command {
+func (c *Query) GetCommand() (command *Command) {
 	const short = "Run a query against the current context"
 
-	c.Command = &Command{
+	command = c.AddCommand(Command{
 		Use:   "query COMMAND_TEXT",
 		Short: short,
 		Long: short,
@@ -29,9 +29,9 @@ Run a query
 		ArgAliases: []string{"text"},
 		//Args: ExactArgs(1),
 		Run: runQuery,
-	}
+	})
 
-	return c.Command
+	return
 }
 
 func runQuery(cmd *Command, args []string) {
