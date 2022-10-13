@@ -16,6 +16,7 @@ import (
 	. "github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
+	"runtime"
 )
 
 type Base struct {
@@ -149,8 +150,17 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 
 	previousContextName := config.GetCurrentContextName()
 
-	userName := os.Getenv("USERNAME")
-	password := secret.Generate(
+	var userName string
+	if runtime.GOOS == "windows" {
+		userName = os.Getenv("USERNAME")
+	} else {
+		userName = os.Getenv("USER")
+	}
+	if userName == "" {
+		panic("Unable to get username, set env var USERNAME or USER")
+	}
+
+		password := secret.Generate(
 		100, 10, 10, 10)
 	// Save the config now, so user can uninstall, even if mssql in the container
 	// fails to start
