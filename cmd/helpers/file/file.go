@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package file
 
 import (
@@ -6,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-func CreateEmptyIfNotExists(filename string) {
+func CreateEmptyFileIfNotExists(filename string) {
 	if filename == "" {
 		panic("filename must not be empty")
 	}

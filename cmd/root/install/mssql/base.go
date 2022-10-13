@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package mssql
 
 import (
@@ -172,8 +175,8 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 			Username: "sa",
 			Password: secret.Encrypt(saPassword),
 		},
-		Name:        "sa",
-	})
+		Name: "sa",
+	}, nil)
 	c.createNonSaUser(s, userName, password)
 
 	hints := []string{"To run a query:    sqlcmd query \"SELECT @@version\""}

@@ -1,9 +1,18 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package folder
 
-func Initialize(handler func(err error)) {
-	if handler == nil {
-		panic("Please provide an error handler")
+func Initialize(
+	errorHandler func(err error),
+	traceHandler func(format string, a...any)) {
+	if errorHandler == nil {
+		panic("Please provide an errorHandler")
+	}
+	if traceHandler == nil {
+		panic("Please provide an traceHandler")
 	}
 
-	errorHandlerCallback = handler
+	errorCallback = errorHandler
+	traceCallback = traceHandler
 }

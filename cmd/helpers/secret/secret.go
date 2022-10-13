@@ -16,6 +16,20 @@ func init() {
 	rand.Seed(time.Now().Unix())
 }
 
+func Encrypt(plainText string) (cyperText string) {
+	var err error
+
+	if runtime.GOOS == "windows" {
+		cyperText, err = dpapi.Encrypt(plainText)
+		checkErr(err)
+	} else {
+		// BUG(stuartpa): MacOS (keychain) and Linux (not sure?)
+		cyperText = plainText
+	}
+
+	return base64.StdEncoding.EncodeToString([]byte(cyperText))
+}
+
 func Decrypt(ciperText string) (secret string) {
 
 	// Show password encrypted (so it can be used in other tools)
@@ -35,19 +49,6 @@ func Decrypt(ciperText string) (secret string) {
 	return
 }
 
-func Encrypt(plainText string) (cyperText string) {
-	var err error
-
-	if runtime.GOOS == "windows" {
-		cyperText, err = dpapi.Encrypt(plainText)
-		checkErr(err)
-	} else {
-		// BUG(stuartpa): MacOS (keychain) and Linux (not sure?)
-		cyperText = plainText
-	}
-
-	return base64.StdEncoding.EncodeToString([]byte(cyperText))
-}
 
 // https://golangbyexample.com/generate-random-password-golang/
 var (

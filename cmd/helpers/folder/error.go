@@ -1,11 +1,10 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package folder
 
-var errorHandlerCallback  func(err error)
+var errorCallback func(err error)
 
 func checkErr(err error) {
-	if errorHandlerCallback == nil {
-		panic("errorHandlerCallback not initialized")
-	}
-
-	errorHandlerCallback(err)
+	errorCallback(err)
 }

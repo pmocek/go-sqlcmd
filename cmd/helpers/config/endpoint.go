@@ -1,8 +1,10 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package config
 
 import (
 	"fmt"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/net"
 	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 	"strconv"
 )
@@ -91,7 +93,7 @@ func FindFreePortForTds() (portNumber int) {
 
 		if foundFreePortNumber == true {
 			// Check this port is actually available on the local machine
-			if net.IsLocalPortAvailable(portNumber) {
+			if isLocalPortAvailableCallback(portNumber) {
 				break
 			} else {
 				foundFreePortNumber = false

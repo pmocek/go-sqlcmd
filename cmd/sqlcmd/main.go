@@ -171,7 +171,6 @@ func setVars(vars *sqlcmd.Variables, args *SQLCmdArguments) {
 	for v := range args.Variables {
 		vars.Set(v, args.Variables[v])
 	}
-
 }
 
 func setConnect(connect *sqlcmd.ConnectSettings, args *SQLCmdArguments, vars *sqlcmd.Variables) {

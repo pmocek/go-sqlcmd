@@ -1,8 +1,11 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package config
 
 import (
+	"errors"
 	"fmt"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 	"strconv"
 )
@@ -49,7 +52,7 @@ func GetCurrentContextName() (name string) {
 func GetCurrentContextOrFatal() (currentContextName string) {
 	currentContextName = GetCurrentContextName()
 	if currentContextName == "" {
-		output.FatalWithHints([]string{"To create a context use `sqlcmd install`, e.g. `sqlcmd install mssql`"}, "No current context")
+		checkErr(errors.New("No current context. To create a context use `sqlcmd install`, e.g. `sqlcmd install mssql`"))
 	}
 	return
 }

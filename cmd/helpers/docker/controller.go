@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package docker
 
 import (
@@ -10,7 +13,6 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	"io"
 	"io/ioutil"
 	"strconv"
@@ -33,14 +35,14 @@ func NewController() (c *Controller) {
 func (c *Controller) EnsureImage(image string) (err error){
 	var reader io.ReadCloser
 
-	output.Tracef("Running ImagePull for image %s", image)
+	trace("Running ImagePull for image %s", image)
 	reader, err = c.cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
 	if reader != nil {
 		defer reader.Close()
 
 		scanner := bufio.NewScanner(reader)
 		for scanner.Scan() {
-			output.Trace(scanner.Text())
+			trace(scanner.Text())
 		}
 	}
 
@@ -98,7 +100,7 @@ func (c *Controller) ContainerWaitForLogEntry(id string, text string) {
 
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
-		output.Tracef("ERRORLOG: " + scanner.Text())
+		trace("ERRORLOG: " + scanner.Text())
 		if strings.Contains(scanner.Text(), text) {
 			break
 		}
@@ -166,10 +168,10 @@ func (c *Controller) ContainerExists(id string) (exists bool) {
 	)
 	checkErr(err)
 	if len(resp) > 0 {
-		output.Struct(resp)
+		trace("%v", resp)
 		containerStatus := strings.Split(resp[0].Status, " ")
 		status := containerStatus[0]
-		output.Struct(status)
+		trace("%v", status)
 		exists = true
 	}
 

@@ -7,6 +7,8 @@ import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/mssql"
+	"github.com/microsoft/go-sqlcmd/pkg/console"
+	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
 	. "github.com/spf13/cobra"
 )
 
@@ -25,7 +27,7 @@ func (c *Query) GetCommand() *Command {
 Run a query
   # sqlcmd query "SELECT @@SERVERNAME"`,
 		ArgAliases: []string{"text"},
-		Args: ExactArgs(1),
+		//Args: ExactArgs(1),
 		Run: runQuery,
 	}
 
@@ -35,6 +37,16 @@ Run a query
 func runQuery(cmd *Command, args []string) {
 	endpoint, user := config.GetCurrentContext()
 
-	s := mssql.Connect(endpoint, user)
-	mssql.Query(s, args[0])
+	var line sqlcmd.Console = nil
+	if len(args) == 0 {
+		line = console.NewConsole("")
+		defer line.Close()
+	}
+	s := mssql.Connect(endpoint, user, line)
+	if len(args) == 0 {
+		err := s.Run(false, false)
+		CheckErr(err)
+	} else {
+		mssql.Query(s, args[0])
+	}
 }

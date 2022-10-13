@@ -3,12 +3,8 @@
 
 package docker
 
-var errorHandlerCallback  func(err error)
+var errorCallback func(err error)
 
 func checkErr(err error) {
-	if errorHandlerCallback == nil {
-		panic("errorHandlerCallback not initialized")
-	}
-
-	errorHandlerCallback(err)
+	errorCallback(err)
 }

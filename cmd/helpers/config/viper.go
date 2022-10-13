@@ -1,9 +1,13 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package config
 
 import (
 	"bytes"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/file"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
+	//"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
+
+	//"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -18,7 +22,7 @@ func configureViper(configFile string) {
 		configFile = filepath.Join(home, ".sqlcmd", "sqlconfig")
 	}
 
-	file.CreateEmptyIfNotExists(configFile)
+	createEmptyFileIfNotExistsCallback(configFile)
 
 	viper.SetConfigType("yaml")
 	viper.SetEnvPrefix("SQLCMD")
@@ -36,7 +40,7 @@ func load() {
 	err = viper.Unmarshal(&config)
 	checkErr(err)
 
-	output.Tracef("Config loaded from file: %v", viper.ConfigFileUsed())
+	trace("Config loaded from file: %v", viper.ConfigFileUsed())
 }
 
 func Save() {
@@ -44,7 +48,7 @@ func Save() {
 	checkErr(err)
 	err = viper.ReadConfig(bytes.NewReader(b))
 	checkErr(err)
-	file.CreateEmptyIfNotExists(viper.ConfigFileUsed())
+	createEmptyFileIfNotExistsCallback(viper.ConfigFileUsed())
 	err = viper.WriteConfig()
 	checkErr(err)
 }
