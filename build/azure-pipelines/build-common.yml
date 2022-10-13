@@ -20,7 +20,7 @@ steps:
     command: 'custom'
     customCommand: 'install'
     arguments: 'github.com/tc-hib/go-winres@latest'
-    workingDirectory: '$(Build.SourcesDirectory)'
+    workingDirectory: '$(Build.SourcesDirectory)/cmd/sqlcmd'
   env:
       GOBIN: $(Build.SourcesDirectory)
 
@@ -28,14 +28,14 @@ steps:
   displayName: 'generate version resource'
   inputs:
     script: $(Build.SourcesDirectory)/go-winres make --file-version git-tag --product-version git-tag
-    workingDirectory: '$(Build.SourcesDirectory)'
+    workingDirectory: '$(Build.SourcesDirectory)/cmd/sqlcmd'
 
 - task: Go@0
   displayName: 'Go: get dependencies'
   inputs:
     command: 'get'
     arguments: '-d'
-    workingDirectory: '$(Build.SourcesDirectory)'
+    workingDirectory: '$(Build.SourcesDirectory)/cmd/sqlcmd'
   env:
       GOOS: ${{ parameters.OS }}
       GOARCH: ${{ parameters.Arch }}
@@ -46,7 +46,7 @@ steps:
   inputs:
     command: 'build'
     arguments: '-o $(Build.BinariesDirectory)'
-    workingDirectory: '$(Build.SourcesDirectory)'
+    workingDirectory: '$(Build.SourcesDirectory)/cmd/sqlcmd'
   env:
       GOOS: ${{ parameters.OS }}
       GOARCH: ${{ parameters.Arch }}
