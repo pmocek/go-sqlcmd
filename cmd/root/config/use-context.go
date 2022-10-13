@@ -28,22 +28,22 @@ func (c *UseContext) GetCommand() (command *Command) {
 			output.InfofWithHints([]string{
 				"To run a query:    sqlcmd query \"SELECT @@SERVERNAME\"",
 				"To remove:         sqlcmd uninstall"},
-			"Switched to context \"%v\".", name)
+				"Switched to context \"%v\".", name)
 		} else {
 			output.FatalfWithHints([]string{"To view available contexts run `sqlcmd config get-contexts`"},
-			"No context exists with the name: \"%v\"", name)
+				"No context exists with the name: \"%v\"", name)
 		}
 	}
 
 	command = c.AddCommand(Command{
-		Use:   use,
-		Short: short,
-		Long: long,
-		Example: example,
-		Args: ExactArgs(1),
+		Use:        use,
+		Short:      short,
+		Long:       long,
+		Example:    example,
+		Args:       ExactArgs(1),
 		ArgAliases: []string{"context_name"},
-		Aliases: []string{"use", "change-context"},
-		Run: run})
+		Aliases:    []string{"use", "change-context"},
+		Run:        run})
 
 	return
 }

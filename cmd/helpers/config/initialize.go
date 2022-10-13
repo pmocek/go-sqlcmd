@@ -10,8 +10,8 @@ var createEmptyFileIfNotExistsCallback func(filename string)
 
 func Initialize(
 	errorHandler func(err error),
-	traceHandler func(format string, a...any),
-	encryptHandler func(plainText string)(cypherText string),
+	traceHandler func(format string, a ...any),
+	encryptHandler func(plainText string) (cypherText string),
 	decryptHandler func(cipherText string) (secret string),
 	isLocalPortAvailableCallbackHandler func(port int) (portAvailable bool),
 	createEmptyFileIfNotExistsHandler func(filename string),

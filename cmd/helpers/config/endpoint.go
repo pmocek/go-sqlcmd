@@ -70,13 +70,6 @@ func GetContainerId() (containerId string) {
 	panic("ContainerId not found")
 }
 
-func GetContainerShortId() (containerId string) {
-	containerId =  GetContainerId()
-	containerId = containerId[len(containerId)-12:]
-
-	return
-}
-
 func FindFreePortForTds() (portNumber int) {
 	const startingPortNumber = 1433
 

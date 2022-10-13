@@ -13,7 +13,7 @@ type Json struct {
 }
 
 func (f *Json) Serialize(in interface{}) {
-	bytes, err := json.MarshalIndent(in,"", "    ")
+	bytes, err := json.MarshalIndent(in, "", "    ")
 	f.Base.CheckErr(err)
 	fmt.Println(string(bytes))
 	_, err = fmt.Println(string(bytes))

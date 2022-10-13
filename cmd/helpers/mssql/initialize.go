@@ -7,7 +7,7 @@ var decryptCallback func(cipherText string) (secret string)
 
 func Initialize(
 	errorHandler func(err error),
-	traceHandler func(format string, a...any),
+	traceHandler func(format string, a ...any),
 	decryptHandler func(cipherText string) (secret string)) {
 	if errorHandler == nil {
 		panic("Please provide an errorHandler")

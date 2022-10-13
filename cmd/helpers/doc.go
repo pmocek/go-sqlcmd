@@ -50,4 +50,4 @@ Do and Do Not:
        encryptHandler func(plainText string)(cypherText string),
        decryptHandler func(cipherText string) (secret string),
 
- */
+*/

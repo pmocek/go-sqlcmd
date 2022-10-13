@@ -9,7 +9,7 @@ func (c *AbstractBase) GetCommand() *Command {
 	panic("Must implement")
 }
 
-func  (c *AbstractBase)  AddCommand(command Command) *Command {
+func (c *AbstractBase) AddCommand(command Command) *Command {
 	c.command = &command
 	c.addSubCommands()
 

@@ -16,7 +16,7 @@ import (
 // postfix, starting at 2
 func FindUniqueContextName(name string, username string) (uniqueContextName string) {
 	if !ContextExists(name) &&
-		!UserNameExists(username + "@" + name) {
+		!UserNameExists(username+"@"+name) {
 		uniqueContextName = name
 	} else {
 		var postfixNumber = 2
@@ -52,7 +52,7 @@ func GetCurrentContextName() (name string) {
 func GetCurrentContextOrFatal() (currentContextName string) {
 	currentContextName = GetCurrentContextName()
 	if currentContextName == "" {
-		checkErr(errors.New("No current context. To create a context use `sqlcmd install`, e.g. `sqlcmd install mssql`"))
+		checkErr(errors.New("no current context. To create a context use `sqlcmd install`, e.g. `sqlcmd install mssql`"))
 	}
 	return
 }
@@ -115,7 +115,7 @@ func ContextExists(name string) (exists bool) {
 	return
 }
 
-func GetCurrentContext() (endpoint Endpoint, user User){
+func GetCurrentContext() (endpoint Endpoint, user User) {
 	currentContextName := GetCurrentContextOrFatal()
 
 	for _, c := range config.Contexts {

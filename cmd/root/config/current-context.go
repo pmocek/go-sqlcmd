@@ -26,11 +26,11 @@ func (c *CurrentContext) GetCommand() (command *Command) {
 	}
 
 	command = c.AddCommand(Command{
-		Use:   use,
-		Short: short,
-		Long: long,
+		Use:     use,
+		Short:   short,
+		Long:    long,
 		Example: example,
-		Run: run})
+		Run:     run})
 
 	return
 }

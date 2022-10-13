@@ -24,13 +24,13 @@ func (c *GetTags) GetCommand() (command *Command) {
 sqlcmd install get-tags`
 
 	command = c.AddCommand(Command{
-		Use:   use,
-		Short: short,
-		Long: long,
+		Use:     use,
+		Short:   short,
+		Long:    long,
 		Example: example,
 		Aliases: []string{"lt"},
-		Args: MaximumNArgs(0),
-		Run: c.Run})
+		Args:    MaximumNArgs(0),
+		Run:     c.Run})
 
 	command.PersistentFlags().StringVarP(
 		&c.installType,
@@ -43,7 +43,7 @@ sqlcmd install get-tags`
 	return
 }
 
-func (c *GetTags) Run(cmd *Command, args []string) {
+func (c *GetTags) Run(*Command, []string) {
 	var path string
 
 	switch c.installType {
@@ -52,7 +52,7 @@ func (c *GetTags) Run(cmd *Command, args []string) {
 	case "edge":
 		path = "azure-sql-edge"
 	default:
-		output.Fatal( "Unrecognized type, please specify 'server' or 'edge'")
+		output.Fatal("Unrecognized type, please specify 'server' or 'edge'")
 	}
 	tags := docker.ListTags(path)
 	output.Struct(tags)

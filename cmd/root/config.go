@@ -18,8 +18,8 @@ func (c *Config) GetCommand() (command *Command) {
 	command = c.AddCommand(Command{
 		Use:   "config",
 		Short: short,
-		Long: short,
-		Args: ExactArgs(1),
+		Long:  short,
+		Args:  ExactArgs(1),
 	})
 
 	return

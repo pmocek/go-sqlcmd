@@ -13,7 +13,7 @@ type Xml struct {
 }
 
 func (f *Xml) Serialize(in interface{}) {
-	bytes, err := xml.MarshalIndent(in,"", "    ")
+	bytes, err := xml.MarshalIndent(in, "", "    ")
 	f.Base.CheckErr(err)
 	_, err = fmt.Println(string(bytes))
 	f.Base.CheckErr(err)

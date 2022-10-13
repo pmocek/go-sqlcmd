@@ -43,12 +43,12 @@ func (c *GetUsers) GetCommand() (command *Command) {
 	}
 
 	command = c.AddCommand(Command{
-		Use:   use,
-		Short: short,
-		Long: long,
+		Use:     use,
+		Short:   short,
+		Long:    long,
 		Example: example,
-		Args: MaximumNArgs(1),
-		Run: run})
+		Args:    MaximumNArgs(1),
+		Run:     run})
 
 	return
 }

@@ -22,11 +22,11 @@ import (
 type Base struct {
 	AbstractBase
 
-	tag string
-	registry string
-	repo string
-	acceptEula bool
-	contextName string
+	tag             string
+	registry        string
+	repo            string
+	acceptEula      bool
+	contextName     string
 	defaultDatabase string
 
 	defaultContextName string
@@ -84,10 +84,10 @@ func (c *Base) addFlags(
 	)
 }
 
-func (c *Base) run(cmd *Command, args []string) {
+func (c *Base) run(*Command, []string) {
 	var imageName string
 
-	if !c.acceptEula && viper.GetString("ACCEPT_EULA") == ""  {
+	if !c.acceptEula && viper.GetString("ACCEPT_EULA") == "" {
 		output.FatalWithHints(
 			[]string{"Either, add the --accept-eula flag to the command-line",
 				"Or, set the environment variable SQLCMD_ACCEPT_EULA=YES "},
@@ -113,7 +113,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 
 	env := []string{"ACCEPT_EULA=Y", fmt.Sprintf("SA_PASSWORD=%s", saPassword)}
 	port := config.FindFreePortForTds()
-	controller  := docker.NewController()
+	controller := docker.NewController()
 	output.Infof("Downloading %v", imageName)
 	err := controller.EnsureImage(imageName)
 	if err != nil {
@@ -132,7 +132,8 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		// Remove the container, because we haven't persisted to config yet, so
 		// uninstall won't work yet
 		if id != "" {
-			controller.ContainerRemove(id)
+			err := controller.ContainerRemove(id)
+			output.FatalErr(err)
 		}
 		output.FatalErr(err)
 	}
@@ -149,7 +150,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		panic("Unable to get username, set env var USERNAME or USER")
 	}
 
-		password := secret.Generate(
+	password := secret.Generate(
 		100, 10, 10, 10)
 	// Save the config now, so user can uninstall, even if mssql in the container
 	// fails to start
@@ -178,12 +179,14 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	}, nil)
 	c.createNonSaUser(s, userName, password)
 
-	hints := []string{"To run a query:    sqlcmd query \"SELECT @@version\""}
+	hints := []string{
+		"To run a query:               sqlcmd query \"SELECT @@version\"",
+		"To start interactive session: select query"}
 	if previousContextName != "" {
 		hints = append(hints, "To change context: sqlcmd config use-context "+previousContextName)
 	}
-	hints = append(hints, "To view config:    sqlcmd config view")
-	hints = append(hints, "To remove:         sqlcmd uninstall")
+	hints = append(hints, "To view config:               sqlcmd config view")
+	hints = append(hints, "To remove:                    sqlcmd uninstall")
 
 	output.InfofWithHints(hints,
 		"Now ready for client connections on port %d",

@@ -11,7 +11,7 @@
 	output.Fatal("Bye.")
 	// Calls panic() after logging
 	output.Panic("I'm bailing.")
- */
+*/
 
 package output
 
@@ -22,7 +22,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var  formatter Formatter
+var formatter Formatter
 var loggingLevel verbosity.Enum
 
 func Struct(in interface{}) {
@@ -33,7 +33,7 @@ func Struct(in interface{}) {
 	formatter.Serialize(in)
 }
 
-func Tracef(format string, a...any) {
+func Tracef(format string, a ...any) {
 	if loggingLevel >= verbosity.Trace {
 		format = ensureEol(format)
 		_, err := fmt.Printf("TRACE: ")
@@ -50,7 +50,7 @@ func ensureEol(format string) string {
 	return format
 }
 
-func Trace(a...any) {
+func Trace(a ...any) {
 	if loggingLevel >= verbosity.Trace {
 		_, err := fmt.Printf("TRACE: ")
 		checkErr(err)
@@ -59,7 +59,7 @@ func Trace(a...any) {
 	}
 }
 
-func Debugf(format string, a...any) {
+func Debugf(format string, a ...any) {
 	if loggingLevel >= verbosity.Debug {
 		format = ensureEol(format)
 		_, err := fmt.Printf("DEBUG: ")
@@ -69,7 +69,7 @@ func Debugf(format string, a...any) {
 	}
 }
 
-func Debug(a...any) {
+func Debug(a ...any) {
 	if loggingLevel >= verbosity.Debug {
 		_, err := fmt.Printf("DEBUG: ")
 		checkErr(err)
@@ -78,15 +78,15 @@ func Debug(a...any) {
 	}
 }
 
-func Infof(format string, a...any) {
+func Infof(format string, a ...any) {
 	infofWithHints([]string{}, format, a...)
 }
 
-func InfofWithHints(hints []string , format string, a...any) {
+func InfofWithHints(hints []string, format string, a ...any) {
 	infofWithHints(hints, format, a...)
 }
 
-func infofWithHints(hints []string, format string, a...any) {
+func infofWithHints(hints []string, format string, a ...any) {
 	if loggingLevel >= verbosity.Info {
 		format = ensureEol(format)
 		if loggingLevel >= verbosity.Debug {
@@ -99,7 +99,7 @@ func infofWithHints(hints []string, format string, a...any) {
 	}
 }
 
-func Info(a...any) {
+func Info(a ...any) {
 	if loggingLevel >= verbosity.Info {
 		if loggingLevel >= verbosity.Debug {
 			_, err := fmt.Printf("INFO:  ")
@@ -110,7 +110,7 @@ func Info(a...any) {
 	}
 }
 
-func Warnf(format string, a...any) {
+func Warnf(format string, a ...any) {
 	if loggingLevel >= verbosity.Warn {
 		format = ensureEol(format)
 		if loggingLevel >= verbosity.Debug {
@@ -122,7 +122,7 @@ func Warnf(format string, a...any) {
 	}
 }
 
-func Warn(a...any) {
+func Warn(a ...any) {
 	if loggingLevel >= verbosity.Warn {
 		if loggingLevel >= verbosity.Debug {
 			_, err := fmt.Printf("WARN:  ")
@@ -133,7 +133,7 @@ func Warn(a...any) {
 	}
 }
 
-func Errorf(format string, a...any) {
+func Errorf(format string, a ...any) {
 	if loggingLevel >= verbosity.Error {
 		format = ensureEol(format)
 		if loggingLevel >= verbosity.Debug {
@@ -145,7 +145,7 @@ func Errorf(format string, a...any) {
 	}
 }
 
-func Error(a...any) {
+func Error(a ...any) {
 	if loggingLevel >= verbosity.Error {
 		if loggingLevel >= verbosity.Debug {
 			_, err := fmt.Printf("ERROR:  ")
@@ -156,21 +156,21 @@ func Error(a...any) {
 	}
 }
 
-func Fatal(a...any) {
+func Fatal(a ...any) {
 	fatal([]string{}, a...)
 }
 
-func FatalWithHints(hints []string, a...any) {
+func FatalWithHints(hints []string, a ...any) {
 	fatal(hints, a...)
 }
 
-func fatal(hints []string, a...any) {
+func fatal(hints []string, a ...any) {
 	err := errors.New(fmt.Sprintf("%v", a...))
 	displayHints(hints)
 	checkErr(err)
 }
 
-func Fatalf(format string, a...any) {
+func Fatalf(format string, a ...any) {
 	fatalf([]string{}, format, a...)
 }
 
@@ -178,25 +178,25 @@ func FatalErr(err error) {
 	checkErr(err)
 }
 
-func FatalfWithHints(hints []string, format string, a...any) {
+func FatalfWithHints(hints []string, format string, a ...any) {
 	fatalf(hints, format, a...)
 }
 
-func FatalfErrorWithHints(err error, hints []string, format string, a...any) {
+func FatalfErrorWithHints(err error, hints []string, format string, a ...any) {
 	fatalf(hints, format, a...)
 	checkErr(err)
 }
 
-func fatalf(hints []string, format string, a...any) {
+func fatalf(hints []string, format string, a ...any) {
 	err := errors.New(fmt.Sprintf(format, a...))
 	displayHints(hints)
 	checkErr(err)
 }
 
-func Panicf(format string, a...any) {
+func Panicf(format string, a ...any) {
 	panic(fmt.Sprintf(format, a...))
 }
 
-func Panic(a...any) {
+func Panic(a ...any) {
 	panic(a)
 }

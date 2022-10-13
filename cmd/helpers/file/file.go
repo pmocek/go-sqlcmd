@@ -16,12 +16,17 @@ func CreateEmptyFileIfNotExists(filename string) {
 
 	d, _ := filepath.Split(filename)
 	if !Exists(d) {
+		trace("Folder %v does not exist, creating", d)
 		folder.MkdirAll(d)
 	}
 	if !Exists(filename) {
+		trace("File %v does not exist, creating empty 0 byte file", filename)
 		handle, err := os.Create(filename)
 		checkErr(err)
-		defer handle.Close()
+		defer func() {
+			err := handle.Close()
+			checkErr(err)
+		}()
 	}
 }
 

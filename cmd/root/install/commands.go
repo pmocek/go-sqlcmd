@@ -9,6 +9,5 @@ import (
 )
 
 var Commands = []Commander{
-	&Mssql{AbstractBase: AbstractBase{SubCommands: mssql.Commands},
-	},
+	&Mssql{AbstractBase: AbstractBase{SubCommands: mssql.Commands}},
 }

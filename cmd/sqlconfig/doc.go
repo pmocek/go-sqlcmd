@@ -55,4 +55,4 @@ The password is also base64 encoded.
 To view the decrypted and (base64) decoded passwords run
 
 	sqlcmd config view --raw
- */
+*/

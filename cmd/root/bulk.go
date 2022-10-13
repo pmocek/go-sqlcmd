@@ -29,27 +29,27 @@ func (c *Bulk) GetCommand() (command *Command) {
 }
 
 type BcpArguments struct {
-	SchemaObjectName     string
-	QueryText            string
-	BatchSize            int
-	ErrorFile            string
-	FormatFile           string
-	FirstRow             int64
-	Hints                string
-	InputFile            string
-	LastRow              int64
-	MaxErrors            int
-	OutputFile           string
-	RowTerminator        string
-	FieldTerminator      string
-	CodePage             string
-	CharacterMode        bool
-	ImportIdentity       bool
-	KeepNulls            bool
-	NativeMode           bool
-	UnicodeNativeMode    bool
-	QuotedIdentifiersOn  bool
-	ReportVersion        bool
-	TypesVersion         string
-	UnicodeMode          bool
+	SchemaObjectName    string
+	QueryText           string
+	BatchSize           int
+	ErrorFile           string
+	FormatFile          string
+	FirstRow            int64
+	Hints               string
+	InputFile           string
+	LastRow             int64
+	MaxErrors           int
+	OutputFile          string
+	RowTerminator       string
+	FieldTerminator     string
+	CodePage            string
+	CharacterMode       bool
+	ImportIdentity      bool
+	KeepNulls           bool
+	NativeMode          bool
+	UnicodeNativeMode   bool
+	QuotedIdentifiersOn bool
+	ReportVersion       bool
+	TypesVersion        string
+	UnicodeMode         bool
 }

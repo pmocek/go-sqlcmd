@@ -22,7 +22,7 @@ func (c *Query) GetCommand() (command *Command) {
 	command = c.AddCommand(Command{
 		Use:   "query COMMAND_TEXT",
 		Short: short,
-		Long: short,
+		Long:  short,
 		Example: `
 Run a query
   # sqlcmd query "SELECT @@SERVERNAME"`,

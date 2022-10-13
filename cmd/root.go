@@ -16,9 +16,9 @@ func (c *Root) GetCommand() (command *Command) {
 	const short = "sqlcmd: a command-line interface for the #SQLFamily."
 
 	command = c.AddCommand(Command{
-		Use:appName,
+		Use:   appName,
 		Short: short,
-		Long: short,
+		Long:  short,
 	})
 
 	c.addGlobalFlags(command)

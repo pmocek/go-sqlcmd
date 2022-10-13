@@ -28,7 +28,7 @@ func (c *Server) GetCommand() (command *Command) {
 		Args:    MaximumNArgs(2),
 		Run:     c.run})
 
-	c.addFlags(command, repo ,"mssql")
+	c.addFlags(command, repo, "mssql")
 
 	return
 }

@@ -8,9 +8,9 @@ type Base struct {
 }
 
 func (f *Base) CheckErr(err error) {
-		if f.ErrorHandlerCallback == nil {
-			panic("errorHandlerCallback not initialized")
-		}
+	if f.ErrorHandlerCallback == nil {
+		panic("errorHandlerCallback not initialized")
+	}
 
-		f.ErrorHandlerCallback(err)
+	f.ErrorHandlerCallback(err)
 }

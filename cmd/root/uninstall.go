@@ -18,7 +18,7 @@ type Uninstall struct {
 	AbstractBase
 
 	force bool
-	yes bool
+	yes   bool
 }
 
 // systemDatabases are the list of non-user databases, used to do a safety check
@@ -47,9 +47,9 @@ func (c *Uninstall) GetCommand() (command *Command) {
 
 # Uninstall/Delete the current context, no user prompt and override safety check for user databases
   sqlcmd uninstall --yes --force`,
-		Args: MaximumNArgs(0),
+		Args:    MaximumNArgs(0),
 		Aliases: []string{"delete", "drop"},
-		Run: c.run,
+		Run:     c.run,
 	})
 
 	command.PersistentFlags().BoolVar(
@@ -69,7 +69,7 @@ func (c *Uninstall) GetCommand() (command *Command) {
 	return
 }
 
-func (c *Uninstall) run(cmd *Command, args []string) {
+func (c *Uninstall) run(*Command, []string) {
 	if currentContextEndPointExists() {
 		controller := docker.NewController()
 		id := config.GetContainerId()
@@ -81,7 +81,8 @@ func (c *Uninstall) run(cmd *Command, args []string) {
 				"Current context is '%s'. Do you want to continue? (Y/N)",
 				config.GetCurrentContextName(),
 			)
-			fmt.Scanln(&input)
+			_, err := fmt.Scanln(&input)
+			CheckErr(err)
 
 			if strings.ToLower(input) != "yes" && strings.ToLower(input) != "y" {
 				output.Fatal("Operation cancelled.")
@@ -96,10 +97,13 @@ func (c *Uninstall) run(cmd *Command, args []string) {
 			"Stopping %s",
 			endpoint.DockerDetails.Image,
 		)
-		controller.ContainerStop(id)
+		err := controller.ContainerStop(id)
+		CheckErr(err)
 
 		output.Infof("Removing context %s", config.GetCurrentContextName())
-		controller.ContainerRemove(id)
+		err = controller.ContainerRemove(id)
+		CheckErr(err)
+
 		config.RemoveCurrentContext()
 		config.Save()
 

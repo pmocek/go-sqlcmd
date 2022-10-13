@@ -26,11 +26,11 @@ func (c *View) GetCommand() (command *Command) {
   sqlcmd config view --raw`
 
 	command = c.AddCommand(Command{
-		Use:   "view",
-		Short: short,
-		Long: long,
+		Use:     "view",
+		Short:   short,
+		Long:    long,
 		Example: example,
-		Run: c.run,
+		Run:     c.run,
 	})
 
 	command.PersistentFlags().BoolVar(
@@ -43,7 +43,7 @@ func (c *View) GetCommand() (command *Command) {
 	return
 }
 
-func (c *View) run(cmd *Command, args []string) {
+func (c *View) run(*Command, []string) {
 	config := config.GetRedactedConfig(c.raw)
 	output.Struct(config)
 }

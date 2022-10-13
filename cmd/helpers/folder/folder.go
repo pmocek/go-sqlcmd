@@ -12,6 +12,7 @@ func MkdirAll(folder string) {
 		panic("folder must not be empty")
 	}
 	if _, err := os.Stat(folder); os.IsNotExist(err) {
+		trace("Folder %v does not exist, creating", folder)
 		err := os.MkdirAll(folder, os.ModePerm)
 		checkErr(err)
 	}

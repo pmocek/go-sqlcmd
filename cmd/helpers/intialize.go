@@ -24,7 +24,7 @@ func Initialize(
 ) {
 	file.Initialize(errorHandler, output.Tracef)
 	folder.Initialize(errorHandler, output.Tracef)
-	mssql.Initialize(errorHandler, output.Tracef, secret.Decrypt,)
+	mssql.Initialize(errorHandler, output.Tracef, secret.Decrypt)
 	output.Initialize(
 		errorHandler,
 		output.Tracef,

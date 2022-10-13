@@ -35,29 +35,29 @@ func Update(
 
 	contextName = FindUniqueContextName(contextName, username)
 	endPointName := FindUniqueEndpointName(contextName)
-	userName := username + "@" + contextName // This is the name of the user config entry, not the mssql user 'sa'
+	userName := username + "@" + contextName
 
 	config.ApiVersion = "v1"
 	config.Kind = "Config"
-	config.CurrentContext =  contextName
+	config.CurrentContext = contextName
 
 	config.Endpoints = append(config.Endpoints, Endpoint{
-		DockerDetails:   DockerDetails{
+		DockerDetails: DockerDetails{
 			ContainerId: id,
-			Image: imageName},
+			Image:       imageName},
 		EndpointDetails: EndpointDetails{
 			Address: "localhost",
 			Port:    portNumber,
 		},
-		Name:            endPointName,
+		Name: endPointName,
 	})
 
 	config.Contexts = append(config.Contexts, Context{
 		ContextDetails: ContextDetails{
 			Endpoint: endPointName,
-			User:    username + "@" + contextName,
+			User:     username + "@" + contextName,
 		},
-		Name:           contextName,
+		Name: contextName,
 	})
 
 	config.Users = append(config.Users, User{
@@ -65,7 +65,7 @@ func Update(
 			Username: username,
 			Password: encryptCallback(password),
 		},
-		Name:        userName,
+		Name: userName,
 	})
 
 	Save()

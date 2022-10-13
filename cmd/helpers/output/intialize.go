@@ -11,7 +11,7 @@ import (
 
 func Initialize(
 	errorHandler func(err error),
-	traceHandler func(format string, a...any),
+	traceHandler func(format string, a ...any),
 	hintHandler func(hints []string),
 	format string,
 	verbosity verbosity.Enum,
@@ -31,13 +31,15 @@ func Initialize(
 	hintCallback = hintHandler
 	loggingLevel = verbosity
 
+	trace("Initializing output as '%v'", format)
+
 	switch format {
 	case "json":
-		formatter = &Json{Base{errorHandler}}
+		formatter = &Json{Base: Base{ErrorHandlerCallback: errorHandler}}
 	case "yaml":
-		formatter = &Yaml{Base{errorHandler}}
+		formatter = &Yaml{Base: Base{ErrorHandlerCallback: errorHandler}}
 	case "xml":
-		formatter = &Xml{Base{errorHandler}}
+		formatter = &Xml{Base: Base{ErrorHandlerCallback: errorHandler}}
 	default:
 		panic(fmt.Sprintf("Format '%v' not supported", format))
 	}

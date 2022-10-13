@@ -21,9 +21,10 @@ func Connect(endpoint sqlconfig.Endpoint, user sqlconfig.User, console sqlcmd.Co
 			endpoint.EndpointDetails.Address,
 			endpoint.EndpointDetails.Port),
 		UseTrustedConnection: false,
-		UserName: user.UserDetails.Username,
-		Password: decryptCallback(user.UserDetails.Password),
+		UserName:             user.UserDetails.Username,
+		Password:             decryptCallback(user.UserDetails.Password),
 	}
+	trace("Connecting to server %v", connect.ServerName)
 	err := s.ConnectDb(&connect, true)
 	checkErr(err)
 	return s

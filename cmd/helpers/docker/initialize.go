@@ -5,7 +5,7 @@ package docker
 
 func Initialize(
 	errorHandler func(err error),
-	traceHandler func(format string, a...any)) {
+	traceHandler func(format string, a ...any)) {
 	if errorHandler == nil {
 		panic("Please provide an errorHandler")
 	}

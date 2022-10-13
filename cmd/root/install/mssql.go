@@ -12,12 +12,12 @@ import (
 type Mssql struct {
 	AbstractBase
 
-	tag string
-	registry string
-	repo string
-	installType string
-	acceptEula bool
-	contextName string
+	tag             string
+	registry        string
+	repo            string
+	installType     string
+	acceptEula      bool
+	contextName     string
 	defaultDatabase string
 }
 
@@ -39,20 +39,20 @@ func (c *Mssql) GetCommand() (command *Command) {
 	return
 }
 
-func  (c *Mssql) setDefaultSubCommandIfNonePresent(command *Command, defCmd string) {
+func (c *Mssql) setDefaultSubCommandIfNonePresent(command *Command, defCmd string) {
 	var cmdFound bool
 	cmd := command.Commands()
 
-	for _,a:=range cmd{
-		for _,b:=range os.Args[1:] {
-			if a.Name()==b {
-				cmdFound=true
+	for _, a := range cmd {
+		for _, b := range os.Args[1:] {
+			if a.Name() == b {
+				cmdFound = true
 				break
 			}
 		}
 	}
 	if cmdFound == false {
-		args:=append([]string{defCmd}, os.Args[1:]...)
+		args := append([]string{defCmd}, os.Args[1:]...)
 		command.SetArgs(args)
 	}
 	if err := command.Execute(); err != nil {

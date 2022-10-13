@@ -34,8 +34,8 @@ func (c *GetEndpoints) GetCommand() (command *Command) {
 			} else {
 				output.FatalfWithHints(
 					[]string{"To view available endpoints run `sqlcmd config get-endpoints"},
-				"error: no endpoint exists with the name: \"%v\"",
-				name)
+					"error: no endpoint exists with the name: \"%v\"",
+					name)
 			}
 		} else {
 			config.OutputEndpoints(output.Struct)
@@ -43,12 +43,12 @@ func (c *GetEndpoints) GetCommand() (command *Command) {
 	}
 
 	command = c.AddCommand(Command{
-		Use:   use,
-		Short: short,
-		Long: long,
+		Use:     use,
+		Short:   short,
+		Long:    long,
 		Example: example,
-		Args: MaximumNArgs(1),
-		Run: run})
+		Args:    MaximumNArgs(1),
+		Run:     run})
 
 	return
 }

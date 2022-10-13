@@ -11,7 +11,7 @@ import (
 	. "github.com/spf13/cobra"
 )
 
-var rootCmd  *Command
+var rootCmd *Command
 var loggingLevel int
 
 // init initializes the command-line interface

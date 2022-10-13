@@ -6,6 +6,6 @@ package commander
 import . "github.com/spf13/cobra"
 
 type AbstractBase struct {
-	command *Command
-	SubCommands  []Commander
+	command     *Command
+	SubCommands []Commander
 }

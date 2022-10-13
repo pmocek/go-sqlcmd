@@ -32,13 +32,16 @@ func NewController() (c *Controller) {
 	return
 }
 
-func (c *Controller) EnsureImage(image string) (err error){
+func (c *Controller) EnsureImage(image string) (err error) {
 	var reader io.ReadCloser
 
 	trace("Running ImagePull for image %s", image)
 	reader, err = c.cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
 	if reader != nil {
-		defer reader.Close()
+		defer func() {
+			err := reader.Close()
+			checkErr(err)
+		}()
 
 		scanner := bufio.NewScanner(reader)
 		for scanner.Scan() {
@@ -49,7 +52,7 @@ func (c *Controller) EnsureImage(image string) (err error){
 	return
 }
 
-func (c *Controller) ContainerRun(image string, env[] string, port int, command []string) (id string, err error) {
+func (c *Controller) ContainerRun(image string, env []string, port int, command []string) (id string, err error) {
 	hostConfig := &container.HostConfig{
 		PortBindings: nat.PortMap{
 			nat.Port("1433/tcp"): []nat.PortBinding{
@@ -96,7 +99,10 @@ func (c *Controller) ContainerWaitForLogEntry(id string, text string) {
 	// Wait for server to start up
 	reader, err := c.cli.ContainerLogs(context.Background(), id, options)
 	checkErr(err)
-	defer reader.Close()
+	defer func() {
+		err := reader.Close()
+		checkErr(err)
+	}()
 
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
@@ -113,7 +119,7 @@ func (c *Controller) ContainerStop(id string) (err error) {
 }
 
 func (c *Controller) ContainerFiles(id string, filespec string) (files []string) {
-	cmd := []string{"find", "/" , "-iname", filespec}
+	cmd := []string{"find", "/", "-iname", filespec}
 	response, err := c.cli.ContainerExecCreate(
 		context.Background(),
 		id,
@@ -158,13 +164,13 @@ func (c *Controller) ContainerFiles(id string, filespec string) (files []string)
 }
 
 func (c *Controller) ContainerExists(id string) (exists bool) {
-	filters := filters.NewArgs()
-	filters.Add(
+	f := filters.NewArgs()
+	f.Add(
 		"id", id,
 	)
 	resp, err := c.cli.ContainerList(
 		context.Background(),
-		types.ContainerListOptions{Filters: filters},
+		types.ContainerListOptions{Filters: f},
 	)
 	checkErr(err)
 	if len(resp) > 0 {
@@ -185,7 +191,7 @@ func (c *Controller) ContainerRemove(id string) (err error) {
 		Force:         false,
 	}
 
-	err = c.cli.ContainerRemove(context.Background(),id, options)
+	err = c.cli.ContainerRemove(context.Background(), id, options)
 
 	return
 }

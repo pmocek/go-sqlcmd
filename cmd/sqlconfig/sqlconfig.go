@@ -5,28 +5,28 @@ package sqlconfig
 
 type EndpointDetails struct {
 	Address string `mapstructure:"address"`
-	Port int `mapstructure:"port"`
+	Port    int    `mapstructure:"port"`
 }
 
 type DockerDetails struct {
 	ContainerId string `mapstructure:"containerId"`
-	Image string `mapstructure:"image"`
+	Image       string `mapstructure:"image"`
 }
 
 type Endpoint struct {
-	DockerDetails   `mapstructure:"docker" yaml:"docker""`
-	EndpointDetails `mapstructure:"endpoint" yaml:"endpoint""`
-	Name            string          `mapstructure:"name"`
+	DockerDetails   `mapstructure:"docker" yaml:"docker"`
+	EndpointDetails `mapstructure:"endpoint" yaml:"endpoint"`
+	Name            string `mapstructure:"name"`
 }
 
 type ContextDetails struct {
 	Endpoint string `mapstructure:"endpoint"`
-	User string `mapstructure:"user"`
+	User     string `mapstructure:"user"`
 }
 
 type Context struct {
-	ContextDetails `mapstructure:"context" yaml:"context""`
-	Name           string         `mapstructure:"name"`
+	ContextDetails `mapstructure:"context" yaml:"context"`
+	Name           string `mapstructure:"name"`
 }
 
 type UserDetails struct {
@@ -36,14 +36,14 @@ type UserDetails struct {
 
 type User struct {
 	UserDetails `mapstructure:"user" yaml:"user"`
-	Name        string      `mapstructure:"name"`
+	Name        string `mapstructure:"name"`
 }
 
 type Sqlconfig struct {
-	ApiVersion string `mapstructure:"apiVersion"`
-	Endpoints []Endpoint  `mapstructure:"endpoints"`
-	Contexts []Context    `mapstructure:"contexts"`
-	CurrentContext string `mapstructure:"currentcontext"`
-	Kind string  `mapstructure:"kind"`
-	Users []User `mapstructure:"users"`
+	ApiVersion     string     `mapstructure:"apiVersion"`
+	Endpoints      []Endpoint `mapstructure:"endpoints"`
+	Contexts       []Context  `mapstructure:"contexts"`
+	CurrentContext string     `mapstructure:"currentcontext"`
+	Kind           string     `mapstructure:"kind"`
+	Users          []User     `mapstructure:"users"`
 }
