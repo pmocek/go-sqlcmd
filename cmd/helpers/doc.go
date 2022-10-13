@@ -1,21 +1,23 @@
 package helpers
 
 /*
-Helpers package abstracts the following using dependency injection:
+Helpers package abstracts the following from the application that uses these
+helpers (using dependency injection):
 
  - error handling for all non-control flow scenarios
  - trace support
 
-This enables the application code (using these helpers) to not have to do any
-error checking (except when it wants to affect application flow)
+The above abstractions enable the application code (using these helpers) to not
+have to sprinkle if (err != nill) blocks (except when the application wants to
+affect application flow based an err)
 
 Do and Do Not:
- - Do verify parameter values and panic if the helper function cannot succeed to
-   catch coding errors (do not panic for user input errors)
- - Do not output (except for the output helper). Do use the injected trace
-    method to output low level debugging information
+ - Do verify parameter values and panic if the helper function would be unable
+   to succeed, to catch coding errors (do not panic for user input errors)
+ - Do not output (except for in the `output` helper of course). Do use the injected
+    trace method to output low level debugging information
  - Do not return error if client is not going use the error for control flow, call the
-   injected checkErr instead, which will probably call cobra.checkErr and exit:
+   injected checkErr instead, which will probably end up calling cobra.checkErr and exit:
      e.g. Do not sprinkle application (non-helper) code with:
        err, _ := fmt.printf("Hope this works")
        if (err != nil) {
@@ -26,9 +28,9 @@ Do and Do Not:
        checkErr(err)
  - Do not have a helper package take a dependency on another helper package
    unless they are building on each other, instead inject the needed capability in the
-   help initialization
+   helpers initialization
      e.g. Do not have the config helper take a dependency on the secret helper, instead
-          inject the methods encrypt/decrypt to config in it's initialize method, do not:
+          inject the methods encrypt/decrypt to config in its initialize method, do not:
 
        package config
 

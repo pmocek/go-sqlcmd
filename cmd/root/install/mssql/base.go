@@ -119,7 +119,7 @@ func (c *Base) run(cmd *Command, args []string) {
 
 func (c *Base) installDockerImage(imageName string, contextName string) {
 	saPassword := secret.Generate(
-		100, 2, 2, 2)
+		100, 10, 10, 10)
 
 	env := []string{"ACCEPT_EULA=Y", fmt.Sprintf("SA_PASSWORD=%s", saPassword)}
 	port := config.FindFreePortForTds()
@@ -151,7 +151,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 
 	userName := os.Getenv("USERNAME")
 	password := secret.Generate(
-		100, 2, 2, 2)
+		100, 10, 10, 10)
 	// Save the config now, so user can uninstall, even if mssql in the container
 	// fails to start
 	config.Update(id, imageName, port, userName, password, contextName)
@@ -215,7 +215,7 @@ CHECK_POLICY=OFF`
 	// Correct safety protocol is to rotate the sa password, because the first
 	// sa password has been in the docker environment (as SA_PASSWORD)
 	rotateSaPassword := secret.Generate(
-		100, 2, 2, 2)
+		100, 10, 10, 10)
 	mssql.Query(s, fmt.Sprintf("ALTER LOGIN [sa] WITH PASSWORD = '%s';", rotateSaPassword))
 	mssql.Query(s, "ALTER LOGIN [sa] DISABLE")
 
