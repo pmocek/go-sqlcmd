@@ -43,11 +43,11 @@ Do and Do Not:
 
        package config
 
-       var encryptCallback func(plainText string) (cypherText string)
+       var encryptCallback func(plainText string) (cipherText string)
        var decryptCallback func(cipherText string) (secret string)
 
        func Initialize(
-       encryptHandler func(plainText string)(cypherText string),
+       encryptHandler func(plainText string)(cipherText string),
        decryptHandler func(cipherText string) (secret string),
 
 */

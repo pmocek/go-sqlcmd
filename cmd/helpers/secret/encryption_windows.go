@@ -4,19 +4,19 @@ import (
 	"github.com/billgraziano/dpapi"
 )
 
-func encrypt(plainText string) (cypherText string) {
+func encrypt(plainText string) (cipherText string) {
 	var err error
 
-	cypherText, err = dpapi.Encrypt(plainText)
+	cipherText, err = dpapi.Encrypt(plainText)
 	checkErr(err)
 
 	return
 }
 
-func decrypt(cypherText string) (secret string) {
+func decrypt(cipherText string) (secret string) {
 	var err error
 
-	secret, err = dpapi.Decrypt(cypherText)
+	secret, err = dpapi.Decrypt(cipherText)
 	checkErr(err)
 
 	return

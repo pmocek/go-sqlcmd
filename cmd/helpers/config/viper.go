@@ -5,9 +5,6 @@ package config
 
 import (
 	"bytes"
-	//"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
-
-	//"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 	"os"

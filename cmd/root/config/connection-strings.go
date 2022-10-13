@@ -10,6 +10,7 @@ import (
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	"github.com/microsoft/go-sqlcmd/cmd/helpers/secret"
 	. "github.com/spf13/cobra"
+	"runtime"
 	"strconv"
 )
 
@@ -56,6 +57,19 @@ func (c *ConnectionStrings) Run(*Command, []string) {
 			user.UserDetails.Username,
 			secret.Decrypt(user.UserDetails.Password))
 	}
+
+	var format string
+	if runtime.GOOS == "windows" {
+		format = "SET \"SQLCMDPASSWORD=%s\" & sqlcmd -S %s,%s -U %s"
+	} else {
+		format = "export \"SQLCMDPASSWORD=%s\"; sqlcmd -S %s,%s -U %s"
+	}
+
+	connectionStringFormats["SQLCMD"] = fmt.Sprintf(format,
+		secret.Decrypt(user.UserDetails.Password),
+		endpoint.EndpointDetails.Address,
+		strconv.Itoa(endpoint.EndpointDetails.Port),
+		user.UserDetails.Username)
 
 	output.Struct(connectionStringFormats)
 }

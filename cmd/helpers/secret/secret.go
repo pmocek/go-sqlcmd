@@ -15,9 +15,9 @@ func Encrypt(plainText string) (cipherText string) {
 	return
 }
 
-func Decrypt(cypherText string) (secret string) {
-	output.Trace(cypherText)
-	bytes, err := base64.StdEncoding.DecodeString(cypherText)
+func Decrypt(cipherText string) (secret string) {
+	output.Trace(cipherText)
+	bytes, err := base64.StdEncoding.DecodeString(cipherText)
 	checkErr(err)
 	secret = decrypt(string(bytes))
 
