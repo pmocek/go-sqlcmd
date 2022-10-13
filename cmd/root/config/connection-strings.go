@@ -62,7 +62,7 @@ func (c *ConnectionStrings) Run(*Command, []string) {
 	if runtime.GOOS == "windows" {
 		format = "SET \"SQLCMDPASSWORD=%s\" & sqlcmd -S %s,%s -U %s"
 	} else {
-		format = "export \"SQLCMDPASSWORD=%s\"; sqlcmd -S %s,%s -U %s"
+		format = "export 'SQLCMDPASSWORD=%s'; sqlcmd -S %s,%s -U %s"
 	}
 
 	connectionStringFormats["SQLCMD"] = fmt.Sprintf(format,

@@ -181,7 +181,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 
 	hints := []string{
 		"To run a query:               sqlcmd query \"SELECT @@version\"",
-		"To start interactive session: select query"}
+		"To start interactive session: sqlcmd query"}
 	if previousContextName != "" {
 		hints = append(hints, "To change context: sqlcmd config use-context "+previousContextName)
 	}
