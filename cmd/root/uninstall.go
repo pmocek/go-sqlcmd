@@ -6,9 +6,9 @@ package root
 import (
 	"fmt"
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/docker"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
+	config2 "github.com/microsoft/go-sqlcmd/internal/helpers/config"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	. "github.com/spf13/cobra"
 	"path/filepath"
 	"strings"
@@ -72,14 +72,14 @@ func (c *Uninstall) GetCommand() (command *Command) {
 func (c *Uninstall) run(*Command, []string) {
 	if currentContextEndPointExists() {
 		controller := docker.NewController()
-		id := config.GetContainerId()
-		endpoint, _ := config.GetCurrentContext()
+		id := config2.GetContainerId()
+		endpoint, _ := config2.GetCurrentContext()
 
 		var input string
 		if !c.yes {
 			output.Infof(
 				"Current context is '%s'. Do you want to continue? (Y/N)",
-				config.GetCurrentContextName(),
+				config2.GetCurrentContextName(),
 			)
 			_, err := fmt.Scanln(&input)
 			CheckErr(err)
@@ -100,14 +100,14 @@ func (c *Uninstall) run(*Command, []string) {
 		err := controller.ContainerStop(id)
 		CheckErr(err)
 
-		output.Infof("Removing context %s", config.GetCurrentContextName())
+		output.Infof("Removing context %s", config2.GetCurrentContextName())
 		err = controller.ContainerRemove(id)
 		CheckErr(err)
 
-		config.RemoveCurrentContext()
-		config.Save()
+		config2.RemoveCurrentContext()
+		config2.Save()
 
-		newContextName := config.GetCurrentContextName()
+		newContextName := config2.GetCurrentContextName()
 		if newContextName != "" {
 			output.Infof("Current context is now %s", newContextName)
 		} else {
@@ -143,7 +143,7 @@ func userDatabaseSafetyCheck(controller *docker.Controller, id string) {
 func currentContextEndPointExists() (exists bool) {
 	exists = true
 
-	if !config.EndpointsExists() {
+	if !config2.EndpointsExists() {
 		output.Fatal("No endpoints to uninstall")
 		exists = false
 	}

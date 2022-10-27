@@ -5,8 +5,8 @@ package mssql
 
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/docker"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	. "github.com/spf13/cobra"
 )
 

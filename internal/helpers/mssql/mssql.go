@@ -11,8 +11,7 @@ import (
 )
 
 func Connect(endpoint sqlconfig.Endpoint, user sqlconfig.User, console sqlcmd.Console) *sqlcmd.Sqlcmd {
-	// BUG(stuartpa): Check what the value of fromEnvironment should be here
-	v := sqlcmd.InitializeVariables(false)
+	v := sqlcmd.InitializeVariables(true)
 	s := sqlcmd.New(console, "", v)
 	s.Format = sqlcmd.NewSQLCmdDefaultFormatter(false)
 	connect := sqlcmd.ConnectSettings{

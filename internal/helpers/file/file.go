@@ -4,7 +4,7 @@
 package file
 
 import (
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/folder"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/folder"
 	"os"
 	"path/filepath"
 )

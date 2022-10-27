@@ -6,12 +6,12 @@ package mssql
 import (
 	"fmt"
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/docker"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/mssql"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/secret"
 	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
+	config2 "github.com/microsoft/go-sqlcmd/internal/helpers/config"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/mssql"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	secret2 "github.com/microsoft/go-sqlcmd/internal/helpers/secret"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
 	. "github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -108,11 +108,11 @@ func (c *Base) run(*Command, []string) {
 }
 
 func (c *Base) installDockerImage(imageName string, contextName string) {
-	saPassword := secret.Generate(
+	saPassword := secret2.Generate(
 		100, 10, 10, 10)
 
 	env := []string{"ACCEPT_EULA=Y", fmt.Sprintf("SA_PASSWORD=%s", saPassword)}
-	port := config.FindFreePortForTds()
+	port := config2.FindFreePortForTds()
 	controller := docker.NewController()
 	output.Infof("Downloading %v", imageName)
 	err := controller.EnsureImage(imageName)
@@ -138,7 +138,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		output.FatalErr(err)
 	}
 
-	previousContextName := config.GetCurrentContextName()
+	previousContextName := config2.GetCurrentContextName()
 
 	var userName string
 	if runtime.GOOS == "windows" {
@@ -150,16 +150,16 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		panic("Unable to get username, set env var USERNAME or USER")
 	}
 
-	password := secret.Generate(
+	password := secret2.Generate(
 		100, 10, 10, 10)
 	// Save the config now, so user can uninstall, even if mssql in the container
 	// fails to start
-	config.Update(id, imageName, port, userName, password, contextName)
+	config2.Update(id, imageName, port, userName, password, contextName)
 
 	output.Infof(
 		"Created context '%s' in %s",
-		config.GetCurrentContextName(),
-		config.GetConfigFileUsed(),
+		config2.GetCurrentContextName(),
+		config2.GetConfigFileUsed(),
 	)
 
 	// BUG(stuartpa): SQL Server bug: "SQL Server is now ready for client connections", oh no it isn't!!
@@ -169,11 +169,11 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		id, "The default language")
 
 	output.Infof("Rotating 'sa' password and disabling account, creating user '%s'", userName)
-	endpoint, _ := config.GetCurrentContext()
+	endpoint, _ := config2.GetCurrentContext()
 	s := mssql.Connect(endpoint, sqlconfig.User{
 		UserDetails: sqlconfig.UserDetails{
 			Username: "sa",
-			Password: secret.Encrypt(saPassword),
+			Password: secret2.Encrypt(saPassword),
 		},
 		Name: "sa",
 	}, nil)
@@ -216,7 +216,7 @@ CHECK_POLICY=OFF`
 	mssql.Query(s, fmt.Sprintf(addSrvRoleMember, userName))
 	// Correct safety protocol is to rotate the sa password, because the first
 	// sa password has been in the docker environment (as SA_PASSWORD)
-	rotateSaPassword := secret.Generate(
+	rotateSaPassword := secret2.Generate(
 		100, 10, 10, 10)
 	mssql.Query(s, fmt.Sprintf("ALTER LOGIN [sa] WITH PASSWORD = '%s';", rotateSaPassword))
 	mssql.Query(s, "ALTER LOGIN [sa] DISABLE")

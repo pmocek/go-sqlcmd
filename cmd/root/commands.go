@@ -10,7 +10,6 @@ import (
 )
 
 var Commands = []Commander{
-	// BUG(shueybubbles): Uncomment when ready: &Bulk{},
 	&Config{AbstractBase{SubCommands: config.Commands}},
 	&Query{},
 	&Install{AbstractBase{SubCommands: install.Commands}},

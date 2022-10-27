@@ -5,9 +5,9 @@ package cmd
 
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 	"github.com/microsoft/go-sqlcmd/cmd/root"
+	"github.com/microsoft/go-sqlcmd/internal/helpers"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	. "github.com/spf13/cobra"
 )
 
@@ -75,12 +75,12 @@ func IsValidRootCommand(command string) (valid bool) {
 	for _, c := range root.Commands {
 		if command == c.GetCommand().Name() {
 			valid = true
-			break
+			return
 		}
 		for _, alias := range c.GetCommand().Aliases {
 			if alias == command {
 				valid = true
-				break
+				return
 			}
 		}
 	}

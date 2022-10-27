@@ -17,8 +17,8 @@ package output
 
 import (
 	"fmt"
-	. "github.com/microsoft/go-sqlcmd/cmd/helpers/output/formatter"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output/verbosity"
+	. "github.com/microsoft/go-sqlcmd/internal/helpers/output/formatter"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
 	"github.com/pkg/errors"
 )
 

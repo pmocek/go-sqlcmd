@@ -5,8 +5,8 @@ package config
 
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
+	config2 "github.com/microsoft/go-sqlcmd/internal/helpers/config"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	. "github.com/spf13/cobra"
 )
 
@@ -28,8 +28,8 @@ func (c *GetContexts) GetCommand() (command *Command) {
 		if len(args) > 0 {
 			name := args[0]
 
-			if config.ContextExists(name) {
-				context := config.GetContext(name)
+			if config2.ContextExists(name) {
+				context := config2.GetContext(name)
 				output.Struct(context)
 			} else {
 				output.FatalfWithHints(
@@ -38,7 +38,7 @@ func (c *GetContexts) GetCommand() (command *Command) {
 					name)
 			}
 		} else {
-			config.OutputContexts(output.Struct)
+			config2.OutputContexts(output.Struct)
 		}
 	}
 

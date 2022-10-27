@@ -4,15 +4,15 @@
 package helpers
 
 import (
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/docker"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/file"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/folder"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/mssql"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/net"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output/verbosity"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/secret"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/file"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/folder"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/mssql"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/net"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
 )
 
 func Initialize(

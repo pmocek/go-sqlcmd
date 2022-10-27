@@ -6,9 +6,9 @@ package config
 import (
 	"fmt"
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/config"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/secret"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
 	. "github.com/spf13/cobra"
 	"runtime"
 	"strconv"

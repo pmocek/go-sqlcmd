@@ -5,7 +5,6 @@ package secret
 
 import (
 	"encoding/base64"
-	"github.com/microsoft/go-sqlcmd/cmd/helpers/output"
 )
 
 func Encrypt(plainText string) (cipherText string) {
@@ -16,7 +15,6 @@ func Encrypt(plainText string) (cipherText string) {
 }
 
 func Decrypt(cipherText string) (secret string) {
-	output.Trace(cipherText)
 	bytes, err := base64.StdEncoding.DecodeString(cipherText)
 	checkErr(err)
 	secret = decrypt(string(bytes))
