@@ -52,7 +52,9 @@ func GetCurrentContextName() (name string) {
 func GetCurrentContextOrFatal() (currentContextName string) {
 	currentContextName = GetCurrentContextName()
 	if currentContextName == "" {
-		checkErr(errors.New("no current context. To create a context use `sqlcmd install`, e.g. `sqlcmd install mssql`"))
+		checkErr(errors.New(
+			"no current context. To create a context use `sqlcmd install`, " +
+				"e.g. `sqlcmd install mssql server`"))
 	}
 	return
 }

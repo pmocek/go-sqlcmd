@@ -10,7 +10,11 @@ import (
 	"os"
 )
 
-func Connect(endpoint sqlconfig.Endpoint, user sqlconfig.User, console sqlcmd.Console) *sqlcmd.Sqlcmd {
+func Connect(
+	endpoint sqlconfig.Endpoint,
+	user sqlconfig.User,
+	console sqlcmd.Console,
+) *sqlcmd.Sqlcmd {
 	v := sqlcmd.InitializeVariables(true)
 	s := sqlcmd.New(console, "", v)
 	s.Format = sqlcmd.NewSQLCmdDefaultFormatter(false)

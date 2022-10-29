@@ -3,10 +3,10 @@
 
 package secret
 
-func Initialize(handler func(err error)) {
-	if handler == nil {
-		panic("Please provide an error handler")
-	}
+func init() {
+	Initialize(func(err error){})
+}
 
+func Initialize(handler func(err error)) {
 	errorHandlerCallback = handler
 }

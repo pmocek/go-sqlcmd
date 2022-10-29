@@ -4,7 +4,6 @@
 package file
 
 import (
-	"fmt"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/folder"
 	"os"
 	"path/filepath"
@@ -37,17 +36,13 @@ func Exists(filename string) (exists bool) {
 	}
 
 	if _, err := os.Stat(filename); err == nil {
-		return true
-	} else if os.IsNotExist(err) {
-		return false
-	} else {
-		return false
+		exists = true
 	}
+
+	return
 }
 
 func Remove(filename string) {
 	err := os.Remove(filename)
-	if err != nil {
-		panic(fmt.Sprintf("Unable to remove file '%s'. %s", filename, err))
-	}
+	checkErr(err)
 }

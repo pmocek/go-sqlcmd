@@ -9,6 +9,15 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
 )
 
+func init() {
+	Initialize(
+		func(err error){},
+		func(format string, a ...any){},
+		func(hints []string){},
+		"yaml",
+		verbosity.Trace)
+}
+
 func Initialize(
 	errorHandler func(err error),
 	traceHandler func(format string, a ...any),
@@ -16,16 +25,6 @@ func Initialize(
 	format string,
 	verbosity verbosity.Enum,
 ) {
-	if errorHandler == nil {
-		panic("Please provide an errorHandler")
-	}
-	if traceHandler == nil {
-		panic("Please provide an traceHandler")
-	}
-	if hintHandler == nil {
-		panic("Please provide a hintHandler")
-	}
-
 	errorCallback = errorHandler
 	traceCallback = traceHandler
 	hintCallback = hintHandler

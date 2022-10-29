@@ -1,18 +1,11 @@
 package file
 
 import (
-	"fmt"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/folder"
 	"path/filepath"
 	"strings"
 	"testing"
 )
-
-func init() {
-	Initialize(
-		func(err error) {if err != nil {panic(err)}},
-		func(format string, a ...any) {_, _ = fmt.Printf(format, a...)})
-}
 
 func TestCreateEmptyFileIfNotExists(t *testing.T) {
 	filename := "foo.txt"
@@ -51,16 +44,6 @@ func TestCreateEmptyFileIfNotExists(t *testing.T) {
 	}
 }
 
-func cleanup(folderName string, filename string) {
-	if Exists(folderName) {
-		folder.RemoveAll(folderName)
-	}
-
-	if Exists(filename) {
-		Remove(filename)
-	}
-}
-
 func TestExists(t *testing.T) {
 	type args struct {
 		filename string
@@ -93,34 +76,12 @@ func TestExists(t *testing.T) {
 	}
 }
 
-func TestRemove(t *testing.T) {
-	type args struct {
-		filename string
+func cleanup(folderName string, filename string) {
+	if Exists(folderName) {
+		folder.RemoveAll(folderName)
 	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{name: "default", args: args{filename: "foo.txt"}},
-		{name: "notExistsPanic", args: args{filename: "does-not-exist.txt"}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
 
-			if tt.name == "default" {
-				CreateEmptyFileIfNotExists(tt.args.filename)
-			}
-
-			// If test name ends in 'Panic' expect a Panic
-			if strings.HasSuffix(tt.name, "Panic") {
-				defer func() {
-					if r := recover(); r == nil {
-						t.Errorf("The code did not panic")
-					}
-				}()
-			}
-
-			Remove(tt.args.filename)
-		})
+	if Exists(filename) {
+		Remove(filename)
 	}
 }

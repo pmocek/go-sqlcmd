@@ -3,10 +3,29 @@
 
 package config
 
+import (
+	"github.com/microsoft/go-sqlcmd/internal/helpers/file"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/net"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
+)
+
 var encryptCallback func(plainText string) (cipherText string)
 var decryptCallback func(cipherText string) (secret string)
 var isLocalPortAvailableCallback func(port int) (portAvailable bool)
 var createEmptyFileIfNotExistsCallback func(filename string)
+
+func init() {
+	Initialize(
+		func(err error) {if err != nil {panic(err)}},
+		output.Tracef,
+		secret.Encrypt,
+		secret.Decrypt,
+		net.IsLocalPortAvailable,
+		file.CreateEmptyFileIfNotExists,
+		"sqlconfig-test",
+	)
+}
 
 func Initialize(
 	errorHandler func(err error),

@@ -4,7 +4,6 @@
 package folder
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -21,7 +20,5 @@ func MkdirAll(folder string) {
 
 func RemoveAll(folder string) {
 	err := os.RemoveAll(folder)
-	if err != nil {
-		panic(fmt.Sprintf("Unable to remove file/folder '%s, %v'",folder, err))
-	}
+	checkErr(err)
 }
