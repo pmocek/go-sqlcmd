@@ -183,9 +183,10 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		"To run a query:               sqlcmd query \"SELECT @@version\"",
 		"To start interactive session: sqlcmd query"}
 	if previousContextName != "" {
-		hints = append(hints, "To change context: sqlcmd config use-context "+previousContextName)
+		hints = append(hints, fmt.Sprintf("To change context:       sqlcmd config use-context %v", previousContextName))
 	}
 	hints = append(hints, "To view config:               sqlcmd config view")
+	hints = append(hints, "To see connection strings:    sqlcmd config connection-strings")
 	hints = append(hints, "To remove:                    sqlcmd uninstall")
 
 	output.InfofWithHints(hints,

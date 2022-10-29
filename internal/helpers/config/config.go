@@ -42,7 +42,7 @@ func Update(
 	config.CurrentContext = contextName
 
 	config.Endpoints = append(config.Endpoints, Endpoint{
-		DockerDetails: DockerDetails{
+		ContainerDetails: ContainerDetails{
 			ContainerId: id,
 			Image:       imageName},
 		EndpointDetails: EndpointDetails{

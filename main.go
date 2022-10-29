@@ -14,6 +14,6 @@ func main() {
 		(cmd.IsValidRootCommand(os.Args[1]) || os.Args[1] == "--help") {
 		cmd.ExecuteCommandLine()
 	} else {
-		legacyMain.LegacyMode()
+		legacyMain.BackCompatMode()
 	}
 }

@@ -4,6 +4,7 @@
 package file
 
 import (
+	"fmt"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/folder"
 	"os"
 	"path/filepath"
@@ -15,7 +16,7 @@ func CreateEmptyFileIfNotExists(filename string) {
 	}
 
 	d, _ := filepath.Split(filename)
-	if !Exists(d) {
+	if d != "" && !Exists(d) {
 		trace("Folder %v does not exist, creating", d)
 		folder.MkdirAll(d)
 	}
@@ -41,5 +42,12 @@ func Exists(filename string) (exists bool) {
 		return false
 	} else {
 		return false
+	}
+}
+
+func Remove(filename string) {
+	err := os.Remove(filename)
+	if err != nil {
+		panic(fmt.Sprintf("Unable to remove file '%s'. %s", filename, err))
 	}
 }

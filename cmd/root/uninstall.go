@@ -95,7 +95,7 @@ func (c *Uninstall) run(*Command, []string) {
 
 		output.Infof(
 			"Stopping %s",
-			endpoint.DockerDetails.Image,
+			endpoint.ContainerDetails.Image,
 		)
 		err := controller.ContainerStop(id)
 		CheckErr(err)

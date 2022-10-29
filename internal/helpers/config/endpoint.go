@@ -61,7 +61,7 @@ func GetContainerId() (containerId string) {
 		if c.Name == currentContextName {
 			for _, e := range config.Endpoints {
 				if e.Name == c.Endpoint {
-					containerId = e.DockerDetails.ContainerId
+					containerId = e.ContainerDetails.ContainerId
 					return
 				}
 			}

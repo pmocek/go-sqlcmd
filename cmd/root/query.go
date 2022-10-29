@@ -27,7 +27,7 @@ func (c *Query) GetCommand() (command *Command) {
 Run a query
   # sqlcmd query "SELECT @@SERVERNAME"`,
 		ArgAliases: []string{"text"},
-		//Args: ExactArgs(1),
+		Args: MaximumNArgs(1),
 		Run: runQuery,
 	})
 

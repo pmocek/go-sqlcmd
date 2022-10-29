@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-package legacyMain
+//+build back_compat_mode
+
+package main
 
 import (
 	"os"

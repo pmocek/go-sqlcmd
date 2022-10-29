@@ -8,14 +8,14 @@ type EndpointDetails struct {
 	Port    int    `mapstructure:"port"`
 }
 
-type DockerDetails struct {
-	ContainerId string `mapstructure:"containerId"`
+type ContainerDetails struct {
+	ContainerId string `mapstructure:"id"`
 	Image       string `mapstructure:"image"`
 }
 
 type Endpoint struct {
-	DockerDetails   `mapstructure:"docker" yaml:"docker"`
-	EndpointDetails `mapstructure:"endpoint" yaml:"endpoint"`
+	ContainerDetails `mapstructure:"container" yaml:"container"`
+	EndpointDetails  `mapstructure:"endpoint" yaml:"endpoint"`
 	Name            string `mapstructure:"name"`
 }
 
