@@ -12,10 +12,10 @@ type Install struct {
 	AbstractBase
 }
 
-func (c *Install) GetCommand() (command *Command) {
+func (c *Install) DefineCommand() (command *Command) {
 	const short = "Install/Create #SQLFamliy and Tools"
 
-	command = c.AddCommand(Command{
+	command = c.SetCommand(Command{
 		Use:     "install",
 		Short:   short,
 		Long:    short,

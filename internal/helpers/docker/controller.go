@@ -114,11 +114,22 @@ func (c *Controller) ContainerWaitForLogEntry(id string, text string) {
 }
 
 func (c *Controller) ContainerStop(id string) (err error) {
+	if id == "" {
+		panic("Must pass in non-empty id")
+	}
+
 	err = c.cli.ContainerStop(context.Background(), id, nil)
 	return
 }
 
 func (c *Controller) ContainerFiles(id string, filespec string) (files []string) {
+	if id == "" {
+		panic("Must pass in non-empty id")
+	}
+	if filespec == "" {
+		panic("Must pass in non-empty filespec")
+	}
+
 	cmd := []string{"find", "/", "-iname", filespec}
 	response, err := c.cli.ContainerExecCreate(
 		context.Background(),
@@ -129,8 +140,8 @@ func (c *Controller) ContainerFiles(id string, filespec string) (files []string)
 			Cmd:          cmd,
 		},
 	)
-
 	checkErr(err)
+
 	r, err := c.cli.ContainerExecAttach(
 		context.Background(),
 		response.ID,

@@ -16,10 +16,10 @@ type Query struct {
 	AbstractBase
 }
 
-func (c *Query) GetCommand() (command *Command) {
+func (c *Query) DefineCommand() (command *Command) {
 	const short = "Run a query against the current context"
 
-	command = c.AddCommand(Command{
+	command = c.SetCommand(Command{
 		Use:   "query COMMAND_TEXT",
 		Short: short,
 		Long:  short,

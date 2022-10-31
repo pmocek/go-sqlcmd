@@ -11,7 +11,7 @@ type Edge struct {
 	Base
 }
 
-func (c *Edge) GetCommand() (command *Command) {
+func (c *Edge) DefineCommand() (command *Command) {
 	const repo = "azure-sql-edge"
 
 	const use = "edge"
@@ -20,7 +20,7 @@ func (c *Edge) GetCommand() (command *Command) {
 	const example = `# Install SQL Server Edge in a docker container
   sqlcmd install mssql edge`
 
-	command = c.AddCommand(Command{
+	command = c.SetCommand(Command{
 		Use:     use,
 		Short:   short,
 		Long:    long,

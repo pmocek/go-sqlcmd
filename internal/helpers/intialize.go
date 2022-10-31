@@ -14,6 +14,11 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
 )
 
+type initInfo struct {
+	ErrorHandler func(error)
+	TraceHandler func(string, ...any)
+}
+
 func Initialize(
 	errorHandler func(error),
 	hintHandler func([]string),
@@ -21,25 +26,27 @@ func Initialize(
 	outputType string,
 	loggingLevel int,
 ) {
-	file.Initialize(errorHandler, output.Tracef)
-	mssql.Initialize(errorHandler, output.Tracef, secret.Decrypt)
+	info := initInfo{errorHandler, output.Tracef}
+
+	file.Initialize(info.ErrorHandler, info.TraceHandler)
+	mssql.Initialize(info.ErrorHandler, info.TraceHandler, secret.Decrypt)
 	output.Initialize(
-		errorHandler,
-		output.Tracef,
+		info.ErrorHandler,
+		info.TraceHandler,
 		hintHandler,
 		outputType,
 		verbosity.Enum(loggingLevel),
 	)
 	config.Initialize(
-		errorHandler,
-		output.Tracef,
+		info.ErrorHandler,
+		info.TraceHandler,
 		secret.Encrypt,
 		secret.Decrypt,
 		net.IsLocalPortAvailable,
 		file.CreateEmptyFileIfNotExists,
 		sqlconfigFilename,
 	)
-	docker.Initialize(errorHandler, output.Tracef)
-	secret.Initialize(errorHandler)
-	net.Initialize(errorHandler, output.Tracef)
+	docker.Initialize(info.ErrorHandler, info.TraceHandler)
+	secret.Initialize(info.ErrorHandler)
+	net.Initialize(info.ErrorHandler, info.TraceHandler)
 }

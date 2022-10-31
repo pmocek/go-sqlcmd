@@ -3,6 +3,12 @@
 
 package net
 
+func init() {
+	Initialize(
+		func(err error) {},
+		func(format string, a ...any) {})
+}
+
 func Initialize(
 	errorHandler func(err error),
 	traceHandler func(format string, a ...any)) {

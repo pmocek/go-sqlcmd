@@ -10,13 +10,12 @@ import (
 const (
 	lowerCharSet   = "abcdedfghijklmnopqrstuvwxyz"
 	upperCharSet   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	specialCharSet = "!@#$%&*"
 	numberSet      = "0123456789"
-	allCharSet     = lowerCharSet + upperCharSet + specialCharSet + numberSet
 )
 
-func Generate(passwordLength, minSpecialChar, minNum, minUpperCase int) string {
+func Generate(passwordLength, minSpecialChar, minNum, minUpperCase int, specialCharSet string) string {
 	var password strings.Builder
+	allCharSet := lowerCharSet + upperCharSet + specialCharSet + numberSet
 
 	//Set special character
 	for i := 0; i < minSpecialChar; i++ {

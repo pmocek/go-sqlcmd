@@ -32,10 +32,10 @@ var systemDatabases = [...]string{
 	"/var/opt/mssql/data/master.mdf",
 }
 
-func (c *Uninstall) GetCommand() (command *Command) {
+func (c *Uninstall) DefineCommand() (command *Command) {
 	const short = "Uninstall/Delete the current context"
 
-	command = c.AddCommand(Command{
+	command = c.SetCommand(Command{
 		Use:   "uninstall",
 		Short: short,
 		Long:  short,

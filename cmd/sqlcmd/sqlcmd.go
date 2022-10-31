@@ -1,9 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 //go:generate go-winres make --file-version=git-tag --product-version=git-tag
-//+build back_compat_mode
 
-package main
+package sqlcmd
 
 import (
 	"fmt"

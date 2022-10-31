@@ -57,17 +57,26 @@ func FindUniqueEndpointName(name string) (uniqueEndpointName string) {
 func GetContainerId() (containerId string) {
 	currentContextName := config.CurrentContext
 
+	if currentContextName == "" {
+		panic("currentContextName must not be empty")
+	}
+
 	for _, c := range config.Contexts {
 		if c.Name == currentContextName {
 			for _, e := range config.Endpoints {
 				if e.Name == c.Endpoint {
-					containerId = e.ContainerDetails.ContainerId
+					containerId = e.ContainerDetails.Id
+
+					if len(containerId) != 64 {
+						panic("container id must be 64 characters")
+					}
+
 					return
 				}
 			}
 		}
 	}
-	panic("ContainerId not found")
+	panic("Id not found")
 }
 
 func FindFreePortForTds() (portNumber int) {

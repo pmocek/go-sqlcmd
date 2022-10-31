@@ -43,8 +43,8 @@ func Update(
 
 	config.Endpoints = append(config.Endpoints, Endpoint{
 		ContainerDetails: ContainerDetails{
-			ContainerId: id,
-			Image:       imageName},
+			Id:    id,
+			Image: imageName},
 		EndpointDetails: EndpointDetails{
 			Address: "localhost",
 			Port:    portNumber,

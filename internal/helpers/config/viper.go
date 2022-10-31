@@ -7,16 +7,11 @@ import (
 	"bytes"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
-	"os"
-	"path/filepath"
 )
 
 func configureViper(configFile string) {
 	if configFile == "" {
-		home, err := os.UserHomeDir()
-		checkErr(err)
-
-		configFile = filepath.Join(home, ".sqlcmd", "sqlconfig")
+		panic("Must provide configFile")
 	}
 
 	createEmptyFileIfNotExistsCallback(configFile)

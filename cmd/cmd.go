@@ -9,6 +9,7 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	. "github.com/spf13/cobra"
+	"os"
 )
 
 var rootCmd *Command
@@ -17,7 +18,7 @@ var loggingLevel int
 // init initializes the command-line interface
 func init() {
 	r := Root{AbstractBase{SubCommands: root.Commands}}
-	rootCmd = r.GetCommand()
+	rootCmd = r.DefineCommand()
 
 	OnInitialize(initializeCobra)
 }
@@ -25,14 +26,35 @@ func init() {
 // ExecuteCommandLine runs the application based on the command-line
 // parameters the user has passed in
 func ExecuteCommandLine() {
+
+	setDefaultSubCommandForInstallMssql()
+
 	err := rootCmd.Execute()
 	checkErr(err)
 }
 
+// setDefaultSubCommandForInstallMssql runs `sqlcmd install mssql server` if
+// no subcommand is added for 'mssql'
+//
+// BUG(stuartpa): Workout a way to  encapsulate this code in the install 'mssql' command
+func setDefaultSubCommandForInstallMssql() {
+	if len(os.Args) == 3 {
+		if os.Args[1] == "install" || os.Args[1] == "create" {
+			if os.Args[2] == "mssql" {
+				args := append(os.Args[1:], "server")
+				rootCmd.SetArgs(args)
+			}
+		}
+	}
+}
+
 func initializeCobra() {
-	configFile, err := rootCmd.Flags().GetString("sqlconfig")
+	var configFilename, outputType string
+	var err error
+
+	configFilename, err = rootCmd.Flags().GetString("sqlconfig")
 	checkErr(err)
-	outputType, err := rootCmd.Flags().GetString("output")
+	outputType, err = rootCmd.Flags().GetString("output")
 	checkErr(err)
 	loggingLevel, err = rootCmd.Flags().GetInt("verbosity")
 	checkErr(err)
@@ -40,13 +62,13 @@ func initializeCobra() {
 	helpers.Initialize(
 		checkErr,
 		displayHints,
-		configFile,
+		configFilename,
 		outputType,
 		loggingLevel,
 	)
 }
 
-// checkErr uses Cobra to checks the err, and halts the application if err is not
+// checkErr uses Cobra to check err, and halts the application if err is not
 // nil.  Pass (inject) checkErr into all dependencies (helpers etc.) as an
 // errorHandler
 func checkErr(err error) {
@@ -73,11 +95,11 @@ func displayHints(hints []string) {
 
 func IsValidRootCommand(command string) (valid bool) {
 	for _, c := range root.Commands {
-		if command == c.GetCommand().Name() {
+		if command == c.Name() {
 			valid = true
 			return
 		}
-		for _, alias := range c.GetCommand().Aliases {
+		for _, alias := range c.Aliases() {
 			if alias == command {
 				valid = true
 				return

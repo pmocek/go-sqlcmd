@@ -15,7 +15,7 @@ func init() {
 		func(format string, a ...any){},
 		func(hints []string){},
 		"yaml",
-		verbosity.Trace)
+		verbosity.Info)
 }
 
 func Initialize(

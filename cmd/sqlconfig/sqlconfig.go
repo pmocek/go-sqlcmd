@@ -9,8 +9,8 @@ type EndpointDetails struct {
 }
 
 type ContainerDetails struct {
-	ContainerId string `mapstructure:"id"`
-	Image       string `mapstructure:"image"`
+	Id    string `mapstructure:"id"`
+	Image string `mapstructure:"image"`
 }
 
 type Endpoint struct {

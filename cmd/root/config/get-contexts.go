@@ -14,7 +14,7 @@ type GetContexts struct {
 	AbstractBase
 }
 
-func (c *GetContexts) GetCommand() (command *Command) {
+func (c *GetContexts) DefineCommand() (command *Command) {
 	const use = "get-contexts [CONTEXT_NAME]"
 	const short = "Display one or many contexts from the sqlconfig file."
 	const long = short
@@ -42,7 +42,7 @@ func (c *GetContexts) GetCommand() (command *Command) {
 		}
 	}
 
-	command = c.AddCommand(Command{
+	command = c.SetCommand(Command{
 		Use:     use,
 		Short:   short,
 		Long:    long,

@@ -18,7 +18,7 @@ type ConnectionStrings struct {
 	AbstractBase
 }
 
-func (c *ConnectionStrings) GetCommand() (command *Command) {
+func (c *ConnectionStrings) DefineCommand() (command *Command) {
 	const use = "connection-strings"
 	const short = "Display connections strings for the current context."
 	const long = short
@@ -28,19 +28,19 @@ func (c *ConnectionStrings) GetCommand() (command *Command) {
 # Or
   sqlcmd config cs`
 
-	command = c.AddCommand(Command{
+	command = c.SetCommand(Command{
 		Use:     use,
 		Short:   short,
 		Long:    long,
 		Example: example,
 		Aliases: []string{"cs"},
 		Args:    MaximumNArgs(1),
-		Run:     c.Run})
+		Run:     c.run})
 
 	return
 }
 
-func (c *ConnectionStrings) Run(*Command, []string) {
+func (c *ConnectionStrings) run(*Command, []string) {
 	// connectionStringFormats borrowed from "portal.azure.com" "connection strings" pane
 	var connectionStringFormats = map[string]string{
 		"ADO.NET": "Server=tcp:%s,%s;Initial Catalog=%s;Persist Security Info=False;User ID=%s;Password=%s;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",

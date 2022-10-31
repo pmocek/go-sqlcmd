@@ -7,11 +7,11 @@ import (
 	"fmt"
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
-	config2 "github.com/microsoft/go-sqlcmd/internal/helpers/config"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/mssql"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	secret2 "github.com/microsoft/go-sqlcmd/internal/helpers/secret"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
 	. "github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -28,6 +28,12 @@ type Base struct {
 	acceptEula      bool
 	contextName     string
 	defaultDatabase string
+
+	passwordLength int
+	passwordMinSpecial int
+	passwordMinNumber int
+	passwordMinUpper int
+	passwordSpecialCharSet string
 
 	defaultContextName string
 }
@@ -57,7 +63,7 @@ func (c *Base) addFlags(
 		&c.tag,
 		"tag",
 		"latest",
-		"Use `sqlcmd install mssql get-tags` to see full list of options",
+		"Use get-tags to see list of tags",
 	)
 
 	command.PersistentFlags().StringVarP(
@@ -73,7 +79,7 @@ func (c *Base) addFlags(
 		"user-database",
 		"u",
 		"",
-		"Create a user database and set it as the default for the user login",
+		"Create a user database and set it as the default for login",
 	)
 
 	command.PersistentFlags().BoolVar(
@@ -81,6 +87,41 @@ func (c *Base) addFlags(
 		"accept-eula",
 		false,
 		"Accept the SQL Server EULA",
+	)
+
+	command.PersistentFlags().IntVar(
+		&c.passwordLength,
+		"password-length",
+		50,
+		"Generated password length",
+	)
+
+	command.PersistentFlags().IntVar(
+		&c.passwordMinSpecial,
+		"password-min-special",
+		10,
+		"Minimum number of special characters",
+	)
+
+	command.PersistentFlags().IntVar(
+		&c.passwordMinNumber,
+		"password-min-number",
+		10,
+		"Minimum number of numeric characters",
+	)
+
+	command.PersistentFlags().IntVar(
+		&c.passwordMinUpper,
+		"password-min-upper",
+		10,
+		"Minimum number of upper characters",
+	)
+
+	command.PersistentFlags().StringVar(
+		&c.passwordSpecialCharSet,
+		"password-special-chars",
+		"!@#$%&*",
+		"Special character set to include in password",
 	)
 }
 
@@ -108,11 +149,10 @@ func (c *Base) run(*Command, []string) {
 }
 
 func (c *Base) installDockerImage(imageName string, contextName string) {
-	saPassword := secret2.Generate(
-		100, 10, 10, 10)
+	saPassword := c.generatePassword()
 
 	env := []string{"ACCEPT_EULA=Y", fmt.Sprintf("SA_PASSWORD=%s", saPassword)}
-	port := config2.FindFreePortForTds()
+	port := config.FindFreePortForTds()
 	controller := docker.NewController()
 	output.Infof("Downloading %v", imageName)
 	err := controller.EnsureImage(imageName)
@@ -138,7 +178,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		output.FatalErr(err)
 	}
 
-	previousContextName := config2.GetCurrentContextName()
+	previousContextName := config.GetCurrentContextName()
 
 	var userName string
 	if runtime.GOOS == "windows" {
@@ -150,16 +190,15 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		panic("Unable to get username, set env var USERNAME or USER")
 	}
 
-	password := secret2.Generate(
-		100, 10, 10, 10)
+	password := c.generatePassword()
 	// Save the config now, so user can uninstall, even if mssql in the container
 	// fails to start
-	config2.Update(id, imageName, port, userName, password, contextName)
+	config.Update(id, imageName, port, userName, password, contextName)
 
 	output.Infof(
 		"Created context '%s' in %s",
-		config2.GetCurrentContextName(),
-		config2.GetConfigFileUsed(),
+		config.GetCurrentContextName(),
+		config.GetConfigFileUsed(),
 	)
 
 	// BUG(stuartpa): SQL Server bug: "SQL Server is now ready for client connections", oh no it isn't!!
@@ -169,11 +208,11 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		id, "The default language")
 
 	output.Infof("Rotating 'sa' password and disabling account, creating user '%s'", userName)
-	endpoint, _ := config2.GetCurrentContext()
+	endpoint, _ := config.GetCurrentContext()
 	s := mssql.Connect(endpoint, sqlconfig.User{
 		UserDetails: sqlconfig.UserDetails{
 			Username: "sa",
-			Password: secret2.Encrypt(saPassword),
+			Password: secret.Encrypt(saPassword),
 		},
 		Name: "sa",
 	}, nil)
@@ -215,11 +254,10 @@ CHECK_POLICY=OFF`
 
 	mssql.Query(s, fmt.Sprintf(createLogin, userName, password, defaultDatabase))
 	mssql.Query(s, fmt.Sprintf(addSrvRoleMember, userName))
+
 	// Correct safety protocol is to rotate the sa password, because the first
 	// sa password has been in the docker environment (as SA_PASSWORD)
-	rotateSaPassword := secret2.Generate(
-		100, 10, 10, 10)
-	mssql.Query(s, fmt.Sprintf("ALTER LOGIN [sa] WITH PASSWORD = '%s';", rotateSaPassword))
+	mssql.Query(s, fmt.Sprintf("ALTER LOGIN [sa] WITH PASSWORD = '%s';", c.generatePassword()))
 	mssql.Query(s, "ALTER LOGIN [sa] DISABLE")
 
 	if c.defaultDatabase != "" {
@@ -227,4 +265,15 @@ CHECK_POLICY=OFF`
 			defaultDatabase,
 			userName))
 	}
+}
+
+func (c *Base) generatePassword() (password string) {
+	password = secret.Generate(
+		c.passwordLength,
+		c.passwordMinSpecial,
+		c.passwordMinNumber,
+		c.passwordMinUpper,
+		c.passwordSpecialCharSet)
+
+	return
 }

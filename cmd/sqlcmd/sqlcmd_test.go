@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-//+build back_compat_mode
 
-package main
+package sqlcmd
 
 import (
 	"os"
@@ -121,7 +120,7 @@ func TestInvalidCommandLine(t *testing.T) {
 		arguments := &SQLCmdArguments{}
 		parser := newKong(t, arguments)
 		_, err := parser.Parse(test.commandLine)
-		assert.EqualError(t, err, test.errorMessage, "Command line:%v", test.commandLine)
+		assert.EqualError(t, err, test.errorMessage, "DefineCommand line:%v", test.commandLine)
 	}
 }
 

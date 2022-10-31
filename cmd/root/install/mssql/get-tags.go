@@ -16,14 +16,14 @@ type GetTags struct {
 	installType string
 }
 
-func (c *GetTags) GetCommand() (command *Command) {
+func (c *GetTags) DefineCommand() (command *Command) {
 	const use = "get-tags"
 	const short = "Get tags available for install."
 	const long = short
 	const example = `# List tags
 sqlcmd install get-tags`
 
-	command = c.AddCommand(Command{
+	command = c.SetCommand(Command{
 		Use:     use,
 		Short:   short,
 		Long:    long,

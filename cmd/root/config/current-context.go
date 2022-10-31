@@ -14,7 +14,7 @@ type CurrentContext struct {
 	AbstractBase
 }
 
-func (c *CurrentContext) GetCommand() (command *Command) {
+func (c *CurrentContext) DefineCommand() (command *Command) {
 	const use = "current-context"
 	const short = "Display the current-context."
 	const long = short
@@ -25,7 +25,7 @@ func (c *CurrentContext) GetCommand() (command *Command) {
 		output.Info(config.GetCurrentContextName())
 	}
 
-	command = c.AddCommand(Command{
+	command = c.SetCommand(Command{
 		Use:     use,
 		Short:   short,
 		Long:    long,

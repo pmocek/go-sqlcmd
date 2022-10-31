@@ -12,10 +12,10 @@ type Config struct {
 	AbstractBase
 }
 
-func (c *Config) GetCommand() (command *Command) {
+func (c *Config) DefineCommand() (command *Command) {
 	const short = "Modify sqlconfig files using subcommands like \"sqlcmd config use-context mssql\""
 
-	command = c.AddCommand(Command{
+	command = c.SetCommand(Command{
 		Use:   "config",
 		Short: short,
 		Long:  short,

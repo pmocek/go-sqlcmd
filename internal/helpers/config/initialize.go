@@ -8,6 +8,8 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/net"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
+	"os"
+	"path/filepath"
 )
 
 var encryptCallback func(plainText string) (cipherText string)
@@ -16,6 +18,9 @@ var isLocalPortAvailableCallback func(port int) (portAvailable bool)
 var createEmptyFileIfNotExistsCallback func(filename string)
 
 func init() {
+	home, _ := os.UserHomeDir()
+	configFile := filepath.Join(home, ".sqlcmd", "sqlconfig")
+
 	Initialize(
 		func(err error) {if err != nil {panic(err)}},
 		output.Tracef,
@@ -23,7 +28,7 @@ func init() {
 		secret.Decrypt,
 		net.IsLocalPortAvailable,
 		file.CreateEmptyFileIfNotExists,
-		"sqlconfig-test",
+		configFile,
 	)
 }
 
@@ -32,33 +37,15 @@ func Initialize(
 	traceHandler func(format string, a ...any),
 	encryptHandler func(plainText string) (cipherText string),
 	decryptHandler func(cipherText string) (secret string),
-	isLocalPortAvailableCallbackHandler func(port int) (portAvailable bool),
+	isLocalPortAvailableHandler func(port int) (portAvailable bool),
 	createEmptyFileIfNotExistsHandler func(filename string),
 	configFile string,
 ) {
-	if errorHandler == nil {
-		panic("Please provide an errorHandler")
-	}
-	if traceHandler == nil {
-		panic("Please provide an traceHandler")
-	}
-	if encryptHandler == nil {
-		panic("Please provide an encryptHandler")
-	}
-	if decryptHandler == nil {
-		panic("Please provide an decryptHandler")
-	}
-	if isLocalPortAvailableCallbackHandler == nil {
-		panic("Please provide an  isLocalPortAvailableCallbackHandler")
-	}
-	if createEmptyFileIfNotExistsHandler == nil {
-		panic("Please provide an  createEmptyFileIfNotExistsHandler")
-	}
 	errorCallback = errorHandler
 	traceCallback = traceHandler
 	encryptCallback = encryptHandler
 	decryptCallback = decryptHandler
-	isLocalPortAvailableCallback = isLocalPortAvailableCallbackHandler
+	isLocalPortAvailableCallback = isLocalPortAvailableHandler
 	createEmptyFileIfNotExistsCallback = createEmptyFileIfNotExistsHandler
 
 	configureViper(configFile)

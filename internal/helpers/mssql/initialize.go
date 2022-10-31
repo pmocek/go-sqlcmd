@@ -5,19 +5,18 @@ package mssql
 
 var decryptCallback func(cipherText string) (secret string)
 
+func init() {
+	Initialize(
+		func(err error) {},
+		func(format string, a ...any) {},
+		func(cipherText string) (secret string) {return})
+}
+
 func Initialize(
 	errorHandler func(err error),
 	traceHandler func(format string, a ...any),
 	decryptHandler func(cipherText string) (secret string)) {
-	if errorHandler == nil {
-		panic("Please provide an errorHandler")
-	}
-	if traceHandler == nil {
-		panic("Please provide an traceHandler")
-	}
-	if decryptHandler == nil {
-		panic("Please provide an decryptHandler")
-	}
+
 
 	errorCallback = errorHandler
 	traceCallback = traceHandler

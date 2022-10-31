@@ -8,6 +8,8 @@ import (
 )
 
 type Commander interface {
-	AddCommand(command Command) *Command
-	GetCommand() *Command
+	SetCommand(command Command) *Command
+	DefineCommand() *Command
+	Name() string
+	Aliases() []string
 }

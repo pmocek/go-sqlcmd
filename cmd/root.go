@@ -6,16 +6,18 @@ package cmd
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	. "github.com/spf13/cobra"
+	"os"
+	"path/filepath"
 )
 
 type Root struct {
 	AbstractBase
 }
 
-func (c *Root) GetCommand() (command *Command) {
+func (c *Root) DefineCommand() (command *Command) {
 	const short = "sqlcmd: a command-line interface for the #SQLFamily."
 
-	command = c.AddCommand(Command{
+	command = c.SetCommand(Command{
 		Use:   "sqlcmd",
 		Short: short,
 		Long:  short,
@@ -34,6 +36,7 @@ func (c *Root) addGlobalFlags(command *Command) {
 		false,
 		"Whether to trust the certificate presented by the endpoint for encryption",
 	)
+
 	command.PersistentFlags().StringVarP(
 		&GlobalOptions.DatabaseName,
 		"database-name",
@@ -41,6 +44,7 @@ func (c *Root) addGlobalFlags(command *Command) {
 		"",
 		"The initial database for the connection",
 	)
+
 	command.PersistentFlags().BoolVarP(
 		&GlobalOptions.UseTrustedConnection,
 		"use-trusted-connection",
@@ -49,10 +53,14 @@ func (c *Root) addGlobalFlags(command *Command) {
 		"Whether to use integrated security",
 	)
 
+	home, err := os.UserHomeDir()
+	checkErr(err)
+	configFile := filepath.Join(home, ".sqlcmd", "sqlconfig")
+
 	command.PersistentFlags().String(
 		"sqlconfig",
+		configFile,
 		"",
-		"config file (default is ~/.sqlcmd/sqlconfig).",
 	)
 
 	command.PersistentFlags().StringP(

@@ -33,7 +33,7 @@ type Command struct {
 type Commands map[string]*Command
 
 func newCommands() Commands {
-	// Commands is the set of Command implementations
+	// Commands is the set of DefineCommand implementations
 	return map[string]*Command{
 		"EXIT": {
 			regex:  regexp.MustCompile(`(?im)^[\t ]*?:?EXIT(?:[ \t]*(\(?.*\)?$)|$)`),
