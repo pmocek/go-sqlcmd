@@ -9,6 +9,11 @@ import (
 	"strconv"
 )
 
+func AddEndpoint(endpoint sqlconfig.Endpoint) {
+	config.Endpoints = append(config.Endpoints, endpoint)
+	Save()
+}
+
 func EndpointsExists() (exists bool) {
 	if len(config.Endpoints) > 0 {
 		exists = true

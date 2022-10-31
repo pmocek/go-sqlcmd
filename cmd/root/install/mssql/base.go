@@ -207,22 +207,30 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	controller.ContainerWaitForLogEntry(
 		id, "The default language")
 
-	output.Infof("Rotating 'sa' password and disabling account, creating user '%s'", userName)
+	output.Infof(
+		"Disabling 'sa' account (and rotating 'sa' password). Creating user '%s'",
+		userName,
+	)
 	endpoint, _ := config.GetCurrentContext()
-	s := mssql.Connect(endpoint, sqlconfig.User{
-		UserDetails: sqlconfig.UserDetails{
-			Username: "sa",
-			Password: secret.Encrypt(saPassword),
+	s := mssql.Connect(
+		endpoint,
+		sqlconfig.User{
+			AuthenticationType: "basic",
+			BasicAuth: sqlconfig.BasicAuthDetails{
+				Username: "sa",
+				Password: secret.Encrypt(saPassword),
+			},
+			Name: "sa",
 		},
-		Name: "sa",
-	}, nil)
+		nil,
+	)
 	c.createNonSaUser(s, userName, password)
 
 	hints := []string{
 		"To run a query:               sqlcmd query \"SELECT @@version\"",
 		"To start interactive session: sqlcmd query"}
 	if previousContextName != "" {
-		hints = append(hints, fmt.Sprintf("To change context:       sqlcmd config use-context %v", previousContextName))
+		hints = append(hints, fmt.Sprintf("To change context:            sqlcmd config use-context %v", previousContextName))
 	}
 	hints = append(hints, "To view config:               sqlcmd config view")
 	hints = append(hints, "To see connection strings:    sqlcmd config connection-strings")

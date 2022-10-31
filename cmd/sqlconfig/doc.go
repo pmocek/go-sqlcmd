@@ -25,8 +25,8 @@ An example of the sqlconfig file looks like this:
 
 	apiversion: v1
 	endpoints:
-	- docker:
-		containerid: 0e698e65e19d9c
+	- container:
+		id: 0e698e65e19d9c
 		image: mcr.microsoft.com/mssql/server:2022-latest
 	  endpoint:
 		address: localhost

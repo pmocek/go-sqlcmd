@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
-
 package config
 
 import (
@@ -10,16 +7,16 @@ import (
 	. "github.com/spf13/cobra"
 )
 
-type CurrentContext struct {
+type AddEndpoint struct {
 	AbstractBase
 }
 
-func (c *CurrentContext) DefineCommand() (command *Command) {
-	const use = "current-context"
-	const short = "Display the current-context."
+func (c *AddEndpoint) DefineCommand() (command *Command) {
+	const use = "add-endpoint"
+	const short = "Add an endpoint."
 	const long = short
-	const example = `Display the current-context
-	sqlcmd config current-context`
+	const example = `Add a default context
+	sqlcmd config add-context --name my-context`
 
 	command = c.SetCommand(Command{
 		Use:     use,
@@ -31,6 +28,7 @@ func (c *CurrentContext) DefineCommand() (command *Command) {
 	return
 }
 
-func (c *CurrentContext) run(cmd *Command, args []string) {
+func (c *AddEndpoint) run(cmd *Command, args []string) {
+
 	output.Info(config.GetCurrentContextName())
 }

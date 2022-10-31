@@ -32,6 +32,8 @@ func isFirstArgAModernCliRootCommand() (isNewCliCommand bool) {
 		isNewCliCommand = true
 	} else if os.Args[1] == "--help" {
 		isNewCliCommand = true
+	} else if os.Args[1] == "completion" {
+		isNewCliCommand = true
 	}
 
 	return

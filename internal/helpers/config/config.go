@@ -61,7 +61,8 @@ func Update(
 	})
 
 	config.Users = append(config.Users, User{
-		UserDetails: UserDetails{
+		AuthenticationType: "basic",
+		BasicAuth: BasicAuthDetails{
 			Username: username,
 			Password: encryptCallback(password),
 		},
@@ -75,9 +76,9 @@ func GetRedactedConfig(raw bool) (c Sqlconfig) {
 	c = config
 	for i, v := range c.Users {
 		if raw {
-			c.Users[i].UserDetails.Password = decryptCallback(v.UserDetails.Password)
+			c.Users[i].BasicAuth.Password = decryptCallback(v.BasicAuth.Password)
 		} else {
-			c.Users[i].UserDetails.Password = "REDACTED"
+			c.Users[i].BasicAuth.Password = "REDACTED"
 		}
 	}
 

@@ -24,8 +24,8 @@ func Connect(
 			endpoint.EndpointDetails.Address,
 			endpoint.EndpointDetails.Port),
 		UseTrustedConnection: false,
-		UserName:             user.UserDetails.Username,
-		Password:             decryptCallback(user.UserDetails.Password),
+		UserName:             user.BasicAuth.Username,
+		Password:             decryptCallback(user.BasicAuth.Password),
 	}
 	trace("Connecting to server %v", connect.ServerName)
 	err := s.ConnectDb(&connect, true)
