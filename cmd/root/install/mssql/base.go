@@ -226,7 +226,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	endpoint, _ := config.GetCurrentContext()
 	s := mssql.Connect(
 		endpoint,
-		sqlconfig.User{
+		&sqlconfig.User{
 			AuthenticationType: "basic",
 			BasicAuth: &sqlconfig.BasicAuthDetails{
 				Username: "sa",

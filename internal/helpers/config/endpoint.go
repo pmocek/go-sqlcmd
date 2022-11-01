@@ -5,11 +5,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
+	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 	"strconv"
 )
 
-func AddEndpoint(endpoint sqlconfig.Endpoint) {
+func AddEndpoint(endpoint Endpoint) {
+	endpoint.Name = FindUniqueEndpointName(endpoint.Name)
 	config.Endpoints = append(config.Endpoints, endpoint)
 	Save()
 }
@@ -147,7 +148,7 @@ func endpointOrdinal(name string) (ordinal int) {
 }
 
 
-func GetEndpoint(name string) (endpoint sqlconfig.Endpoint) {
+func GetEndpoint(name string) (endpoint Endpoint) {
 	for _, e := range config.Endpoints {
 		if name == e.Name {
 			endpoint = e
@@ -155,4 +156,18 @@ func GetEndpoint(name string) (endpoint sqlconfig.Endpoint) {
 		}
 	}
 	return
+}
+
+func OutputEndpoints(formatter func(interface{}), detailed bool) {
+	if detailed {
+		formatter(config.Endpoints)
+	} else {
+		var names []string
+
+		for _, v := range config.Endpoints {
+			names = append(names, v.Name)
+		}
+
+		formatter(names)
+	}
 }

@@ -3,9 +3,14 @@
 
 package config
 
-import . "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
+import (
+	"fmt"
+	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
+	"strconv"
+)
 
 func AddUser(user User) {
+	user.Name = FindUniqueUserName(user.Name)
 	config.Users = append(config.Users, user)
 	Save()
 }
@@ -57,4 +62,44 @@ func GetUser(name string) (user User) {
 		}
 	}
 	return
+}
+
+func FindUniqueUserName(name string) (uniqueUserName string) {
+	if !UserNameExists(name) {
+		uniqueUserName = name
+	} else {
+		var postfixNumber = 2
+
+		for {
+			uniqueUserName = fmt.Sprintf(
+				"%v%v",
+				name,
+				strconv.Itoa(postfixNumber),
+			)
+			if !UserNameExists(uniqueUserName) {
+				break
+			} else {
+				postfixNumber++
+			}
+			if postfixNumber == 5000 {
+				panic("Did not find an available user name")
+			}
+		}
+	}
+
+	return
+}
+
+func OutputUsers(formatter func(interface{}), detailed bool) {
+	if detailed {
+		formatter(config.Users)
+	} else {
+		var names []string
+
+		for _, v := range config.Users {
+			names = append(names, v.Name)
+		}
+
+		formatter(names)
+	}
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
 	. "github.com/spf13/cobra"
 	"os"
+	"runtime"
 )
 
 type AddUser struct {
@@ -37,8 +38,8 @@ func (c *AddUser) DefineCommand() (command *Command) {
 	command.PersistentFlags().StringVar(
 		&c.name,
 		"name",
-		"my-endpoint",
-		"Display name for the endpoint")
+		"user",
+		"Display name for the user (this is not the username)")
 
 	command.PersistentFlags().StringVar(
 		&c.authType,
@@ -52,11 +53,13 @@ func (c *AddUser) DefineCommand() (command *Command) {
 		"",
 		"The username (provide password in SQLCMD_PASSWORD environment variable)")
 
-	command.PersistentFlags().BoolVar(
-		&c.encryptPassword,
-		"encrypt-password",
-		false,
-		"Encrypt the password")
+	if runtime.GOOS == "windows" {
+		command.PersistentFlags().BoolVar(
+			&c.encryptPassword,
+			"encrypt-password",
+			false,
+			"Encrypt the password")
+	}
 
 	return
 }

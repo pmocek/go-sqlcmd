@@ -99,6 +99,30 @@ func infofWithHints(hints []string, format string, a ...any) {
 	}
 }
 
+func InfofWithHintExamples(hintExamples [][]string, format string, a ...any) {
+	if loggingLevel >= verbosity.Info {
+		format = ensureEol(format)
+		if loggingLevel >= verbosity.Debug {
+			_, err := fmt.Printf("INFO:  ")
+			checkErr(err)
+		}
+		_, err := fmt.Printf(format, a...)
+		checkErr(err)
+		displayHintExamples(hintExamples)
+	}
+}
+
+func displayHintExamples(hintExamples [][]string) {
+	var hints []string
+	for _, hintExample := range hintExamples {
+		if len(hintExample) != 2 {
+			panic("Hintexample must be 2 elements, a description, and an example")
+		}
+		hints = append(hints, fmt.Sprintf("%v:\t\t`%s`", hintExample[0], hintExample[1]))
+	}
+	displayHints(hints)
+}
+
 func Info(a ...any) {
 	if loggingLevel >= verbosity.Info {
 		if loggingLevel >= verbosity.Debug {
@@ -167,6 +191,12 @@ func FatalWithHints(hints []string, a ...any) {
 func fatal(hints []string, a ...any) {
 	err := errors.New(fmt.Sprintf("%v", a...))
 	displayHints(hints)
+	checkErr(err)
+}
+
+func FatalfWithHintExamples(hintExamples [][]string, format string, a ...any) {
+	err := errors.New(fmt.Sprintf("%v", a...))
+	displayHintExamples(hintExamples)
 	checkErr(err)
 }
 

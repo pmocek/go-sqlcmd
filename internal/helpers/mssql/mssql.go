@@ -12,7 +12,7 @@ import (
 
 func Connect(
 	endpoint sqlconfig.Endpoint,
-	user sqlconfig.User,
+	user *sqlconfig.User,
 	console sqlcmd.Console,
 ) *sqlcmd.Sqlcmd {
 	v := sqlcmd.InitializeVariables(true)
@@ -24,17 +24,22 @@ func Connect(
 			endpoint.EndpointDetails.Address,
 			endpoint.EndpointDetails.Port),
 	}
-	if user.AuthenticationType == "basic" {
-		connect.UseTrustedConnection = false
-		connect.UserName = user.BasicAuth.Username
-		connect.Password = decryptCallback(
-			user.BasicAuth.Password,
-			user.BasicAuth.PasswordEncrypted,
-		)
-	} else if user.AuthenticationType == "trusted" {
+
+	if user == nil {
 		connect.UseTrustedConnection = true
 	} else {
-		panic("Authentication not supported")
+		if user.AuthenticationType == "basic" {
+			connect.UseTrustedConnection = false
+			connect.UserName = user.BasicAuth.Username
+			connect.Password = decryptCallback(
+				user.BasicAuth.Password,
+				user.BasicAuth.PasswordEncrypted,
+			)
+		} else if user.AuthenticationType == "trusted" {
+			connect.UseTrustedConnection = true
+		} else {
+			panic("Authentication not supported")
+		}
 	}
 
 	trace("Connecting to server %v", connect.ServerName)

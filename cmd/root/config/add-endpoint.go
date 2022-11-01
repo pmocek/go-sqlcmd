@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
@@ -33,7 +34,7 @@ func (c *AddEndpoint) DefineCommand() (command *Command) {
 	command.PersistentFlags().StringVar(
 		&c.name,
 		"name",
-		"my-endpoint",
+		"endpoint",
 		"Display name for the endpoint")
 
 	command.PersistentFlags().StringVar(
@@ -63,5 +64,8 @@ func (c *AddEndpoint) run(cmd *Command, args []string) {
 	}
 
 	config.AddEndpoint(endpoint)
-	output.Infof("Endpoint '%v' added", endpoint.Name)
+	output.InfofWithHintExamples([][]string{
+			{"Add a context", fmt.Sprintf("sqlcmd config add-context --endpoint %v", endpoint.Name)},
+		},
+	"Endpoint '%v' added", endpoint.Name)
 }

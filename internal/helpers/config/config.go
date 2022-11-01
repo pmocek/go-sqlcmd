@@ -91,15 +91,3 @@ func GetRedactedConfig(raw bool) (c Sqlconfig) {
 
 	return
 }
-
-func OutputUsers(formatter func(interface{})) {
-	formatter(config.Users)
-}
-
-func OutputEndpoints(formatter func(interface{})) {
-	formatter(config.Endpoints)
-}
-
-func OutputContexts(formatter func(interface{})) {
-	formatter(config.Contexts)
-}

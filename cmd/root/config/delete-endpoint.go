@@ -40,6 +40,9 @@ func (c *DeleteEndpoint) DefineCommand() (command *Command) {
 }
 
 func (c *DeleteEndpoint) run(cmd *Command, args []string) {
+	if c.name == "" {
+		output.Fatal("Endpoint name must be provided.  Provide endpoint name with --name flag")
+	}
 	config.DeleteEndpoint(c.name)
 
 	output.Infof("Endpoint '%v' deleted", c.name)

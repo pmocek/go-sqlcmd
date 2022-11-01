@@ -11,6 +11,7 @@ import (
 )
 
 func AddContext(context Context) {
+	context.Name = FindUniqueContextName(context.Name, context.User)
 	config.Contexts = append(config.Contexts, context)
 	Save()
 }
@@ -134,13 +135,13 @@ func contextOrdinal(name string) (ordinal int) {
 	for i, c := range config.Contexts {
 		if name == c.Name {
 			ordinal = i
-			break
+			return
 		}
 	}
-	return
+	panic("Context not found")
 }
 
-func GetCurrentContext() (endpoint Endpoint, user User) {
+func GetCurrentContext() (endpoint Endpoint, user* User) {
 	currentContextName := GetCurrentContextOrFatal()
 
 	for _, c := range config.Contexts {
@@ -154,7 +155,7 @@ func GetCurrentContext() (endpoint Endpoint, user User) {
 
 			for _, u := range config.Users {
 				if u.Name == c.User {
-					user = u
+					user = &u
 					break
 				}
 			}
@@ -171,4 +172,18 @@ func GetContext(name string) (context Context) {
 		}
 	}
 	return
+}
+
+func OutputContexts(formatter func(interface{}), detailed bool) {
+	if detailed {
+		formatter(config.Contexts)
+	} else {
+		var names []string
+
+		for _, v := range config.Contexts {
+			names = append(names, v.Name)
+		}
+
+		formatter(names)
+	}
 }

@@ -34,19 +34,19 @@ func (c *AddContext) DefineCommand() (command *Command) {
 	command.PersistentFlags().StringVar(
 		&c.name,
 		"name",
-		"my-context",
+		"context",
 		"Display name for the context")
 
 	command.PersistentFlags().StringVar(
 		&c.endpointName,
-		"endpoint-name",
-		"my-endpoint",
+		"endpoint",
+		"",
 		"Name of endpoint this context will use, use `sqlcmd config get-endpoints` to see list")
 
 	command.PersistentFlags().StringVar(
 		&c.userName,
-		"user-name",
-		"my-user",
+		"user",
+		"",
 		"Name of user this context will use, use `sqlcmd config get-users` to see list")
 
 	return
@@ -63,19 +63,27 @@ func (c *AddContext) run(cmd *Command, args []string) {
 
 	if !config.EndpointExists(c.endpointName) {
 		output.FatalfWithHints([]string{
-			"Use `sqlcmd config get-endpoints` to view endpoint list",
-			fmt.Sprintf("Use `sqlcmd config add-endpoint --name %v` to add an endpoint", c.endpointName),
-			"Add an endpoint using `sqlcmd install`"},
-		"Endpoint '%v' does not exist", c.endpointName)
+			"Use `sqlcmd config get-endpoints` to view endpoint list to choose from",
+			"Add a local endpoint using `sqlcmd install`",
+			"Add an already existing endpoint using `sqlcmd config add-endpoint --address localhost --port 1433`"},
+		"An endpoint is required to add a context.  Endpoint '%v' does not exist", c.endpointName)
 	}
 
-	if !config.UserExists(c.userName) {
-		output.FatalfWithHints([]string{
-			"Use `sqlcmd config get-users` to view user list",
-			fmt.Sprintf("Use `sqlcmd config add-user --name %v` to add a user", c.userName),
-			"Add an endpoint using `sqlcmd install`"},
-			"User '%v' does not exist", c.userName)
+	if c.userName != "" {
+		if !config.UserExists(c.userName) {
+			output.FatalfWithHints([]string{
+				"Use `sqlcmd config get-users` to view user list",
+				fmt.Sprintf("Use `sqlcmd config add-user --name %v` to add a user", c.userName),
+				"Add an endpoint using `sqlcmd install`"},
+				"User '%v' does not exist", c.userName)
+		}
 	}
+
 	config.AddContext(context)
-	output.Infof("Context '%v' added", context.Name)
+	config.SetCurrentContextName(context.Name)
+	output.InfofWithHintExamples([][]string{
+			{"To start interactive query session", "sqlcmd query"},
+			{"To run a query", "sqlcmd query \"SELECT @@version\""},
+		},
+	"Current Context '%v'", context.Name)
 }
