@@ -17,7 +17,7 @@ type DeleteEndpoint struct {
 }
 
 func (c *DeleteEndpoint) DefineCommand() (command *Command) {
-	const use = "delete-endpoint"
+	const use = "delete-endpoint NAME"
 	const short = "Delete an endpoint"
 	const long = short
 	const example = `Delete an endpoint
@@ -40,6 +40,10 @@ func (c *DeleteEndpoint) DefineCommand() (command *Command) {
 }
 
 func (c *DeleteEndpoint) run(cmd *Command, args []string) {
+	if len(args) == 1 {
+		c.name = args[0]
+	}
+
 	if c.name == "" {
 		output.Fatal("Endpoint name must be provided.  Provide endpoint name with --name flag")
 	}

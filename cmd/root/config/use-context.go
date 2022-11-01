@@ -12,6 +12,8 @@ import (
 
 type UseContext struct {
 	AbstractBase
+
+	name string
 }
 
 func (c *UseContext) DefineCommand() (command *Command) {
@@ -22,16 +24,23 @@ func (c *UseContext) DefineCommand() (command *Command) {
   sqlcmd config use-context sa@sql1`
 
 	var run = func(cmd *Command, args []string) {
-		var name = args[0]
-		if config.ContextExists(name) {
-			config.SetCurrentContextName(name)
+		if c.name != "" && len(args) == 1 && args[0] != "" {
+			output.Fatal("Both an argument and the --name flag have been provided.  Please provide either an argument or the --name flag")
+		}
+		if c.name == "" {
+			if len(args) == 1 {
+				c.name = args[0]
+			}
+		}
+		if config.ContextExists(c.name) {
+			config.SetCurrentContextName(c.name)
 			output.InfofWithHints([]string{
 				"To run a query:    sqlcmd query \"SELECT @@SERVERNAME\"",
 				"To remove:         sqlcmd uninstall"},
-				"Switched to context \"%v\".", name)
+				"Switched to context \"%v\".", c.name)
 		} else {
 			output.FatalfWithHints([]string{"To view available contexts run `sqlcmd config get-contexts`"},
-				"No context exists with the name: \"%v\"", name)
+				"No context exists with the name: \"%v\"", c.name)
 		}
 	}
 
@@ -40,10 +49,15 @@ func (c *UseContext) DefineCommand() (command *Command) {
 		Short:      short,
 		Long:       long,
 		Example:    example,
-		Args:       ExactArgs(1),
-		ArgAliases: []string{"context_name"},
-		Aliases:    []string{"use", "change-context"},
+		Args:       MaximumNArgs(1),
+		Aliases:    []string{"use", "change-context", "set-context"},
 		Run:        run})
+
+	command.PersistentFlags().StringVar(
+		&c.name,
+		"name",
+		"",
+		"Name of context to set as current context")
 
 	return
 }

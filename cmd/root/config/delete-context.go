@@ -18,7 +18,7 @@ type DeleteContext struct {
 }
 
 func (c *DeleteContext) DefineCommand() (command *Command) {
-	const use = "delete-context"
+	const use = "delete-context NAME"
 	const short = "Delete a context"
 	const long = short
 	const example = `Delete a context
@@ -47,6 +47,10 @@ func (c *DeleteContext) DefineCommand() (command *Command) {
 }
 
 func (c *DeleteContext) run(cmd *Command, args []string) {
+	if len(args) == 1 {
+		c.name = args[0]
+	}
+
 	if c.name == "" {
 		output.FatalWithHints([]string{"Use the --name flag to pass in a context name to delete"},
 		"A 'name' is required")

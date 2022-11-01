@@ -20,6 +20,13 @@ func DeleteContext(name string, cascade bool) {
 	if ContextExists(name) {
 		ordinal := contextOrdinal(name)
 		config.Contexts = append(config.Contexts[:ordinal], config.Contexts[ordinal+1:]...)
+
+		if len(config.Contexts) > 0 {
+			config.CurrentContext = config.Contexts[0].Name
+		} else {
+			config.CurrentContext = ""
+		}
+		
 		Save()
 	}
 }

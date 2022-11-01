@@ -17,7 +17,7 @@ type DeleteUser struct {
 }
 
 func (c *DeleteUser) DefineCommand() (command *Command) {
-	const use = "delete-user"
+	const use = "delete-user NAME"
 	const short = "Delete a user"
 	const long = short
 	const example = `Delete a user
@@ -40,6 +40,10 @@ func (c *DeleteUser) DefineCommand() (command *Command) {
 }
 
 func (c *DeleteUser) run(cmd *Command, args []string) {
+	if len(args) == 1 {
+		c.name = args[0]
+	}
+
 	config.DeleteUser(c.name)
 
 	output.Infof("User '%v' deleted", c.name)
