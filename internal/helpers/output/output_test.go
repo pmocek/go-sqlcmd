@@ -1,6 +1,7 @@
 package output
 
 import (
+	"errors"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
 	"testing"
 )
@@ -34,17 +35,279 @@ func TestTracef(t *testing.T) {
 			Warn(tt.args.a)
 			Errorf(tt.args.format, tt.args.a...)
 			Error(tt.args.a)
-			//Fatalf(tt.args.format, tt.args.a...)
-			//Fatal(tt.args.a)
 
 			InfofWithHints([]string{}, tt.args.format, tt.args.a...)
 			InfofWithHintExamples([][]string{}, tt.args.format, tt.args.a...)
 
-			//FatalfWithHints([]string{}, tt.args.format, tt.args.a...)
-			//FatalfWithHintExamples([][]string{}, tt.args.format, tt.args.a...)
+			Struct([]string{"A", "Struct"})
+			Initialize(errorCallback, Tracef, hintCallback, "xml", verbosity.Error)
+			Struct([]string{"A", "Struct"})
+			Initialize(errorCallback, Tracef, hintCallback, "json", verbosity.Error)
+			Struct([]string{"A", "Struct"})
 
-			Initialize(nil, Tracef, nil, "xml", verbosity.Error)
-			Initialize(nil, Tracef, nil, "json", verbosity.Error)
+		})
+	}
+}
+
+func TestFatal(t *testing.T) {
+	type args struct {
+		a []any
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"default", args{
+			a: []any{"sample trace"},
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Errorf("The code did not panic")
+				}
+			}()
+			Fatal(tt.args.a...)
+		})
+	}
+}
+
+func TestFatalWithHints(t *testing.T) {
+	type args struct {
+		hints []string
+		a     []any
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"default", args{
+			hints: []string{"This is a hint"},
+			a: []any{"sample trace"},
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Errorf("The code did not panic")
+				}
+			}()
+			FatalWithHints(tt.args.hints, tt.args.a...)
+		})
+	}
+}
+
+func TestFatalfWithHintExamples(t *testing.T) {
+	type args struct {
+		hintExamples [][]string
+		format       string
+		a            []any
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"default", args{
+			hintExamples: [][]string{{"This is a hint", "With a sample"}},
+			a: []any{"sample trace"},
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Errorf("The code did not panic")
+				}
+			}()
+			FatalfWithHintExamples(tt.args.hintExamples, tt.args.format, tt.args.a...)
+		})
+	}
+}
+
+func TestFatalfErrorWithHints(t *testing.T) {
+	type args struct {
+		err    error
+		hints  []string
+		format string
+		a      []any
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"default", args{
+			hints: []string{"This is a hint"},
+			a: []any{"sample trace"},
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Errorf("The code did not panic")
+				}
+			}()
+			FatalfErrorWithHints(tt.args.err, tt.args.hints, tt.args.format, tt.args.a...)
+		})
+	}
+}
+
+func TestFatalfWithHints(t *testing.T) {
+	type args struct {
+		hints  []string
+		format string
+		a      []any
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"default", args{
+			hints: []string{"This is a hint"},
+			a: []any{"sample trace"},
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Errorf("The code did not panic")
+				}
+			}()
+			FatalfWithHints(tt.args.hints, tt.args.format, tt.args.a...)
+		})
+	}
+}
+
+func TestFatalf(t *testing.T) {
+	type args struct {
+		format string
+		a      []any
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"default", args{
+			a: []any{"sample trace"},
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Errorf("The code did not panic")
+				}
+			}()
+			Fatalf(tt.args.format, tt.args.a...)
+		})
+	}
+}
+
+func TestFatalErr(t *testing.T) {
+	type args struct {
+		err error
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"default", args{
+			errors.New("An error"),
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Errorf("The code did not panic")
+				}
+			}()
+			FatalErr(tt.args.err)
+		})
+	}
+}
+
+func TestPanicf(t *testing.T) {
+	type args struct {
+		format string
+		a      []any
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"default", args{
+			a: []any{"sample trace"},
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Errorf("The code did not panic")
+				}
+			}()
+			Panicf(tt.args.format, tt.args.a...)
+		})
+	}
+}
+
+func TestPanic(t *testing.T) {
+	type args struct {
+		a []any
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"default", args{
+			a: []any{"sample trace"},
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Errorf("The code did not panic")
+				}
+			}()
+			Panic(tt.args.a...)
+		})
+	}
+}
+
+func TestInfofWithHintExamples(t *testing.T) {
+	type args struct {
+		hintExamples [][]string
+		format       string
+		a            []any
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"default", args{
+			hintExamples: [][]string{{"Bad", "Sample", "One To Many Elements"}, {"Good", "Example"}},
+			format: "sample trace %v",
+			a: []any{"hello"},
+		}},
+		{"emptyFormatString", args{
+			hintExamples: [][]string{{"Bad", "Sample", "One To Many Elements"}, {"Good", "Example"}},
+			format: "",
+			a: []any{"hello"},
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			/*defer func() {
+				if r := recover(); r == nil {
+					t.Errorf("The code did not panic")
+				}
+			}()*/
+			InfofWithHintExamples(tt.args.hintExamples, tt.args.format, tt.args.a...)
 		})
 	}
 }

@@ -19,17 +19,15 @@ import (
 	"fmt"
 	. "github.com/microsoft/go-sqlcmd/internal/helpers/output/formatter"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
+	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 var formatter Formatter
 var loggingLevel verbosity.Enum
 
 func Struct(in interface{}) {
-	if formatter == nil {
-		panic("formatter not initialized")
-	}
-
 	formatter.Serialize(in)
 }
 
@@ -44,8 +42,12 @@ func Tracef(format string, a ...any) {
 }
 
 func ensureEol(format string) string {
-	if format[len(format)-1] != '\n' {
-		format = format + "\n"
+	if len(format) >= len(sqlcmd.SqlcmdEol) {
+		if !strings.HasSuffix(format, sqlcmd.SqlcmdEol) {
+			format = format + sqlcmd.SqlcmdEol
+		}
+	} else {
+		format = sqlcmd.SqlcmdEol
 	}
 	return format
 }

@@ -12,8 +12,11 @@ import (
 // init initializes the package for unit testing.  For production, use
 // the Initialize method to inject fully functional dependencies
 func init() {
+	errorHandler := func(err error){if err != nil {panic(err)}}
+	formatter = &Yaml{Base: Base{ErrorHandlerCallback:errorHandler}}
+
 	Initialize(
-		func(err error){if err != nil {panic(err)}},
+		errorHandler,
 		func(format string, a ...any){},
 		func(hints []string){},
 		"yaml",
