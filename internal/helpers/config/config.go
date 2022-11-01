@@ -79,13 +79,16 @@ func Update(
 func GetRedactedConfig(raw bool) (c Sqlconfig) {
 	c = config
 	for i, _ := range c.Users {
-		if raw {
-			c.Users[i].BasicAuth.Password = decryptCallback(
-				c.Users[i].BasicAuth.Password,
-				c.Users[i].BasicAuth.PasswordEncrypted,
-			)
-		} else {
-			c.Users[i].BasicAuth.Password = "REDACTED"
+		user := c.Users[i]
+		if user.AuthenticationType == "basic" {
+			if raw {
+				user.BasicAuth.Password = decryptCallback(
+					user.BasicAuth.Password,
+					user.BasicAuth.PasswordEncrypted,
+				)
+			} else {
+				user.BasicAuth.Password = "REDACTED"
+			}
 		}
 	}
 

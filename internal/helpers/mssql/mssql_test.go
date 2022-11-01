@@ -2,9 +2,7 @@ package mssql
 
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
-	"reflect"
 	"testing"
 )
 
@@ -12,30 +10,31 @@ func TestConnect(t *testing.T) {
 
 	type args struct {
 		endpoint Endpoint
-		user     User
+		user     *User
 		console  sqlcmd.Console
-	}
-	endpoint, user := config.GetCurrentContext()
-
-	if endpoint.Name == "" || user.Name == "" {
-		panic("Ensure there is a current context, by installing mssql")
 	}
 
 	tests := []struct {
 		name string
 		args args
-		want *sqlcmd.Sqlcmd
+		want int
 	}{
 		{
 			name: "connect", 
-			args: args{endpoint: endpoint, user: user, console:  nil},
-			want: nil,
+			args: args{endpoint: Endpoint{
+				EndpointDetails:  EndpointDetails{
+					Address: "localhost",
+					Port:    1433,
+				},
+				Name:             "local-default-instance",
+			}, user: nil, console:  nil},
+			want: 0,
 		},
 	}
 		for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Connect(tt.args.endpoint, tt.args.user, tt.args.console); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Connect() = %v, want %v", got, tt.want)
+			if got := Connect(tt.args.endpoint, tt.args.user, tt.args.console); got.Exitcode != tt.want {
+				t.Errorf("ExitCode = %v, want %v", got.Exitcode, tt.want)
 			}
 		})
 	}

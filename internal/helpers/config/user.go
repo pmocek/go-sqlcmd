@@ -11,6 +11,17 @@ import (
 
 func AddUser(user User) {
 	user.Name = FindUniqueUserName(user.Name)
+
+	if user.AuthenticationType == "basic" {
+		if user.BasicAuth == nil {
+			panic("If authType is basic, then user.BasicAuth must be provided")
+		}
+
+		if user.BasicAuth.Username == "" {
+			panic("BasicAuth Username cannot be empty")
+		}
+	}
+
 	config.Users = append(config.Users, user)
 	Save()
 }

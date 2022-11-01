@@ -4,7 +4,7 @@
 package secret
 
 func init() {
-	Initialize(func(err error){})
+	Initialize(func(err error){if err != nil {panic(err)}})
 }
 
 func Initialize(handler func(err error)) {

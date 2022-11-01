@@ -9,9 +9,11 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
 )
 
+// init initializes the package for unit testing.  For production, use
+// the Initialize method to inject fully functional dependencies
 func init() {
 	Initialize(
-		func(err error){},
+		func(err error){if err != nil {panic(err)}},
 		func(format string, a ...any){},
 		func(hints []string){},
 		"yaml",

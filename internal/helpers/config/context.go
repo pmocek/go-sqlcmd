@@ -7,10 +7,16 @@ import (
 	"errors"
 	"fmt"
 	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	"strconv"
 )
 
 func AddContext(context Context) {
+	if !EndpointExists(context.Endpoint) {
+		output.FatalfWithHintExamples([][]string{
+			{"Add the endpoint", fmt.Sprintf("sqlcmd config add-endpoint --name %v",context.Endpoint)},
+		}, "Endpoint '%v' does not exist", context.Endpoint)
+	}
 	context.Name = FindUniqueContextName(context.Name, context.User)
 	config.Contexts = append(config.Contexts, context)
 	Save()
@@ -151,11 +157,13 @@ func contextOrdinal(name string) (ordinal int) {
 func GetCurrentContext() (endpoint Endpoint, user* User) {
 	currentContextName := GetCurrentContextOrFatal()
 
+	endPointFound := false
 	for _, c := range config.Contexts {
 		if c.Name == currentContextName {
 			for _, e := range config.Endpoints {
 				if e.Name == c.Endpoint {
 					endpoint = e
+					endPointFound = true
 					break
 				}
 			}
@@ -168,6 +176,11 @@ func GetCurrentContext() (endpoint Endpoint, user* User) {
 			}
 		}
 	}
+
+	if !endPointFound {
+		panic(fmt.Sprintf("Context '%v' has no endpoint.  Every context must have an endpoint", currentContextName))
+	}
+
 	return
 }
 
