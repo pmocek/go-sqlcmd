@@ -37,6 +37,7 @@ func ExecuteCommandLine() {
 // no subcommand is added for 'mssql'
 //
 // BUG(stuartpa): Workout a way to  encapsulate this code in the install 'mssql' command
+// BUG(stuartpa): This doesn't work if use adds a flag like `sqlcmd install mssql -v 4`
 func setDefaultSubCommandForInstallMssql() {
 	if len(os.Args) == 3 {
 		if os.Args[1] == "install" || os.Args[1] == "create" {

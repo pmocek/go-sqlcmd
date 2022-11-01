@@ -14,7 +14,7 @@ type ContainerDetails struct {
 }
 
 type Endpoint struct {
-	ContainerDetails `mapstructure:"container" yaml:"container"`
+	*ContainerDetails `mapstructure:"container,omitempty" yaml:"container,omitempty"`
 	EndpointDetails  `mapstructure:"endpoint" yaml:"endpoint"`
 	Name            string `mapstructure:"name"`
 }
@@ -31,6 +31,7 @@ type Context struct {
 
 type BasicAuthDetails struct {
 	Username string `mapstructure:"username"`
+	PasswordEncrypted bool `mapstructure:"password-encrypted" yaml:"password-encrypted"`
 	Password string `mapstructure:"password"`
 }
 
@@ -50,7 +51,7 @@ type OtherAuthDetails struct {
 type User struct {
 	Name        string `mapstructure:"name"`
 	AuthenticationType string `mapstructure:"authentication-type" yaml:"authentication-type"`
-	BasicAuth BasicAuthDetails `mapstructure:"basic-auth,omitempty" yaml:"basic-auth,omitempty"`
+	BasicAuth* BasicAuthDetails `mapstructure:"basic-auth,omitempty" yaml:"basic-auth,omitempty"`
 	OtherAuth* OtherAuthDetails `mapstructure:"other-auth,omitempty" yaml:"other-auth,omitempty"`
 }
 

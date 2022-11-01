@@ -55,7 +55,7 @@ func (c *ConnectionStrings) run(*Command, []string) {
 			strconv.Itoa(endpoint.EndpointDetails.Port),
 			"master",
 			user.BasicAuth.Username,
-			secret.Decrypt(user.BasicAuth.Password))
+			secret.Decrypt(user.BasicAuth.Password, user.BasicAuth.PasswordEncrypted))
 	}
 
 	var format string
@@ -66,7 +66,7 @@ func (c *ConnectionStrings) run(*Command, []string) {
 	}
 
 	connectionStringFormats["SQLCMD"] = fmt.Sprintf(format,
-		secret.Decrypt(user.BasicAuth.Password),
+		secret.Decrypt(user.BasicAuth.Password, user.BasicAuth.PasswordEncrypted),
 		endpoint.EndpointDetails.Address,
 		strconv.Itoa(endpoint.EndpointDetails.Port),
 		user.BasicAuth.Username)

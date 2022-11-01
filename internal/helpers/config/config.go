@@ -15,6 +15,7 @@ func Update(
 	portNumber int,
 	username string,
 	password string,
+	encryptPassword bool,
 	contextName string,
 ) {
 	if id == "" {
@@ -42,7 +43,7 @@ func Update(
 	config.CurrentContext = contextName
 
 	config.Endpoints = append(config.Endpoints, Endpoint{
-		ContainerDetails: ContainerDetails{
+		ContainerDetails: &ContainerDetails{
 			Id:    id,
 			Image: imageName},
 		EndpointDetails: EndpointDetails{
@@ -60,23 +61,29 @@ func Update(
 		Name: contextName,
 	})
 
-	config.Users = append(config.Users, User{
+	user := User{
 		AuthenticationType: "basic",
-		BasicAuth: BasicAuthDetails{
+		BasicAuth: &BasicAuthDetails{
 			Username: username,
-			Password: encryptCallback(password),
+			PasswordEncrypted: encryptPassword,
+			Password: encryptCallback(password, encryptPassword),
 		},
 		Name: userName,
-	})
+	}
+
+	config.Users = append(config.Users, user)
 
 	Save()
 }
 
 func GetRedactedConfig(raw bool) (c Sqlconfig) {
 	c = config
-	for i, v := range c.Users {
+	for i, _ := range c.Users {
 		if raw {
-			c.Users[i].BasicAuth.Password = decryptCallback(v.BasicAuth.Password)
+			c.Users[i].BasicAuth.Password = decryptCallback(
+				c.Users[i].BasicAuth.Password,
+				c.Users[i].BasicAuth.PasswordEncrypted,
+			)
 		} else {
 			c.Users[i].BasicAuth.Password = "REDACTED"
 		}

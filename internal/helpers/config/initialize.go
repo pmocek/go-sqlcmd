@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 )
 
-var encryptCallback func(plainText string) (cipherText string)
-var decryptCallback func(cipherText string) (secret string)
+var encryptCallback func(plainText string, encrypt bool) (cipherText string)
+var decryptCallback func(cipherText string, decrypt bool) (secret string)
 var isLocalPortAvailableCallback func(port int) (portAvailable bool)
 var createEmptyFileIfNotExistsCallback func(filename string)
 
@@ -35,8 +35,8 @@ func init() {
 func Initialize(
 	errorHandler func(err error),
 	traceHandler func(format string, a ...any),
-	encryptHandler func(plainText string) (cipherText string),
-	decryptHandler func(cipherText string) (secret string),
+	encryptHandler func(plainText string, encrypt bool) (cipherText string),
+	decryptHandler func(cipherText string, decrypt bool) (secret string),
 	isLocalPortAvailableHandler func(port int) (portAvailable bool),
 	createEmptyFileIfNotExistsHandler func(filename string),
 	configFile string,

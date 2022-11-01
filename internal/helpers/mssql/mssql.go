@@ -23,10 +23,20 @@ func Connect(
 			"%s,%d",
 			endpoint.EndpointDetails.Address,
 			endpoint.EndpointDetails.Port),
-		UseTrustedConnection: false,
-		UserName:             user.BasicAuth.Username,
-		Password:             decryptCallback(user.BasicAuth.Password),
 	}
+	if user.AuthenticationType == "basic" {
+		connect.UseTrustedConnection = false
+		connect.UserName = user.BasicAuth.Username
+		connect.Password = decryptCallback(
+			user.BasicAuth.Password,
+			user.BasicAuth.PasswordEncrypted,
+		)
+	} else if user.AuthenticationType == "trusted" {
+		connect.UseTrustedConnection = true
+	} else {
+		panic("Authentication not supported")
+	}
+
 	trace("Connecting to server %v", connect.ServerName)
 	err := s.ConnectDb(&connect, true)
 	checkErr(err)

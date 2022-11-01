@@ -10,6 +10,19 @@ import (
 	"strconv"
 )
 
+func AddContext(context Context) {
+	config.Contexts = append(config.Contexts, context)
+	Save()
+}
+
+func DeleteContext(name string, cascade bool) {
+	if ContextExists(name) {
+		ordinal := contextOrdinal(name)
+		config.Contexts = append(config.Contexts[:ordinal], config.Contexts[ordinal+1:]...)
+		Save()
+	}
+}
+
 // FindUniqueContextName finds a unique context name, that is both a
 // unique context name, but also a unique sa@context name.  If the name passed
 // in is unique then this is returned, else we look for the name with a numeral
@@ -111,6 +124,16 @@ func ContextExists(name string) (exists bool) {
 	for _, c := range config.Contexts {
 		if name == c.Name {
 			exists = true
+			break
+		}
+	}
+	return
+}
+
+func contextOrdinal(name string) (ordinal int) {
+	for i, c := range config.Contexts {
+		if name == c.Name {
+			ordinal = i
 			break
 		}
 	}

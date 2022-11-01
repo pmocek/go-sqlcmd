@@ -7,6 +7,7 @@ import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/mssql"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	"github.com/microsoft/go-sqlcmd/pkg/console"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
 	. "github.com/spf13/cobra"
@@ -14,6 +15,8 @@ import (
 
 type Query struct {
 	AbstractBase
+
+	text string
 }
 
 func (c *Query) DefineCommand() (command *Command) {
@@ -28,13 +31,29 @@ Run a query
   # sqlcmd query "SELECT @@SERVERNAME"`,
 		ArgAliases: []string{"text"},
 		Args: MaximumNArgs(1),
-		Run: runQuery,
+		Run: c.run,
 	})
+
+	command.PersistentFlags().StringVarP(
+		&c.text,
+		"query",
+		"q",
+		"",
+		"Command text to run")
 
 	return
 }
 
-func runQuery(cmd *Command, args []string) {
+func (c *Query) run(cmd *Command, args []string) {
+	if len(args) > 0 && args[0] != "" && c.text != "" {
+		output.FatalWithHints([]string{"Provide the query command text either as the first argument or using the --query flag"},
+		"Two queries have been provided, as an argument '%v' and using the --query flag '%v'", args[0], c.text)
+	}
+
+	if len(args) > 0 {
+		c.text = args[0]
+	}
+
 	endpoint, user := config.GetCurrentContext()
 
 	var line sqlcmd.Console = nil
@@ -47,6 +66,6 @@ func runQuery(cmd *Command, args []string) {
 		err := s.Run(false, false)
 		CheckErr(err)
 	} else {
-		mssql.Query(s, args[0])
+		mssql.Query(s, c.text)
 	}
 }

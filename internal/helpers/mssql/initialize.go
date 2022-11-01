@@ -3,19 +3,19 @@
 
 package mssql
 
-var decryptCallback func(cipherText string) (secret string)
+var decryptCallback func(cipherText string, decrypt bool) (secret string)
 
 func init() {
 	Initialize(
 		func(err error) {},
 		func(format string, a ...any) {},
-		func(cipherText string) (secret string) {return})
+		func(cipherText string, decrypt bool) (secret string) {return})
 }
 
 func Initialize(
 	errorHandler func(err error),
 	traceHandler func(format string, a ...any),
-	decryptHandler func(cipherText string) (secret string)) {
+	decryptHandler func(cipherText string, decrypt bool) (secret string)) {
 
 
 	errorCallback = errorHandler

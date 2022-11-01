@@ -14,6 +14,14 @@ func AddEndpoint(endpoint sqlconfig.Endpoint) {
 	Save()
 }
 
+func DeleteEndpoint(name string) {
+	if EndpointExists(name) {
+	ordinal := endpointOrdinal(name)
+	config.Endpoints = append(config.Endpoints[:ordinal], config.Endpoints[ordinal+1:]...)
+	Save()
+	}
+}
+
 func EndpointsExists() (exists bool) {
 	if len(config.Endpoints) > 0 {
 		exists = true
@@ -126,6 +134,18 @@ func EndpointExists(name string) (exists bool) {
 	}
 	return
 }
+
+
+func endpointOrdinal(name string) (ordinal int) {
+	for i, c := range config.Endpoints {
+		if name == c.Name {
+			ordinal = i
+			break
+		}
+	}
+	return
+}
+
 
 func GetEndpoint(name string) (endpoint sqlconfig.Endpoint) {
 	for _, e := range config.Endpoints {

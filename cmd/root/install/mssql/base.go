@@ -35,6 +35,8 @@ type Base struct {
 	passwordMinUpper int
 	passwordSpecialCharSet string
 
+	encryptPassword bool
+
 	defaultContextName string
 }
 
@@ -123,6 +125,16 @@ func (c *Base) addFlags(
 		"!@#$%&*",
 		"Special character set to include in password",
 	)
+
+	// Windows has the DPAPI which allows securely encrypting
+	if runtime.GOOS == "windows" {
+		command.PersistentFlags().BoolVar(
+			&c.acceptEula,
+			"encrypt-password",
+			false,
+			"Encrypt the generated password in the sqlconfig file",
+		)
+	}
 }
 
 func (c *Base) run(*Command, []string) {
@@ -193,7 +205,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	password := c.generatePassword()
 	// Save the config now, so user can uninstall, even if mssql in the container
 	// fails to start
-	config.Update(id, imageName, port, userName, password, contextName)
+	config.Update(id, imageName, port, userName, password, false, contextName)
 
 	output.Infof(
 		"Created context '%s' in %s",
@@ -216,9 +228,9 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		endpoint,
 		sqlconfig.User{
 			AuthenticationType: "basic",
-			BasicAuth: sqlconfig.BasicAuthDetails{
+			BasicAuth: &sqlconfig.BasicAuthDetails{
 				Username: "sa",
-				Password: secret.Encrypt(saPassword),
+				Password: secret.Encrypt(saPassword, c.encryptPassword),
 			},
 			Name: "sa",
 		},

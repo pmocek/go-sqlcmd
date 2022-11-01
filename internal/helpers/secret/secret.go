@@ -7,17 +7,35 @@ import (
 	"encoding/base64"
 )
 
-func Encrypt(plainText string) (cipherText string) {
-	cipherText = encrypt(plainText)
+func Encrypt(plainText string, encryptPassword bool) (cipherText string) {
+	if plainText == "" {
+		panic("Cannot encrypt an empty string")
+	}
+
+	if encryptPassword {
+		cipherText = encrypt(plainText)
+	} else {
+		cipherText = plainText
+	}
+
 	cipherText = base64.StdEncoding.EncodeToString([]byte(cipherText))
 
 	return
 }
 
-func Decrypt(cipherText string) (secret string) {
+func Decrypt(cipherText string, decryptPassword bool) (secret string) {
+	if cipherText == "" {
+		panic("Cannot decrypt an empty string")
+	}
+
 	bytes, err := base64.StdEncoding.DecodeString(cipherText)
 	checkErr(err)
-	secret = decrypt(string(bytes))
+
+	if decryptPassword {
+		secret = decrypt(string(bytes))
+	} else {
+		secret = string(bytes)
+	}
 
 	return
 }
