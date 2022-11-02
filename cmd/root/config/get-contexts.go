@@ -39,7 +39,7 @@ func (c *GetContexts) DefineCommand() (command *Command) {
 
 	command.PersistentFlags().BoolVar(
 		&c.detailed,
-		"detail",
+		"detailed",
 		false,
 		"Include context details")
 

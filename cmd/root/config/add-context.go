@@ -56,12 +56,12 @@ func (c *AddContext) run(cmd *Command, args []string) {
 	context := sqlconfig.Context{
 		ContextDetails: sqlconfig.ContextDetails{
 			Endpoint: c.endpointName,
-			User:     c.userName,
+			User:     &c.userName,
 		},
 		Name:           c.name,
 	}
 
-	if !config.EndpointExists(c.endpointName) {
+	if c.endpointName == "" || !config.EndpointExists(c.endpointName) {
 		output.FatalfWithHints([]string{
 			"Use `sqlcmd config get-endpoints` to view endpoint list to choose from",
 			"Add a local endpoint using `sqlcmd install`",

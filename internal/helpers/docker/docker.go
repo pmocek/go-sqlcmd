@@ -12,17 +12,16 @@ import (
 
 func ListTags(path string, baseURL string) []string {
 	ctx := context.Background()
-
 	repo, err := reference.WithName(path)
 	checkErr(err)
-	r, err := client.NewRepository(
+	repository, err := client.NewRepository(
 		repo,
 		baseURL,
 		http.DefaultTransport,
 	)
 	checkErr(err)
-	ts := r.Tags(ctx)
-	tags, err := ts.All(ctx)
+	tagService := repository.Tags(ctx)
+	tags, err := tagService.All(ctx)
 	checkErr(err)
 
 	return tags

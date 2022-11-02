@@ -39,7 +39,7 @@ func (c *GetUsers) DefineCommand() (command *Command) {
 
 	command.PersistentFlags().BoolVar(
 		&c.detailed,
-		"detail",
+		"detailed",
 		false,
 		"Include user details")
 

@@ -109,10 +109,11 @@ func TestConfig(t *testing.T) {
 }
 
 func addContext() {
+	user := "user1"
 	AddContext(Context{
 		ContextDetails: ContextDetails{
 			Endpoint: "endpoint",
-			User:     "user1",
+			User:     &user,
 		},
 		Name: "context",
 	})

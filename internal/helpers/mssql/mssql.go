@@ -25,7 +25,7 @@ func Connect(
 			endpoint.EndpointDetails.Port),
 	}
 
-	if user == nil || user.AuthenticationType == "trusted" {
+	if user == nil {
 		connect.UseTrustedConnection = true
 	} else {
 		if user.AuthenticationType == "basic" {

@@ -14,6 +14,7 @@ import (
 
 var rootCmd *Command
 var loggingLevel int
+var panicOnFailure bool
 
 // init initializes the command-line interface
 func init() {
@@ -25,7 +26,9 @@ func init() {
 
 // RunCommandLine runs the application based on the command-line
 // parameters the user has passed in
-func RunCommandLine() {
+func RunCommandLine(negativeUnitTest bool) {
+	panicOnFailure = negativeUnitTest
+
 	setDefaultSubCommandForInstallMssql()
 
 	err := rootCmd.Execute()
@@ -71,13 +74,22 @@ func initializeCobra() {
 // checkErr uses Cobra to check err, and halts the application if err is not
 // nil.  Pass (inject) checkErr into all dependencies (helpers etc.) as an
 // errorHandler
+//
+// DEVNOTE: cobra.CheckErr (last line of function), goes on to call os.Exit(1)
+// if error != nil, this will be an issue for negative Unit Tests (it will close
+// down the text executor, so you'll need inject a checkErr handler that doesn't
+// call os.Exit (probably one that just calls Panic(), which you catch as expected)
 func checkErr(err error) {
 	if loggingLevel > 2 {
 		if err != nil {
 			panic(err)
 		}
 	}
-	CheckErr(err)
+	if panicOnFailure && err != nil {
+		panic(err)
+	} else {
+		CheckErr(err)
+	}
 }
 
 // displayHints displays helpful information on what the user should do next
@@ -87,7 +99,7 @@ func displayHints(hints []string) {
 		output.Info()
 		output.Info("HINT:")
 		for i, hint := range hints {
-			output.Infof("  %d. %v\n", i+1, hint)
+			output.Infof("  %d. %v", i+1, hint)
 		}
 		output.Info()
 	}

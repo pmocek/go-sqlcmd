@@ -6,7 +6,6 @@ package install
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	. "github.com/spf13/cobra"
-	"os"
 )
 
 type Mssql struct {
@@ -34,25 +33,4 @@ func (c *Mssql) DefineCommand() (command *Command) {
 	})
 
 	return
-}
-
-func (c *Mssql) setDefaultSubCommandIfNonePresent(command *Command, defCmd string) {
-	var cmdFound bool
-	cmd := command.Commands()
-
-	for _, a := range cmd{
-		for _, b := range os.Args[2:] {
-			if a.Name() == b {
-				cmdFound = true
-				break
-			}
-		}
-	}
-	if cmdFound == false {
-		args := append([]string{defCmd}, os.Args[2:]...)
-		command.SetArgs(args)
-	}
-	if err := command.Execute(); err != nil {
-		CheckErr(err)
-	}
 }

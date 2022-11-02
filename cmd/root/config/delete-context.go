@@ -55,16 +55,24 @@ func (c *DeleteContext) run(cmd *Command, args []string) {
 		output.FatalWithHints([]string{"Use the --name flag to pass in a context name to delete"},
 		"A 'name' is required")
 	}
-	context := config.GetContext(c.name)
 
-	if c.cascade {
-		config.DeleteEndpoint(context.Endpoint)
-		if context.User != "" {
-			config.DeleteUser(context.User)
+	if config.ContextExists(c.name) {
+		context := config.GetContext(c.name)
+
+		if c.cascade {
+			config.DeleteEndpoint(context.Endpoint)
+			if *context.User != "" {
+				config.DeleteUser(*context.User)
+			}
 		}
+
+		config.DeleteContext(c.name, c.cascade)
+
+		output.Infof("Context '%v' deleted", c.name)
+	} else {
+		output.FatalfWithHintExamples([][]string{
+			{"View available contexts","sqlcmd config get-contexts"},
+		},
+		"Context '%v' does not exist", c.name)
 	}
-
-	config.DeleteContext(c.name, c.cascade)
-
-	output.Infof("Context '%v' deleted", c.name)
 }

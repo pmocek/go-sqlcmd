@@ -34,8 +34,9 @@ type Base struct {
 	passwordMinNumber int
 	passwordMinUpper int
 	passwordSpecialCharSet string
-
 	encryptPassword bool
+
+	useCached bool
 
 	defaultContextName string
 }
@@ -135,6 +136,13 @@ func (c *Base) addFlags(
 			"Encrypt the generated password in the sqlconfig file",
 		)
 	}
+
+	command.PersistentFlags().BoolVar(
+		&c.useCached,
+		"cached",
+		false,
+		"Don't download image.  Use already downloaded image",
+	)
 }
 
 func (c *Base) run(*Command, []string) {
@@ -166,16 +174,19 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	env := []string{"ACCEPT_EULA=Y", fmt.Sprintf("SA_PASSWORD=%s", saPassword)}
 	port := config.FindFreePortForTds()
 	controller := docker.NewController()
-	output.Infof("Downloading %v", imageName)
-	err := controller.EnsureImage(imageName)
-	if err != nil {
-		output.FatalfErrorWithHints(
-			err,
-			[]string{
-				"Is docker installed on this machine?  If not, download from: https://docs.docker.com/get-docker/",
-				"Is docker running. Try `docker ps` (list containers), does it return without error?",
-				fmt.Sprintf("If `docker ps` works, try `docker pull %s`", imageName)},
-			"Unable to download image %s", imageName)
+
+	if !c.useCached {
+		output.Infof("Downloading %v", imageName)
+		err := controller.EnsureImage(imageName)
+		if err != nil {
+			output.FatalfErrorWithHints(
+				err,
+				[]string{
+					"Is docker installed on this machine?  If not, download from: https://docs.docker.com/get-docker/",
+					"Is docker running. Try `docker ps` (list containers), does it return without error?",
+					fmt.Sprintf("If `docker ps` works, try `docker pull %s`", imageName)},
+				"Unable to download image %s", imageName)
+		}
 	}
 
 	output.Infof("Starting %v", imageName)

@@ -56,7 +56,7 @@ func Update(
 	config.Contexts = append(config.Contexts, Context{
 		ContextDetails: ContextDetails{
 			Endpoint: endPointName,
-			User:     username + "@" + contextName,
+			User:     &userName,
 		},
 		Name: contextName,
 	})

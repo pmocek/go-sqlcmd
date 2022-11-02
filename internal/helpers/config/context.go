@@ -17,7 +17,7 @@ func AddContext(context Context) {
 			{"Add the endpoint", fmt.Sprintf("sqlcmd config add-endpoint --name %v",context.Endpoint)},
 		}, "Endpoint '%v' does not exist", context.Endpoint)
 	}
-	context.Name = FindUniqueContextName(context.Name, context.User)
+	context.Name = FindUniqueContextName(context.Name, *context.User)
 	config.Contexts = append(config.Contexts, context)
 	Save()
 }
@@ -110,7 +110,7 @@ func RemoveCurrentContext() {
 			}
 
 			for ui, u := range config.Users {
-				if u.Name == c.User {
+				if u.Name == *c.User {
 					config.Users = append(
 						config.Users[:ui],
 						config.Users[ui+1:]...)
@@ -169,7 +169,7 @@ func GetCurrentContext() (endpoint Endpoint, user* User) {
 			}
 
 			for _, u := range config.Users {
-				if u.Name == c.User {
+				if u.Name == *c.User {
 					user = &u
 					break
 				}

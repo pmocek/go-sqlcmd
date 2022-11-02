@@ -44,8 +44,8 @@ func (c *AddUser) DefineCommand() (command *Command) {
 	command.PersistentFlags().StringVar(
 		&c.authType,
 		"auth-type",
-		"trusted",
-		"Authentication type this user will use (trusted | basic | other)")
+		"basic",
+		"Authentication type this user will use (basic | other)")
 
 	command.PersistentFlags().StringVar(
 		&c.username,
@@ -66,9 +66,8 @@ func (c *AddUser) DefineCommand() (command *Command) {
 
 func (c *AddUser) run(cmd *Command, args []string) {
 	if c.authType != "basic" &&
-		c.authType != "trusted" &&
 		c.authType != "other" {
-		output.FatalfWithHints([]string{"Authentication type must be 'basic', 'trusted' or 'other'"},
+		output.FatalfWithHints([]string{"Authentication type must be 'basic' or 'other'"},
 		"Authentication type '' is not valid %v'", c.authType)
 	}
 
@@ -89,6 +88,13 @@ func (c *AddUser) run(cmd *Command, args []string) {
 			output.FatalWithHints([]string{
 				"Provide password in the SQLCMD_PASSWORD environment variable"},
 				"Authentication Type 'basic' requires a password")
+		}
+
+		if c.username == "" {
+			output.FatalfWithHintExamples([][]string{
+				{"Provide a username with the --username flag", "sqlcmd config add-user --username stuartpa"},
+			},
+				"Username not provider")
 		}
 
 		user.BasicAuth = &sqlconfig.BasicAuthDetails{

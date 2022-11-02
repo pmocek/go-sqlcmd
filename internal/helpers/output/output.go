@@ -198,7 +198,7 @@ func fatal(hints []string, a ...any) {
 }
 
 func FatalfWithHintExamples(hintExamples [][]string, format string, a ...any) {
-	err := errors.New(fmt.Sprintf("%v", a...))
+	err := errors.New(fmt.Sprintf(format, a...))
 	displayHintExamples(hintExamples)
 	checkErr(err)
 }

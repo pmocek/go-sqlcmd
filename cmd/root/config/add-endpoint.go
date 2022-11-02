@@ -55,7 +55,6 @@ func (c *AddEndpoint) DefineCommand() (command *Command) {
 func (c *AddEndpoint) run(cmd *Command, args []string) {
 
 	endpoint := Endpoint{
-		ContainerDetails: &ContainerDetails{},
 		EndpointDetails:  EndpointDetails{
 			Address: c.address,
 			Port:    c.port,

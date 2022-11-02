@@ -74,6 +74,6 @@ func (c *Root) addGlobalFlags(command *Command) {
 		"verbosity",
 		"v",
 		2,
-		"Logging verbosity. error = 0, warn = 1, info = 2, debug = 3, trace = 4",
+		"Log level, error = 0, warn = 1, info = 2, debug = 3, trace = 4",
 	)
 }

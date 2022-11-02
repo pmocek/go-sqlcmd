@@ -39,7 +39,7 @@ func (c *GetEndpoints) DefineCommand() (command *Command) {
 
 	command.PersistentFlags().BoolVar(
 		&c.detailed,
-		"detail",
+		"detailed",
 		false,
 		"Include endpoint details")
 
