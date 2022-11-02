@@ -54,6 +54,6 @@ func (c *GetTags) Run(*Command, []string) {
 	default:
 		output.Fatal("Unrecognized type, please specify 'server' or 'edge'")
 	}
-	tags := docker.ListTags(path)
+	tags := docker.ListTags(path, "https://mcr.microsoft.com")
 	output.Struct(tags)
 }

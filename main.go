@@ -13,7 +13,7 @@ func main() {
 	if isModernCliEnvVarEnabled() &&
 		isAnArgProvided() &&
 		isFirstArgAModernCliRootCommand() {
-		cmd.ExecuteCommandLine()
+		cmd.RunCommandLine()
 	} else {
 		legacyMain.BackCompatMode()
 	}

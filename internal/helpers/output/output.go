@@ -26,6 +26,7 @@ import (
 
 var formatter Formatter
 var loggingLevel verbosity.Enum
+var runningUnitTests bool
 
 func Struct(in interface{}) {
 	formatter.Serialize(in)
@@ -102,7 +103,7 @@ func infofWithHints(hints []string, format string, a ...any) {
 }
 
 func InfofWithHintExamples(hintExamples [][]string, format string, a ...any) {
-	if loggingLevel >= verbosity.Info {
+	if loggingLevel >= verbosity.Info || runningUnitTests {
 		format = ensureEol(format)
 		if loggingLevel >= verbosity.Debug {
 			_, err := fmt.Printf("INFO:  ")

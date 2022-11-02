@@ -1,15 +1,8 @@
 package net
 
 import (
-	"fmt"
 	"testing"
 )
-
-func init() {
-	Initialize(
-		func(err error) {if err != nil {panic(err)}},
-		func(format string, a ...any) {_, _ = fmt.Printf(format, a...)})
-}
 
 func TestIsLocalPortAvailable(t *testing.T) {
 	type args struct {

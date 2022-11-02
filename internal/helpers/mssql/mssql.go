@@ -25,7 +25,7 @@ func Connect(
 			endpoint.EndpointDetails.Port),
 	}
 
-	if user == nil {
+	if user == nil || user.AuthenticationType == "trusted" {
 		connect.UseTrustedConnection = true
 	} else {
 		if user.AuthenticationType == "basic" {
@@ -35,8 +35,6 @@ func Connect(
 				user.BasicAuth.Password,
 				user.BasicAuth.PasswordEncrypted,
 			)
-		} else if user.AuthenticationType == "trusted" {
-			connect.UseTrustedConnection = true
 		} else {
 			panic("Authentication not supported")
 		}

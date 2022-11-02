@@ -23,10 +23,9 @@ func init() {
 	OnInitialize(initializeCobra)
 }
 
-// ExecuteCommandLine runs the application based on the command-line
+// RunCommandLine runs the application based on the command-line
 // parameters the user has passed in
-func ExecuteCommandLine() {
-
+func RunCommandLine() {
 	setDefaultSubCommandForInstallMssql()
 
 	err := rootCmd.Execute()

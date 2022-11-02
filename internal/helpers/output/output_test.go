@@ -302,12 +302,16 @@ func TestInfofWithHintExamples(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			/*defer func() {
+			defer func() {
 				if r := recover(); r == nil {
 					t.Errorf("The code did not panic")
 				}
-			}()*/
+			}()
+
+			//BUG(stuartpa): Not thread safe
+			runningUnitTests = true
 			InfofWithHintExamples(tt.args.hintExamples, tt.args.format, tt.args.a...)
+			runningUnitTests = false
 		})
 	}
 }

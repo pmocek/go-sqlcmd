@@ -3,10 +3,17 @@ package mssql
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
+	"strings"
 	"testing"
 )
 
 func TestConnect(t *testing.T) {
+ 	endpoint := Endpoint{
+		 EndpointDetails:  EndpointDetails{
+			 Address: "localhost",
+			 Port:    1433,
+		 },
+	 Name: "local-default-instance"}
 
 	type args struct {
 		endpoint Endpoint
@@ -20,40 +27,52 @@ func TestConnect(t *testing.T) {
 		want int
 	}{
 		{
-			name: "connect", 
-			args: args{endpoint: Endpoint{
-				EndpointDetails:  EndpointDetails{
-					Address: "localhost",
-					Port:    1433,
+			name: "connectTrusted", args: args{endpoint: endpoint, user: nil, console:  nil},
+			want: 0,
+		},
+		{
+			name: "connectBasicPanic", args: args{
+			endpoint: endpoint,
+			user: &User{
+				Name:               "basicUser",
+				AuthenticationType: "basic",
+				BasicAuth:          &BasicAuthDetails{
+					Username:          "foo",
+					PasswordEncrypted: true,
+					Password:          "bar",
 				},
-				Name:             "local-default-instance",
-			}, user: nil, console:  nil},
+				OtherAuth:          nil,
+			},
+			console:  nil,
+		},
+			want: 0,
+		},
+		{
+			name: "invalidAuthTypePanic", args: args{
+			endpoint: endpoint,
+			user: &User{
+				Name:               "basicUser",
+				AuthenticationType: "badbad",
+			},
+			console:  nil,
+		},
 			want: 0,
 		},
 	}
 		for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Connect(tt.args.endpoint, tt.args.user, tt.args.console); got.Exitcode != tt.want {
-				t.Errorf("ExitCode = %v, want %v", got.Exitcode, tt.want)
-			}
-		})
-	}
-}
 
-func TestQuery(t *testing.T) {
-	type args struct {
-		s    *sqlcmd.Sqlcmd
-		text string
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			Query(tt.args.s, tt.args.text)
+			// If test name ends in 'Panic' expect a Panic
+			if strings.HasSuffix(tt.name, "Panic") {
+				defer func() {
+					if r := recover(); r == nil {
+						t.Errorf("The code did not panic")
+					}
+				}()
+			}
+
+			s := Connect(tt.args.endpoint, tt.args.user, tt.args.console)
+			Query(s, "SELECT @@version")
 		})
 	}
 }

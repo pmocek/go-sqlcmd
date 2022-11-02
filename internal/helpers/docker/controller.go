@@ -52,7 +52,12 @@ func (c *Controller) EnsureImage(image string) (err error) {
 	return
 }
 
-func (c *Controller) ContainerRun(image string, env []string, port int, command []string) (id string, err error) {
+func (c *Controller) ContainerRun(
+	image string,
+	env []string,
+	port int,
+	command []string,
+) (id string, err error) {
 	hostConfig := &container.HostConfig{
 		PortBindings: nat.PortMap{
 			nat.Port("1433/tcp"): []nat.PortBinding{
@@ -75,7 +80,11 @@ func (c *Controller) ContainerRun(image string, env []string, port int, command 
 		return "", err
 	}
 
-	err = c.cli.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
+	err = c.cli.ContainerStart(
+		context.Background(),
+		resp.ID,
+		types.ContainerStartOptions{},
+	)
 	if err != nil {
 		return resp.ID, err
 	}
@@ -155,7 +164,7 @@ func (c *Controller) ContainerFiles(id string, filespec string) (files []string)
 	outputDone := make(chan error)
 
 	go func() {
-		// StdCopy demultiplexes the stream into two buffers
+		// StdCopy de-multiplexes the stream into two buffers
 		_, err = stdcopy.StdCopy(&outBuf, &errBuf, r.Reader)
 		outputDone <- err
 	}()
