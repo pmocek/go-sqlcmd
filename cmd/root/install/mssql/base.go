@@ -39,6 +39,8 @@ type Base struct {
 	useCached bool
 
 	defaultContextName string
+
+	sqlcmdPkg *sqlcmd.Sqlcmd
 }
 
 func (c *Base) addFlags(
@@ -235,7 +237,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		userName,
 	)
 	endpoint, _ := config.GetCurrentContext()
-	s := mssql.Connect(
+	c.sqlcmdPkg = mssql.Connect(
 		endpoint,
 		&sqlconfig.User{
 			AuthenticationType: "basic",
@@ -247,7 +249,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		},
 		nil,
 	)
-	c.createNonSaUser(s, userName, password)
+	c.createNonSaUser(userName, password)
 
 	hints := []string{
 		"To run a query:               sqlcmd query \"SELECT @@version\"",
@@ -265,36 +267,34 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	)
 }
 
-func (c *Base) createNonSaUser(s *sqlcmd.Sqlcmd, userName string, password string) {
+func (c *Base) createNonSaUser(userName string, password string) {
 	defaultDatabase := "master"
 
 	if c.defaultDatabase != "" {
 		defaultDatabase = c.defaultDatabase
 		output.Infof("Creating default database [%s]", defaultDatabase)
-		mssql.Query(s, fmt.Sprintf("CREATE DATABASE [%s]", defaultDatabase))
+		c.Query(fmt.Sprintf("CREATE DATABASE [%s]", defaultDatabase))
 	}
 
 	const createLogin = `CREATE LOGIN [%s]
 WITH PASSWORD=N'%s',
-DEFAULT_DATABASE=%s,
+DEFAULT_DATABASE=[%s],
 CHECK_EXPIRATION=OFF,
 CHECK_POLICY=OFF`
 	const addSrvRoleMember = `EXEC master..sp_addsrvrolemember
 @loginame = N'%s',
 @rolename = N'sysadmin'`
 
-	mssql.Query(s, fmt.Sprintf(createLogin, userName, password, defaultDatabase))
-	mssql.Query(s, fmt.Sprintf(addSrvRoleMember, userName))
+	c.Query(fmt.Sprintf(createLogin, userName, password, defaultDatabase))
+	c.Query(fmt.Sprintf(addSrvRoleMember, userName))
 
 	// Correct safety protocol is to rotate the sa password, because the first
 	// sa password has been in the docker environment (as SA_PASSWORD)
-	mssql.Query(s, fmt.Sprintf("ALTER LOGIN [sa] WITH PASSWORD = '%s';", c.generatePassword()))
-	mssql.Query(s, "ALTER LOGIN [sa] DISABLE")
+	c.Query(fmt.Sprintf("ALTER LOGIN [sa] WITH PASSWORD = '%s';", c.generatePassword()))
+	c.Query("ALTER LOGIN [sa] DISABLE")
 
 	if c.defaultDatabase != "" {
-		mssql.Query(s, fmt.Sprintf("ALTER AUTHORIZATION ON DATABASE::%s TO %s",
-			defaultDatabase,
-			userName))
+		c.Query(fmt.Sprintf("ALTER AUTHORIZATION ON DATABASE::[%s] TO %s", defaultDatabase, userName))
 	}
 }
 
@@ -307,4 +307,11 @@ func (c *Base) generatePassword() (password string) {
 		c.passwordSpecialCharSet)
 
 	return
+}
+
+func (c *Base) Query(commandText string) {
+	output.Trace(commandText)
+
+	//BUG(stuartpa): Need to check for errors
+	mssql.Query(c.sqlcmdPkg, commandText)
 }

@@ -9,6 +9,14 @@ import (
 
 var config Sqlconfig
 
+func Clean() {
+	config.Users = nil
+	config.Contexts = nil
+	config.Endpoints = nil
+	config.CurrentContext = ""
+	Save()
+}
+
 func Update(
 	id string,
 	imageName string,

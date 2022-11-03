@@ -29,6 +29,8 @@ func init() {
 func RunCommandLine(negativeUnitTest bool) {
 	panicOnFailure = negativeUnitTest
 
+	// BUG(stuartpa): Temporary until I work out how to do this in the `mssql`
+	// subcommand
 	setDefaultSubCommandForInstallMssql()
 
 	err := rootCmd.Execute()

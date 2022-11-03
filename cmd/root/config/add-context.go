@@ -62,19 +62,19 @@ func (c *AddContext) run(cmd *Command, args []string) {
 	}
 
 	if c.endpointName == "" || !config.EndpointExists(c.endpointName) {
-		output.FatalfWithHints([]string{
-			"Use `sqlcmd config get-endpoints` to view endpoint list to choose from",
-			"Add a local endpoint using `sqlcmd install`",
-			"Add an already existing endpoint using `sqlcmd config add-endpoint --address localhost --port 1433`"},
+		output.FatalfWithHintExamples([][]string{
+			{"Use to view endpoints to choose from", "sqlcmd config get-endpoints"},
+			{"Add a local endpoint", "sqlcmd install"},
+			{"Add an already existing endpoint", "sqlcmd config add-endpoint --address localhost --port 1433"}},
 		"An endpoint is required to add a context.  Endpoint '%v' does not exist", c.endpointName)
 	}
 
 	if c.userName != "" {
 		if !config.UserExists(c.userName) {
-			output.FatalfWithHints([]string{
-				"Use `sqlcmd config get-users` to view user list",
-				fmt.Sprintf("Use `sqlcmd config add-user --name %v` to add a user", c.userName),
-				"Add an endpoint using `sqlcmd install`"},
+			output.FatalfWithHintExamples([][]string{
+				{"View list of users", "sqlcmd config get-users"},
+				{"Add the user", fmt.Sprintf("sqlcmd config add-user --name %v", c.userName)},
+				{"Add an endpoint", "sqlcmd install"}},
 				"User '%v' does not exist", c.userName)
 		}
 	}
