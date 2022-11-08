@@ -98,12 +98,11 @@ func checkErr(err error) {
 // to make progress.  displayHints is injected into dependencies (helpers etc.)
 func displayHints(hints []string) {
 	if len(hints) > 0 {
-		output.Info()
-		output.Info("HINT:")
+		output.Infof("\nHINT:")
 		for i, hint := range hints {
 			output.Infof("  %d. %v", i+1, hint)
 		}
-		output.Info()
+		output.Infof("%v", "\n")
 	}
 }
 

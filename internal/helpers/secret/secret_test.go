@@ -50,14 +50,14 @@ func TestEncryptAndDecrypt(t *testing.T) {
 
 			var gotPlainText string
 			if tt.name != "emptyStringForDecryptPanic" {
-				cipherText := Encrypt(tt.args.plainText, tt.args.encrypt)
-				gotPlainText = Decrypt(cipherText, tt.args.encrypt)
+				cipherText := Encode(tt.args.plainText, tt.args.encrypt)
+				gotPlainText = Decode(cipherText, tt.args.encrypt)
 			} else {
-				gotPlainText = Decrypt(tt.args.plainText, tt.args.encrypt)
+				gotPlainText = Decode(tt.args.plainText, tt.args.encrypt)
 			}
 
 			if gotPlainText = tt.args.plainText; gotPlainText != tt.wantPlainText {
-				t.Errorf("Encrypt/Decrypt() = %v, want %v", gotPlainText, tt.wantPlainText)
+				t.Errorf("Encode/Decode() = %v, want %v", gotPlainText, tt.wantPlainText)
 			}
 		})
 	}

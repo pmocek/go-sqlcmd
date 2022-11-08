@@ -17,23 +17,26 @@ func Clean() {
 	Save()
 }
 
-func Update(
-	id string,
+func AddContextWithContainer(
+	contextName string,
 	imageName string,
 	portNumber int,
+	containerId string,
 	username string,
 	password string,
 	encryptPassword bool,
-	contextName string,
 ) {
-	if id == "" {
-		panic("id must be provided")
+	if containerId == "" {
+		panic("containerId must be provided")
 	}
 	if imageName == "" {
 		panic("imageName must be provided")
 	}
 	if portNumber == 0 {
 		panic("portNumber must be non-zero")
+	}
+	if username == "" {
+		panic("username must be provided")
 	}
 	if password == "" {
 		panic("password must be provided")
@@ -52,7 +55,7 @@ func Update(
 
 	config.Endpoints = append(config.Endpoints, Endpoint{
 		ContainerDetails: &ContainerDetails{
-			Id:    id,
+			Id:    containerId,
 			Image: imageName},
 		EndpointDetails: EndpointDetails{
 			Address: "localhost",

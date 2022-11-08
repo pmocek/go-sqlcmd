@@ -41,7 +41,6 @@ func TestConnect(t *testing.T) {
 					PasswordEncrypted: true,
 					Password:          "bar",
 				},
-				OtherAuth:          nil,
 			},
 			console:  nil,
 		},

@@ -118,7 +118,7 @@ func (c *Uninstall) run(*Command, []string) {
 		if newContextName != "" {
 			output.Infof("Current context is now %s", newContextName)
 		} else {
-			output.Info("Operation completed successfully")
+			output.Infof("%v\n", "Operation completed successfully")
 		}
 	}
 }

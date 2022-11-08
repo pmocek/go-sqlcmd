@@ -32,5 +32,5 @@ func (c *CurrentContext) DefineCommand() (command *Command) {
 }
 
 func (c *CurrentContext) run(cmd *Command, args []string) {
-	output.Info(config.GetCurrentContextName())
+	output.Infof("%v\n", config.GetCurrentContextName())
 }

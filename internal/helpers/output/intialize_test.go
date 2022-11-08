@@ -2,6 +2,8 @@ package output
 
 import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
+	"io"
+	"os"
 	"strings"
 	"testing"
 )
@@ -11,6 +13,8 @@ func TestInitialize(t *testing.T) {
 		errorHandler func(err error)
 		traceHandler func(format string, a ...any)
 		hintHandler  func(hints []string)
+		standardOutput io.WriteCloser
+		errorOutput io.WriteCloser
 		format       string
 		verbosity    verbosity.Enum
 	}
@@ -24,6 +28,8 @@ func TestInitialize(t *testing.T) {
 				errorHandler: errorCallback,
 				traceHandler: traceCallback,
 				hintHandler:  hintCallback,
+				standardOutput: os.Stdout,
+				errorOutput: os.Stderr,
 				format:       "badbad",
 				verbosity:    0,
 			},
@@ -40,7 +46,15 @@ func TestInitialize(t *testing.T) {
 					}
 				}()
 			}
-			Initialize(tt.args.errorHandler, tt.args.traceHandler, tt.args.hintHandler, tt.args.format, tt.args.verbosity)
+			Initialize(
+				tt.args.errorHandler,
+				tt.args.traceHandler,
+				tt.args.hintHandler,
+				tt.args.standardOutput,
+				tt.args.errorOutput,
+				tt.args.format,
+				tt.args.verbosity,
+			)
 		})
 	}
 }

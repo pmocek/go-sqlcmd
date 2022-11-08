@@ -3,6 +3,7 @@ package output
 import (
 	"errors"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
+	"os"
 	"testing"
 )
 
@@ -26,23 +27,34 @@ func TestTracef(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			loggingLevel = tt.args.loggingLevel
 			Tracef(tt.args.format, tt.args.a...)
-			Trace(tt.args.a)
 			Debugf(tt.args.format, tt.args.a...)
-			Debug(tt.args.a)
 			Infof(tt.args.format, tt.args.a...)
-			Info(tt.args.a)
 			Warnf(tt.args.format, tt.args.a...)
-			Warn(tt.args.a)
 			Errorf(tt.args.format, tt.args.a...)
-			Error(tt.args.a)
 
 			InfofWithHints([]string{}, tt.args.format, tt.args.a...)
 			InfofWithHintExamples([][]string{}, tt.args.format, tt.args.a...)
 
 			Struct([]string{"A", "Struct"})
-			Initialize(errorCallback, Tracef, hintCallback, "xml", verbosity.Error)
+			Initialize(
+				errorCallback,
+				Tracef,
+				hintCallback,
+				os.Stdout,
+				os.Stderr,
+				"xml",
+				verbosity.Error,
+			)
 			Struct([]string{"A", "Struct"})
-			Initialize(errorCallback, Tracef, hintCallback, "json", verbosity.Error)
+			Initialize(
+				errorCallback,
+				Tracef,
+				hintCallback,
+				os.Stdout,
+				os.Stderr,
+				"json",
+				verbosity.Error,
+			)
 			Struct([]string{"A", "Struct"})
 
 		})

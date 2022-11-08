@@ -58,7 +58,7 @@ func (c *AddUser) DefineCommand() (command *Command) {
 			&c.encryptPassword,
 			"encrypt-password",
 			false,
-			"Encrypt the password")
+			"Encode the password")
 	}
 
 	return
@@ -100,7 +100,7 @@ func (c *AddUser) run(cmd *Command, args []string) {
 		user.BasicAuth = &sqlconfig.BasicAuthDetails{
 			Username: c.username,
 			PasswordEncrypted: c.encryptPassword,
-			Password: secret.Encrypt(os.Getenv("SQLCMD_PASSWORD"), c.encryptPassword),
+			Password: secret.Encode(os.Getenv("SQLCMD_PASSWORD"), c.encryptPassword),
 		}
 	}
 

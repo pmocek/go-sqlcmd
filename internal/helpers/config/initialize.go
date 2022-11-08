@@ -24,8 +24,8 @@ func init() {
 	Initialize(
 		func(err error) {if err != nil {panic(err)}},
 		output.Tracef,
-		secret.Encrypt,
-		secret.Decrypt,
+		secret.Encode,
+		secret.Decode,
 		net.IsLocalPortAvailable,
 		file.CreateEmptyFileIfNotExists,
 		configFile,

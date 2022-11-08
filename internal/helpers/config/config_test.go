@@ -95,13 +95,7 @@ func TestConfig(t *testing.T) {
 			GetCurrentContext()
 			RemoveCurrentContext()
 			RemoveCurrentContext()
-			Update("containerId",
-				"imageName",
-				1433,
-				"user",
-				"password",
-				false,
-				"context")
+			AddContextWithContainer("context", "imageName", 1433, "containerId", "user", "password", false)
 		})
 		}
 }

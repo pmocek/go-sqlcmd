@@ -21,12 +21,16 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
 	"github.com/pkg/errors"
+	"io"
 	"strings"
 )
 
 var formatter Formatter
 var loggingLevel verbosity.Enum
 var runningUnitTests bool
+
+var standardWriteCloser io.WriteCloser
+var errorWriteCloser io.WriteCloser
 
 func Struct(in interface{}) {
 	formatter.Serialize(in)
@@ -35,11 +39,14 @@ func Struct(in interface{}) {
 func Tracef(format string, a ...any) {
 	if loggingLevel >= verbosity.Trace {
 		format = ensureEol(format)
-		_, err := fmt.Printf("TRACE: ")
-		checkErr(err)
-		_, err = fmt.Printf(format, a...)
-		checkErr(err)
+		printf("%v", "TRACE: ")
+		printf(format, a)
 	}
+}
+
+func printf(format string, a ...any) {
+	_, err := standardWriteCloser.Write([]byte(fmt.Sprintf(format, a...)))
+	checkErr(err)
 }
 
 func ensureEol(format string) string {
@@ -53,31 +60,11 @@ func ensureEol(format string) string {
 	return format
 }
 
-func Trace(a ...any) {
-	if loggingLevel >= verbosity.Trace {
-		_, err := fmt.Printf("TRACE: ")
-		checkErr(err)
-		_, err = fmt.Println(a...)
-		checkErr(err)
-	}
-}
-
 func Debugf(format string, a ...any) {
 	if loggingLevel >= verbosity.Debug {
 		format = ensureEol(format)
-		_, err := fmt.Printf("DEBUG: ")
-		checkErr(err)
-		_, err = fmt.Printf(format, a...)
-		checkErr(err)
-	}
-}
-
-func Debug(a ...any) {
-	if loggingLevel >= verbosity.Debug {
-		_, err := fmt.Printf("DEBUG: ")
-		checkErr(err)
-		_, err = fmt.Println(a...)
-		checkErr(err)
+		printf("DEBUG: ")
+		printf(format, a...)
 	}
 }
 
@@ -93,11 +80,9 @@ func infofWithHints(hints []string, format string, a ...any) {
 	if loggingLevel >= verbosity.Info {
 		format = ensureEol(format)
 		if loggingLevel >= verbosity.Debug {
-			_, err := fmt.Printf("INFO:  ")
-			checkErr(err)
+			printf("INFO:  ")
 		}
-		_, err := fmt.Printf(format, a...)
-		checkErr(err)
+		printf(format, a...)
 		displayHints(hints)
 	}
 }
@@ -106,11 +91,9 @@ func InfofWithHintExamples(hintExamples [][]string, format string, a ...any) {
 	if loggingLevel >= verbosity.Info || runningUnitTests {
 		format = ensureEol(format)
 		if loggingLevel >= verbosity.Debug {
-			_, err := fmt.Printf("INFO:  ")
-			checkErr(err)
+			printf("INFO:  ")
 		}
-		_, err := fmt.Printf(format, a...)
-		checkErr(err)
+		printf(format, a...)
 		displayHintExamples(hintExamples)
 	}
 }
@@ -141,37 +124,13 @@ func displayHintExamples(hintExamples [][]string) {
 	displayHints(hints)
 }
 
-func Info(a ...any) {
-	if loggingLevel >= verbosity.Info {
-		if loggingLevel >= verbosity.Debug {
-			_, err := fmt.Printf("INFO:  ")
-			checkErr(err)
-		}
-		_, err := fmt.Println(a...)
-		checkErr(err)
-	}
-}
-
 func Warnf(format string, a ...any) {
 	if loggingLevel >= verbosity.Warn {
 		format = ensureEol(format)
 		if loggingLevel >= verbosity.Debug {
-			_, err := fmt.Printf("WARN:  ")
-			checkErr(err)
+			printf("WARN:  ")
 		}
-		_, err := fmt.Printf(format, a...)
-		checkErr(err)
-	}
-}
-
-func Warn(a ...any) {
-	if loggingLevel >= verbosity.Warn {
-		if loggingLevel >= verbosity.Debug {
-			_, err := fmt.Printf("WARN:  ")
-			checkErr(err)
-		}
-		_, err := fmt.Println(a...)
-		checkErr(err)
+		printf(format, a...)
 	}
 }
 
@@ -179,22 +138,9 @@ func Errorf(format string, a ...any) {
 	if loggingLevel >= verbosity.Error {
 		format = ensureEol(format)
 		if loggingLevel >= verbosity.Debug {
-			_, err := fmt.Printf("ERROR:  ")
-			checkErr(err)
+			printf("ERROR:  ")
 		}
-		_, err := fmt.Printf(format, a...)
-		checkErr(err)
-	}
-}
-
-func Error(a ...any) {
-	if loggingLevel >= verbosity.Error {
-		if loggingLevel >= verbosity.Debug {
-			_, err := fmt.Printf("ERROR:  ")
-			checkErr(err)
-		}
-		_, err := fmt.Println(a...)
-		checkErr(err)
+		printf(format, a...)
 	}
 }
 

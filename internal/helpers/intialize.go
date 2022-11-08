@@ -12,6 +12,7 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
+	"os"
 )
 
 type initInfo struct {
@@ -29,19 +30,21 @@ func Initialize(
 	info := initInfo{errorHandler, output.Tracef}
 
 	file.Initialize(info.ErrorHandler, info.TraceHandler)
-	mssql.Initialize(info.ErrorHandler, info.TraceHandler, secret.Decrypt)
+	mssql.Initialize(info.ErrorHandler, info.TraceHandler, secret.Decode)
 	output.Initialize(
 		info.ErrorHandler,
 		info.TraceHandler,
 		hintHandler,
+		os.Stdout,
+		os.Stderr,
 		outputType,
 		verbosity.Enum(loggingLevel),
 	)
 	config.Initialize(
 		info.ErrorHandler,
 		info.TraceHandler,
-		secret.Encrypt,
-		secret.Decrypt,
+		secret.Encode,
+		secret.Decode,
 		net.IsLocalPortAvailable,
 		file.CreateEmptyFileIfNotExists,
 		sqlconfigFilename,

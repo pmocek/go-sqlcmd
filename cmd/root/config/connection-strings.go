@@ -43,9 +43,9 @@ func (c *ConnectionStrings) DefineCommand() (command *Command) {
 func (c *ConnectionStrings) run(*Command, []string) {
 	// connectionStringFormats borrowed from "portal.azure.com" "connection strings" pane
 	var connectionStringFormats = map[string]string{
-		"ADO.NET": "Server=tcp:%s,%s;Initial Catalog=%s;Persist Security Info=False;User ID=%s;Password=%s;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+		"ADO.NET": "Server=tcp:%s,%s;Initial Catalog=%s;Persist Security Info=False;User ID=%s;Password=%s;MultipleActiveResultSets=False;Encode=True;TrustServerCertificate=False;Connection Timeout=30;",
 		"JDBC":    "jdbc:sqlserver://%s:%s;database=%s;user=%s;password=%s;encrypt=true;trustServerCertificate=false;loginTimeout=30;",
-		"ODBC":    "Driver={ODBC Driver 13 for SQL Server};Server=tcp:%s,%s;Database=%s;Uid=%s;Pwd=%s;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;",
+		"ODBC":    "Driver={ODBC Driver 13 for SQL Server};Server=tcp:%s,%s;Database=%s;Uid=%s;Pwd=%s;Encode=yes;TrustServerCertificate=no;Connection Timeout=30;",
 	}
 
 	endpoint, user := config.GetCurrentContext()
@@ -55,7 +55,7 @@ func (c *ConnectionStrings) run(*Command, []string) {
 			strconv.Itoa(endpoint.EndpointDetails.Port),
 			"master",
 			user.BasicAuth.Username,
-			secret.Decrypt(user.BasicAuth.Password, user.BasicAuth.PasswordEncrypted))
+			secret.Decode(user.BasicAuth.Password, user.BasicAuth.PasswordEncrypted))
 	}
 
 	var format string
@@ -66,7 +66,7 @@ func (c *ConnectionStrings) run(*Command, []string) {
 	}
 
 	connectionStringFormats["SQLCMD"] = fmt.Sprintf(format,
-		secret.Decrypt(user.BasicAuth.Password, user.BasicAuth.PasswordEncrypted),
+		secret.Decode(user.BasicAuth.Password, user.BasicAuth.PasswordEncrypted),
 		endpoint.EndpointDetails.Address,
 		strconv.Itoa(endpoint.EndpointDetails.Port),
 		user.BasicAuth.Username)

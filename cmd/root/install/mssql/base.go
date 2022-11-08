@@ -136,7 +136,7 @@ func (c *Base) addFlags(
 			&c.encryptPassword,
 			"encrypt-password",
 			false,
-			"Encrypt the generated password in the sqlconfig file",
+			"Encode the generated password in the sqlconfig file",
 		)
 	}
 
@@ -211,12 +211,12 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	}
 
 	output.Infof("Starting %v", imageName)
-	id, err := controller.ContainerRun(imageName, env, port, []string{})
+	containerId, err := controller.ContainerRun(imageName, env, port, []string{})
 	if err != nil {
 		// Remove the container, because we haven't persisted to config yet, so
 		// uninstall won't work yet
-		if id != "" {
-			err := controller.ContainerRemove(id)
+		if containerId != "" {
+			err := controller.ContainerRemove(containerId)
 			output.FatalErr(err)
 		}
 		output.FatalErr(err)
@@ -235,16 +235,17 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	}
 
 	password := c.generatePassword()
+
 	// Save the config now, so user can uninstall, even if mssql in the container
 	// fails to start
-	config.Update(
-		id,
+	config.AddContextWithContainer(
+		contextName,
 		imageName,
 		port,
+		containerId,
 		userName,
 		password,
 		c.encryptPassword,
-		contextName,
 	)
 
 	output.Infof(
@@ -258,7 +259,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	// Wait for "The default language" instead
 	// BUG(stuartpa): This obviously doesn't work for non US LCIDs
 	controller.ContainerWaitForLogEntry(
-		id, c.errorLogEntryToWaitFor)
+		containerId, c.errorLogEntryToWaitFor)
 
 	output.Infof(
 		"Disabling 'sa' account (and rotating 'sa' password). Creating user '%s'",
@@ -272,7 +273,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 			BasicAuth: &sqlconfig.BasicAuthDetails{
 				Username: "sa",
 				PasswordEncrypted: c.encryptPassword,
-				Password: secret.Encrypt(saPassword, c.encryptPassword),
+				Password: secret.Encode(saPassword, c.encryptPassword),
 			},
 			Name: "sa",
 		},
@@ -347,7 +348,7 @@ func (c *Base) generatePassword() (password string) {
 }
 
 func (c *Base) Query(commandText string) {
-	output.Trace(commandText)
+	output.Tracef("%v", commandText)
 
 	//BUG(stuartpa): Need to check for errors
 	mssql.Query(c.sqlcmdPkg, commandText)
