@@ -28,6 +28,28 @@ func GetContainerId() (containerId string) {
 	panic("Id not found")
 }
 
+func CurrentContextEndpointHasContainer() (exists bool) {
+	currentContextName := config.CurrentContext
+
+	if currentContextName == "" {
+		panic("currentContextName must not be empty")
+	}
+
+	for _, c := range config.Contexts {
+		if c.Name == currentContextName {
+			for _, e := range config.Endpoints {
+				if e.Name == c.Endpoint {
+					if e.ContainerDetails != nil {
+						exists = true
+					}
+					break
+				}
+			}
+		}
+	}
+	return
+}
+
 func FindFreePortForTds() (portNumber int) {
 	const startingPortNumber = 1433
 

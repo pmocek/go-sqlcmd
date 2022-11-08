@@ -4,6 +4,7 @@
 package config
 
 import (
+	"fmt"
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
@@ -47,7 +48,15 @@ func (c *DeleteEndpoint) run(cmd *Command, args []string) {
 	if c.name == "" {
 		output.Fatal("Endpoint name must be provided.  Provide endpoint name with --name flag")
 	}
-	config.DeleteEndpoint(c.name)
+
+	if config.EndpointExists(c.name) {
+		config.DeleteEndpoint(c.name)
+	} else {
+		output.FatalfWithHintExamples([][]string{
+			{"View endpoints", "sqlcmd config get-endpoints"},
+		},
+		fmt.Sprintf("Endpoint '%v' does not exist", c.name))
+	}
 
 	output.Infof("Endpoint '%v' deleted", c.name)
 }

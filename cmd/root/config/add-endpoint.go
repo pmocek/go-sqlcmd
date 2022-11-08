@@ -62,9 +62,13 @@ func (c *AddEndpoint) run(cmd *Command, args []string) {
 		Name:             c.name,
 	}
 
-	config.AddEndpoint(endpoint)
+	uniqueEndpointName := config.AddEndpoint(endpoint)
 	output.InfofWithHintExamples([][]string{
-			{"Add a context", fmt.Sprintf("sqlcmd config add-context --endpoint %v", endpoint.Name)},
+			{"Add a context for this endpoint", fmt.Sprintf("sqlcmd config add-context --endpoint %v", uniqueEndpointName)},
+			{"View endpoint names", "sqlcmd config get-endpoints"},
+			{"View endpoint details", fmt.Sprintf("sqlcmd config get-endpoints %v", uniqueEndpointName) },
+			{"View all endpoints details", "sqlcmd config get-endpoints --detailed" },
+			{"Delete this endpoint", fmt.Sprintf("sqlcmd config delete-context %v", uniqueEndpointName) },
 		},
-	"Endpoint '%v' added", endpoint.Name)
+	"Endpoint '%v' added (address: '%v', port: '%v')", uniqueEndpointName, c.address, c.port)
 }

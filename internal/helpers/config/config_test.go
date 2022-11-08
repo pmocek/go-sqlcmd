@@ -27,7 +27,6 @@ func TestConfig(t *testing.T) {
 							PasswordEncrypted: false,
 							Password:          "weak",
 						},
-						OtherAuth:          nil,
 					}}}}},
 	}
 		for _, tt := range tests {
@@ -72,7 +71,6 @@ func TestConfig(t *testing.T) {
 					PasswordEncrypted: false,
 					Password:          "password",
 				},
-				OtherAuth:          nil,
 			}
 
 			AddUser(user)

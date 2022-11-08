@@ -28,7 +28,7 @@ func (c *Mssql) DefineCommand() (command *Command) {
 		Use:   use,
 		Short: short,
 		Long:  short,
-		Example: `# Install SQL Server in a docker container
+		Example: `# Install SQL Server in a local container
   sqlcmd install mssql`,
 	})
 

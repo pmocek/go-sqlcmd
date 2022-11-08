@@ -290,12 +290,20 @@ func TestInfofWithHintExamples(t *testing.T) {
 		args args
 	}{
 		{"default", args{
-			hintExamples: [][]string{{"Bad", "Sample", "One To Many Elements"}, {"Good", "Example"}},
+			hintExamples: [][]string{{
+				"Bad",
+				"Sample",
+				"One To Many Elements",
+			}, {"Good", "Example"}},
 			format: "sample trace %v",
 			a: []any{"hello"},
 		}},
 		{"emptyFormatString", args{
-			hintExamples: [][]string{{"Bad", "Sample", "One To Many Elements"}, {"Good", "Example"}},
+			hintExamples: [][]string{{
+				"Bad",
+				"Sample",
+				"One To Many Elements",
+			}, {"Good", "Example"}},
 			format: "",
 			a: []any{"hello"},
 		}},

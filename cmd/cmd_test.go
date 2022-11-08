@@ -12,6 +12,7 @@ import (
 	"testing"
 )
 
+// Set to true to run unit tests without a network connection
 var offlineMode = false
 
 func TestRunCommandLine(t *testing.T) {
@@ -70,8 +71,12 @@ func TestRunCommandLine(t *testing.T) {
 			split("config get-endpoints --detailed")},
 		{"config-add-context",
 			split("config add-context --endpoint endpoint")},
-		{"neg-uninstall-but-context-has-no-container",
+		{"uninstall-but-context-has-no-container",
 			split("uninstall --force --yes")},
+		{"config-add-endpoint",
+			split("config add-endpoint")},
+		{"config-add-context",
+			split("config add-context --endpoint endpoint")},
 		{"config-use-context",
 			split("config use-context context")},
 		{"config-get-contexts",
@@ -129,7 +134,7 @@ func TestRunCommandLine(t *testing.T) {
 		{"neg-install-no-eula",
 			split("install mssql server")},
 		{"install",
-			split(fmt.Sprintf("install mssql server %v --user-database my-database --accept-eula", useCached))},
+			split(fmt.Sprintf("install mssql server %v --user-database my-database --accept-eula --encrypt-password", useCached))},
 		{"config-current-context",
 			split("config current-context")},
 		{"config-connection-strings",
@@ -147,6 +152,13 @@ func TestRunCommandLine(t *testing.T) {
 		{"uninstall",
 			split("uninstall --yes --force")},
 
+		// BUG(stuartpa): Shouldn't need to clean up here
+		{"cleanup",
+			split("config delete-endpoint endpoint3")},
+		{"cleanup",
+			split("config delete-endpoint endpoint4")},
+
+		// BUG(stuartpa): Verify config is empty here
 	}
 
 	for _, tt := range tests {

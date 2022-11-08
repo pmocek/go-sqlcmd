@@ -117,11 +117,26 @@ func InfofWithHintExamples(hintExamples [][]string, format string, a ...any) {
 
 func displayHintExamples(hintExamples [][]string) {
 	var hints []string
+
+	maxLengthHintText := 0
 	for _, hintExample := range hintExamples {
 		if len(hintExample) != 2 {
 			panic("Hintexample must be 2 elements, a description, and an example")
 		}
-		hints = append(hints, fmt.Sprintf("%v:\t\t`%s`", hintExample[0], hintExample[1]))
+
+		if len(hintExample[0]) > maxLengthHintText {
+			maxLengthHintText = len(hintExample[0])
+		}
+	}
+
+	for _, hintExample := range hintExamples {
+		padLength := maxLengthHintText - len(hintExample[0])
+		hints = append(hints, fmt.Sprintf(
+			"%v: %v%s",
+			hintExample[0],
+			strings.Repeat(" ", padLength),
+			hintExample[1],
+		))
 	}
 	displayHints(hints)
 }

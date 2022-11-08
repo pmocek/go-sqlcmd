@@ -37,8 +37,9 @@ type Base struct {
 	encryptPassword bool
 
 	useCached bool
-
+	errorLogEntryToWaitFor string
 	defaultContextName string
+	collation string
 
 	sqlcmdPkg *sqlcmd.Sqlcmd
 }
@@ -132,7 +133,7 @@ func (c *Base) addFlags(
 	// Windows has the DPAPI which allows securely encrypting
 	if runtime.GOOS == "windows" {
 		command.PersistentFlags().BoolVar(
-			&c.acceptEula,
+			&c.encryptPassword,
 			"encrypt-password",
 			false,
 			"Encrypt the generated password in the sqlconfig file",
@@ -144,6 +145,20 @@ func (c *Base) addFlags(
 		"cached",
 		false,
 		"Don't download image.  Use already downloaded image",
+	)
+
+	command.PersistentFlags().StringVar(
+		&c.errorLogEntryToWaitFor,
+		"errorlog-to-wait-for",
+		"The default language",
+		"The line in the errorlog to wait for before connecting to disable the 'sa' account",
+	)
+
+	command.PersistentFlags().StringVar(
+		&c.collation,
+		"collation",
+		"SQL_Latin1_General_CP1_CI_AS",
+		"The SQL Server collation",
 	)
 }
 
@@ -173,7 +188,11 @@ func (c *Base) run(*Command, []string) {
 func (c *Base) installDockerImage(imageName string, contextName string) {
 	saPassword := c.generatePassword()
 
-	env := []string{"ACCEPT_EULA=Y", fmt.Sprintf("SA_PASSWORD=%s", saPassword)}
+	env := []string{
+		"ACCEPT_EULA=Y",
+		fmt.Sprintf("MSSQL_SA_PASSWORD=%s", saPassword),
+		fmt.Sprintf("MSSQL_COLLATION=%s", c.collation),
+	}
 	port := config.FindFreePortForTds()
 	controller := docker.NewController()
 
@@ -218,7 +237,15 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	password := c.generatePassword()
 	// Save the config now, so user can uninstall, even if mssql in the container
 	// fails to start
-	config.Update(id, imageName, port, userName, password, false, contextName)
+	config.Update(
+		id,
+		imageName,
+		port,
+		userName,
+		password,
+		c.encryptPassword,
+		contextName,
+	)
 
 	output.Infof(
 		"Created context '%s' in %s",
@@ -229,8 +256,9 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	// BUG(stuartpa): SQL Server bug: "SQL Server is now ready for client connections", oh no it isn't!!
 	// Wait for "Server name is" instead!  Nope, that doesn't work on edge
 	// Wait for "The default language" instead
+	// BUG(stuartpa): This obviously doesn't work for non US LCIDs
 	controller.ContainerWaitForLogEntry(
-		id, "The default language")
+		id, c.errorLogEntryToWaitFor)
 
 	output.Infof(
 		"Disabling 'sa' account (and rotating 'sa' password). Creating user '%s'",
@@ -243,6 +271,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 			AuthenticationType: "basic",
 			BasicAuth: &sqlconfig.BasicAuthDetails{
 				Username: "sa",
+				PasswordEncrypted: c.encryptPassword,
 				Password: secret.Encrypt(saPassword, c.encryptPassword),
 			},
 			Name: "sa",
@@ -251,17 +280,25 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	)
 	c.createNonSaUser(userName, password)
 
-	hints := []string{
-		"To run a query:               sqlcmd query \"SELECT @@version\"",
-		"To start interactive session: sqlcmd query"}
-	if previousContextName != "" {
-		hints = append(hints, fmt.Sprintf("To change context:            sqlcmd config use-context %v", previousContextName))
-	}
-	hints = append(hints, "To view config:               sqlcmd config view")
-	hints = append(hints, "To see connection strings:    sqlcmd config connection-strings")
-	hints = append(hints, "To remove:                    sqlcmd uninstall")
+	hints := [][]string{
+		{"To run a query", "sqlcmd query \"SELECT @@version\""},
+		{"To start interactive session", "sqlcmd query"}}
 
-	output.InfofWithHints(hints,
+	if previousContextName != "" {
+		hints = append(
+			hints,
+			[]string{"To change context", fmt.Sprintf(
+				"sqlcmd config use-context %v",
+				previousContextName,
+			)},
+		)
+	}
+
+	hints = append(hints, []string{"To view config", "sqlcmd config view"})
+	hints = append(hints, []string{"To see connection strings", "sqlcmd config connection-strings"})
+	hints = append(hints, []string{"To remove", "sqlcmd uninstall"})
+
+	output.InfofWithHintExamples(hints,
 		"Now ready for client connections on port %d",
 		port,
 	)

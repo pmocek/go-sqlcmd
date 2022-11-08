@@ -70,39 +70,46 @@ func (c *Uninstall) DefineCommand() (command *Command) {
 }
 
 func (c *Uninstall) run(*Command, []string) {
+	if config.GetCurrentContextName() == "" {
+		output.FatalfWithHintExamples([][]string{
+			{"To view available contexts", "sqlcmd config get-contexts"},
+		}, "No current context")
+	}
 	if currentContextEndPointExists() {
-		controller := docker.NewController()
-		id := config.GetContainerId()
-		endpoint, _ := config.GetCurrentContext()
+		if config.CurrentContextEndpointHasContainer() {
+			controller := docker.NewController()
+			id := config.GetContainerId()
+			endpoint, _ := config.GetCurrentContext()
 
-		var input string
-		if !c.yes {
+			var input string
+			if !c.yes {
+				output.Infof(
+					"Current context is '%s'. Do you want to continue? (Y/N)",
+					config.GetCurrentContextName(),
+				)
+				_, err := fmt.Scanln(&input)
+				CheckErr(err)
+
+				if strings.ToLower(input) != "yes" && strings.ToLower(input) != "y" {
+					output.Fatal("Operation cancelled.")
+				}
+			}
+			if !c.force {
+				output.Infof("Verifying no user (non-system) database (.mdf) files")
+				userDatabaseSafetyCheck(controller, id)
+			}
+
 			output.Infof(
-				"Current context is '%s'. Do you want to continue? (Y/N)",
-				config.GetCurrentContextName(),
+				"Stopping %s",
+				endpoint.ContainerDetails.Image,
 			)
-			_, err := fmt.Scanln(&input)
+			err := controller.ContainerStop(id)
 			CheckErr(err)
 
-			if strings.ToLower(input) != "yes" && strings.ToLower(input) != "y" {
-				output.Fatal("Operation cancelled.")
-			}
+			output.Infof("Removing context %s", config.GetCurrentContextName())
+			err = controller.ContainerRemove(id)
+			CheckErr(err)
 		}
-		if !c.force {
-			output.Infof("Verifying no user (non-system) database (.mdf) files")
-			userDatabaseSafetyCheck(controller, id)
-		}
-
-		output.Infof(
-			"Stopping %s",
-			endpoint.ContainerDetails.Image,
-		)
-		err := controller.ContainerStop(id)
-		CheckErr(err)
-
-		output.Infof("Removing context %s", config.GetCurrentContextName())
-		err = controller.ContainerRemove(id)
-		CheckErr(err)
 
 		config.RemoveCurrentContext()
 		config.Save()

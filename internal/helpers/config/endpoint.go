@@ -9,10 +9,12 @@ import (
 	"strconv"
 )
 
-func AddEndpoint(endpoint Endpoint) {
+func AddEndpoint(endpoint Endpoint) (actualEndpointName string) {
 	endpoint.Name = FindUniqueEndpointName(endpoint.Name)
 	config.Endpoints = append(config.Endpoints, endpoint)
 	Save()
+
+	return endpoint.Name
 }
 
 func DeleteEndpoint(name string) {

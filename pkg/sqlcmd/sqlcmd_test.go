@@ -70,7 +70,6 @@ func TestConnectionStringFromSqlCmd(t *testing.T) {
 /* The following tests require a working SQL instance and rely on SqlCmd environment variables
 to manage the initial connection string. The default connection when no environment variables are
 set will be to localhost using Windows auth.
-
 */
 func TestSqlCmdConnectDb(t *testing.T) {
 	v := InitializeVariables(true)

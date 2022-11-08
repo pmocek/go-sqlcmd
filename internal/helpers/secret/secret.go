@@ -23,7 +23,7 @@ func Encrypt(plainText string, encryptPassword bool) (cipherText string) {
 	return
 }
 
-func Decrypt(cipherText string, decryptPassword bool) (secret string) {
+func Decrypt(cipherText string, decryptPassword bool) (plainText string) {
 	if cipherText == "" {
 		panic("Cannot decrypt an empty string")
 	}
@@ -32,9 +32,9 @@ func Decrypt(cipherText string, decryptPassword bool) (secret string) {
 	checkErr(err)
 
 	if decryptPassword {
-		secret = decrypt(string(bytes))
+		plainText = decrypt(string(bytes))
 	} else {
-		secret = string(bytes)
+		plainText = string(bytes)
 	}
 
 	return

@@ -35,24 +35,10 @@ type BasicAuthDetails struct {
 	Password string `mapstructure:"password"`
 }
 
-// Use same names that the Azure SDK for GO uses
-// Add Syntantaic sugar to command line that generates the parameters
-//   -  Azure Active Directory
-//   0.   Default
-//   1.   Service Principal
-//   2.   Managed Identiy
-//   3.   Username and Password
-//   4.   Interactive
-//   5.   Device code
-type OtherAuthDetails struct {
-	Parameters map[string]string  `mapstructure:"parameters"`
-}
-
 type User struct {
 	Name        string `mapstructure:"name"`
 	AuthenticationType string `mapstructure:"authentication-type" yaml:"authentication-type"`
 	BasicAuth* BasicAuthDetails `mapstructure:"basic-auth,omitempty" yaml:"basic-auth,omitempty"`
-	OtherAuth* OtherAuthDetails `mapstructure:"other-auth,omitempty" yaml:"other-auth,omitempty"`
 }
 
 type Sqlconfig struct {

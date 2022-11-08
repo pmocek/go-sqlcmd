@@ -63,10 +63,10 @@ func (c *AddContext) run(cmd *Command, args []string) {
 
 	if c.endpointName == "" || !config.EndpointExists(c.endpointName) {
 		output.FatalfWithHintExamples([][]string{
-			{"Use to view endpoints to choose from", "sqlcmd config get-endpoints"},
-			{"Add a local endpoint", "sqlcmd install"},
+			{"View existing endpoints to choose from", "sqlcmd config get-endpoints"},
+			{"Add a new local endpoint", "sqlcmd install"},
 			{"Add an already existing endpoint", "sqlcmd config add-endpoint --address localhost --port 1433"}},
-		"An endpoint is required to add a context.  Endpoint '%v' does not exist", c.endpointName)
+		"Endpoint required to add context.  Endpoint '%v' does not exist.  Use --endpoint flag", c.endpointName)
 	}
 
 	if c.userName != "" {
