@@ -13,8 +13,12 @@ type ContainerDetails struct {
 	Image string `mapstructure:"image"`
 }
 
-type Endpoint struct {
+type AssetDetails struct {
 	*ContainerDetails `mapstructure:"container,omitempty" yaml:"container,omitempty"`
+}
+
+type Endpoint struct {
+	*AssetDetails `mapstructure:"asset,omitempty" yaml:"asset,omitempty"`
 	EndpointDetails   `mapstructure:"endpoint" yaml:"endpoint"`
 	Name              string `mapstructure:"name"`
 }

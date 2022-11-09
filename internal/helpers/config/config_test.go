@@ -37,9 +37,11 @@ func TestConfig(t *testing.T) {
 			GetRedactedConfig(true)
 
 			AddEndpoint(Endpoint{
-				ContainerDetails: &ContainerDetails{
-					Id:    strings.Repeat("9", 64),
-					Image: "www.image.url"},
+				AssetDetails: &AssetDetails{
+					ContainerDetails: &ContainerDetails{
+						Id:    strings.Repeat("9", 64),
+						Image: "www.image.url"},
+				},
 				EndpointDetails: EndpointDetails{
 					Address: "localhost",
 					Port:    1433,

@@ -65,9 +65,11 @@ func AddContextWithContainer(
 	config.CurrentContext = contextName
 
 	config.Endpoints = append(config.Endpoints, Endpoint{
-		ContainerDetails: &ContainerDetails{
-			Id:    containerId,
-			Image: imageName},
+		AssetDetails: &AssetDetails{
+			ContainerDetails: &ContainerDetails{
+				Id:    containerId,
+				Image: imageName},
+		},
 		EndpointDetails: EndpointDetails{
 			Address: "localhost",
 			Port:    portNumber,

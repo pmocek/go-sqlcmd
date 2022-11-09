@@ -35,7 +35,7 @@ sqlcmd install mssql-edge get-tags`
 
 func (c *GetTags) Run(*Command, []string) {
 	tags := docker.ListTags(
-		"mssql/server",
+		"azure-sql-edge",
 		"https://mcr.microsoft.com",
 	)
 	output.Struct(tags)
