@@ -3,7 +3,6 @@ package output
 import (
 	"errors"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
-	"os"
 	"testing"
 )
 
@@ -34,29 +33,6 @@ func TestTracef(t *testing.T) {
 
 			InfofWithHints([]string{}, tt.args.format, tt.args.a...)
 			InfofWithHintExamples([][]string{}, tt.args.format, tt.args.a...)
-
-			Struct([]string{"A", "Struct"})
-			Initialize(
-				errorCallback,
-				Tracef,
-				hintCallback,
-				os.Stdout,
-				os.Stderr,
-				"xml",
-				verbosity.Error,
-			)
-			Struct([]string{"A", "Struct"})
-			Initialize(
-				errorCallback,
-				Tracef,
-				hintCallback,
-				os.Stdout,
-				os.Stderr,
-				"json",
-				verbosity.Error,
-			)
-			Struct([]string{"A", "Struct"})
-
 		})
 	}
 }

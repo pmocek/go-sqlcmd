@@ -36,6 +36,8 @@ func TestNegCommandLines(t *testing.T) {
 			split("config get-contexts badbad")},
 		{"neg-config-get-endpoints-bad-endpoint",
 			split("config get-endpoints badbad")},
+		{"neg-install-no-eula",
+			split("install mssql")},
 	}
 	run(t, tests)
 }
@@ -117,20 +119,18 @@ func TestConfigUsers(t *testing.T) {
 	run(t, tests)
 }
 
-func TestRunCommandLine(t *testing.T) {
+func TestLocalContext(t *testing.T) {
 	setup()
 	tests := []struct {
 		name string
 		args struct {args []string}
 	}{
-		{"install",
-			split("install mssql --accept-eula")},
-		{"config-delete-endpoint",
-			split("config delete-endpoint endpoint2")},
 		{"neg-config-delete-endpoint-no-name",
 			split("config delete-endpoint")},
 		{"config-add-endpoint",
 			split("config add-endpoint --address localhost --port 1433")},
+		{"config-add-user",
+			split("config add-user --username foobar")},
 		{"config-add-context",
 			split("config add-context --user user --endpoint endpoint --name my-context")},
 		{"config-delete-context-cascade",
@@ -139,18 +139,35 @@ func TestRunCommandLine(t *testing.T) {
 			split("config view")},
 		{"config-view",
 			split("config view --raw")},
-		{"config-delete-user",
-			split("config delete-user user")},
 
 		{"neg-config-add-user-bad-auth-type",
 			split("config add-user --username foobar --auth-type badbad")},
 		{"neg-config-add-user-bad-use-encrypted",
 			split("config add-user --username foobar  --auth-type other --encrypt-password")},
+	}
 
+	run(t, tests)
+}
+
+func TestGetTags(t *testing.T) {
+	setup()
+	tests := []struct {
+		name string
+		args struct {args []string}
+	}{
 		{"get-tags",
 			split("install mssql get-tags")},
-		{"neg-install-no-eula",
-			split("install mssql")},
+	}
+
+	run(t, tests)
+}
+
+func TestMssqlInstall(t *testing.T) {
+	setup()
+	tests := []struct {
+		name string
+		args struct {args []string}
+	}{
 		{"install",
 			split(fmt.Sprintf("install mssql %v --user-database my-database --accept-eula --encrypt-password", useCached))},
 		{"config-current-context",
@@ -171,11 +188,7 @@ func TestRunCommandLine(t *testing.T) {
 			split("uninstall --yes --force")},
 			}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			runTests(t, tt)
-		})
-	}
+	run(t, tests)
 }
 
 func runTests(t *testing.T, tt struct {

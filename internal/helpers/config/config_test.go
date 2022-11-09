@@ -170,7 +170,7 @@ func TestGetUser(t *testing.T) {
 
 func TestOutputUsers(t *testing.T) {
 	type args struct {
-		formatter func(interface{})
+		formatter func(interface{}) []byte
 		detailed  bool
 	}
 	tests := []struct {
