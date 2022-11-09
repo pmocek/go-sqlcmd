@@ -16,20 +16,20 @@ func TestConfig(t *testing.T) {
 		name string
 		args args
 	}{
-		{ "config",
+		{"config",
 			args{
 				Config: Sqlconfig{
 					Users: []User{{
 						Name:               "user1",
 						AuthenticationType: "basic",
-						BasicAuth:          &BasicAuthDetails{
+						BasicAuth: &BasicAuthDetails{
 							Username:          "user",
 							PasswordEncrypted: false,
 							Password:          "weak",
 						},
 					}}}}},
 	}
-		for _, tt := range tests {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			config = tt.args.Config
 			GetConfigFileUsed()
@@ -38,21 +38,21 @@ func TestConfig(t *testing.T) {
 
 			AddEndpoint(Endpoint{
 				ContainerDetails: &ContainerDetails{
-					Id: strings.Repeat("9", 64),
+					Id:    strings.Repeat("9", 64),
 					Image: "www.image.url"},
-				EndpointDetails:  EndpointDetails{
+				EndpointDetails: EndpointDetails{
 					Address: "localhost",
 					Port:    1433,
 				},
-				Name:             "endpoint",
+				Name: "endpoint",
 			})
 
 			AddEndpoint(Endpoint{
-				EndpointDetails:  EndpointDetails{
+				EndpointDetails: EndpointDetails{
 					Address: "localhost",
 					Port:    1434,
 				},
-				Name:             "endpoint",
+				Name: "endpoint",
 			})
 
 			EndpointsExists()
@@ -66,7 +66,7 @@ func TestConfig(t *testing.T) {
 			user := User{
 				Name:               "user",
 				AuthenticationType: "basic",
-				BasicAuth:          &BasicAuthDetails{
+				BasicAuth: &BasicAuthDetails{
 					Username:          "username",
 					PasswordEncrypted: false,
 					Password:          "password",
@@ -97,7 +97,7 @@ func TestConfig(t *testing.T) {
 			RemoveCurrentContext()
 			AddContextWithContainer("context", "imageName", 1433, "containerId", "user", "password", false)
 		})
-		}
+	}
 }
 
 func addContext() {

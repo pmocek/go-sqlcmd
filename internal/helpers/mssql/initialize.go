@@ -7,9 +7,13 @@ var decryptCallback func(cipherText string, decrypt bool) (secret string)
 
 func init() {
 	Initialize(
-		func(err error) {if err != nil {panic(err)}},
+		func(err error) {
+			if err != nil {
+				panic(err)
+			}
+		},
 		func(format string, a ...any) {},
-		func(cipherText string, decrypt bool) (secret string) {return})
+		func(cipherText string, decrypt bool) (secret string) { return })
 }
 
 func Initialize(

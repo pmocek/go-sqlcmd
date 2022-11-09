@@ -10,13 +10,13 @@ import (
 
 func TestInitialize(t *testing.T) {
 	type args struct {
-		errorHandler func(err error)
-		traceHandler func(format string, a ...any)
-		hintHandler  func(hints []string)
+		errorHandler   func(err error)
+		traceHandler   func(format string, a ...any)
+		hintHandler    func(hints []string)
 		standardOutput io.WriteCloser
-		errorOutput io.WriteCloser
-		format       string
-		verbosity    verbosity.Enum
+		errorOutput    io.WriteCloser
+		format         string
+		verbosity      verbosity.Enum
 	}
 	tests := []struct {
 		name string
@@ -25,17 +25,17 @@ func TestInitialize(t *testing.T) {
 		{
 			name: "badFormatterPanic",
 			args: args{
-				errorHandler: errorCallback,
-				traceHandler: traceCallback,
-				hintHandler:  hintCallback,
+				errorHandler:   errorCallback,
+				traceHandler:   traceCallback,
+				hintHandler:    hintCallback,
 				standardOutput: os.Stdout,
-				errorOutput: os.Stderr,
-				format:       "badbad",
-				verbosity:    0,
+				errorOutput:    os.Stderr,
+				format:         "badbad",
+				verbosity:      0,
 			},
 		},
 	}
-		for _, tt := range tests {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
 			// If test name ends in 'Panic' expect a Panic

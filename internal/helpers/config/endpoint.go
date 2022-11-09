@@ -19,9 +19,9 @@ func AddEndpoint(endpoint Endpoint) (actualEndpointName string) {
 
 func DeleteEndpoint(name string) {
 	if EndpointExists(name) {
-	ordinal := endpointOrdinal(name)
-	config.Endpoints = append(config.Endpoints[:ordinal], config.Endpoints[ordinal+1:]...)
-	Save()
+		ordinal := endpointOrdinal(name)
+		config.Endpoints = append(config.Endpoints[:ordinal], config.Endpoints[ordinal+1:]...)
+		Save()
 	}
 }
 
@@ -70,7 +70,6 @@ func FindUniqueEndpointName(name string) (uniqueEndpointName string) {
 	return
 }
 
-
 func EndpointExists(name string) (exists bool) {
 	if name == "" {
 		panic("Name must not be empty")
@@ -95,7 +94,6 @@ func endpointOrdinal(name string) (ordinal int) {
 	return
 }
 
-
 func GetEndpoint(name string) (endpoint Endpoint) {
 	for _, e := range config.Endpoints {
 		if name == e.Name {
@@ -106,7 +104,7 @@ func GetEndpoint(name string) (endpoint Endpoint) {
 	return
 }
 
-func OutputEndpoints(formatter func(interface{}), detailed bool) {
+func OutputEndpoints(formatter func(interface{}) []byte, detailed bool) {
 	if detailed {
 		formatter(config.Endpoints)
 	} else {

@@ -14,8 +14,15 @@ import (
 // init initializes the package for unit testing.  For production, use
 // the Initialize method to inject fully functional dependencies
 func init() {
-	errorHandler := func(err error){if err != nil {panic(err)}}
-	formatter = &Yaml{Base: Base{ErrorHandlerCallback: errorHandler}}
+	errorHandler := func(err error) {
+		if err != nil {
+			panic(err)
+		}
+	}
+	formatter = &Yaml{Base: Base{
+		StandardOutput: standardWriteCloser,
+		ErrorHandlerCallback: errorHandler,
+	}}
 
 	Initialize(
 		errorHandler,
@@ -48,11 +55,17 @@ func Initialize(
 
 	switch serializationFormat {
 	case "json":
-		formatter = &Json{Base: Base{ErrorHandlerCallback: errorHandler}}
+		formatter = &Json{Base: Base{
+			StandardOutput: standardWriteCloser,
+			ErrorHandlerCallback: errorHandler}}
 	case "yaml":
-		formatter = &Yaml{Base: Base{ErrorHandlerCallback: errorHandler}}
+		formatter = &Yaml{Base: Base{
+			StandardOutput: standardWriteCloser,
+			ErrorHandlerCallback: errorHandler}}
 	case "xml":
-		formatter = &Xml{Base: Base{ErrorHandlerCallback: errorHandler}}
+		formatter = &Xml{Base: Base{
+			StandardOutput: standardWriteCloser,
+			ErrorHandlerCallback: errorHandler}}
 	default:
 		panic(fmt.Sprintf("Format '%v' not supported", serializationFormat))
 	}

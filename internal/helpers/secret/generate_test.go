@@ -8,7 +8,7 @@ func TestGenerate(t *testing.T) {
 		minSpecialChar int
 		minNum         int
 		minUpperCase   int
-		specialChars string
+		specialChars   string
 	}
 	tests := []struct {
 		name string
@@ -22,12 +22,12 @@ func TestGenerate(t *testing.T) {
 				minSpecialChar: 10,
 				minNum:         10,
 				minUpperCase:   10,
-				specialChars: "!@#$%&*",
+				specialChars:   "!@#$%&*",
 			},
 			want: "",
 		},
 	}
-		for _, tt := range tests {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Generate(
 				tt.args.passwordLength,

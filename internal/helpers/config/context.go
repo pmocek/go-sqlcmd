@@ -14,7 +14,7 @@ import (
 func AddContext(context Context) {
 	if !EndpointExists(context.Endpoint) {
 		output.FatalfWithHintExamples([][]string{
-			{"Add the endpoint", fmt.Sprintf("sqlcmd config add-endpoint --name %v",context.Endpoint)},
+			{"Add the endpoint", fmt.Sprintf("sqlcmd config add-endpoint --name %v", context.Endpoint)},
 		}, "Endpoint '%v' does not exist", context.Endpoint)
 	}
 	context.Name = FindUniqueContextName(context.Name, *context.User)
@@ -32,7 +32,7 @@ func DeleteContext(name string, cascade bool) {
 		} else {
 			config.CurrentContext = ""
 		}
-		
+
 		Save()
 	}
 }
@@ -154,7 +154,7 @@ func contextOrdinal(name string) (ordinal int) {
 	panic("Context not found")
 }
 
-func GetCurrentContext() (endpoint Endpoint, user* User) {
+func GetCurrentContext() (endpoint Endpoint, user *User) {
 	currentContextName := GetCurrentContextOrFatal()
 
 	endPointFound := false
@@ -194,7 +194,7 @@ func GetContext(name string) (context Context) {
 	return
 }
 
-func OutputContexts(formatter func(interface{}), detailed bool) {
+func OutputContexts(formatter func(interface{}) []byte, detailed bool) {
 	if detailed {
 		formatter(config.Contexts)
 	} else {

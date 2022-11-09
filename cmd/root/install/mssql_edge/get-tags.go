@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package mssql
+package mssql_edge
 
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
@@ -16,10 +16,10 @@ type GetTags struct {
 
 func (c *GetTags) DefineCommand() (command *Command) {
 	const use = "get-tags"
-	const short = "Get tags available for mssql install."
+	const short = "Get tags available for mssql-edge install."
 	const long = short
 	const example = `# List tags
-sqlcmd install mssql get-tags`
+sqlcmd install mssql-edge get-tags`
 
 	command = c.SetCommand(Command{
 		Use:     use,

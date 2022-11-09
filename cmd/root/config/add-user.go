@@ -14,9 +14,9 @@ import (
 type AddUser struct {
 	AbstractBase
 
-	name string
-	authType string
-	username string
+	name            string
+	authType        string
+	username        string
 	encryptPassword bool
 }
 
@@ -68,7 +68,7 @@ func (c *AddUser) run(cmd *Command, args []string) {
 	if c.authType != "basic" &&
 		c.authType != "other" {
 		output.FatalfWithHints([]string{"Authentication type must be 'basic' or 'other'"},
-		"Authentication type '' is not valid %v'", c.authType)
+			"Authentication type '' is not valid %v'", c.authType)
 	}
 
 	if c.authType != "basic" && c.encryptPassword {
@@ -98,9 +98,9 @@ func (c *AddUser) run(cmd *Command, args []string) {
 		}
 
 		user.BasicAuth = &sqlconfig.BasicAuthDetails{
-			Username: c.username,
+			Username:          c.username,
 			PasswordEncrypted: c.encryptPassword,
-			Password: secret.Encode(os.Getenv("SQLCMD_PASSWORD"), c.encryptPassword),
+			Password:          secret.Encode(os.Getenv("SQLCMD_PASSWORD"), c.encryptPassword),
 		}
 	}
 

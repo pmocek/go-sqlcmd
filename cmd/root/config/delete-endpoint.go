@@ -55,7 +55,7 @@ func (c *DeleteEndpoint) run(cmd *Command, args []string) {
 		output.FatalfWithHintExamples([][]string{
 			{"View endpoints", "sqlcmd config get-endpoints"},
 		},
-		fmt.Sprintf("Endpoint '%v' does not exist", c.name))
+			fmt.Sprintf("Endpoint '%v' does not exist", c.name))
 	}
 
 	output.Infof("Endpoint '%v' deleted", c.name)

@@ -13,7 +13,7 @@ import (
 type DeleteContext struct {
 	AbstractBase
 
-	name string
+	name    string
 	cascade bool
 }
 
@@ -53,7 +53,7 @@ func (c *DeleteContext) run(cmd *Command, args []string) {
 
 	if c.name == "" {
 		output.FatalWithHints([]string{"Use the --name flag to pass in a context name to delete"},
-		"A 'name' is required")
+			"A 'name' is required")
 	}
 
 	if config.ContextExists(c.name) {
@@ -71,8 +71,8 @@ func (c *DeleteContext) run(cmd *Command, args []string) {
 		output.Infof("Context '%v' deleted", c.name)
 	} else {
 		output.FatalfWithHintExamples([][]string{
-			{"View available contexts","sqlcmd config get-contexts"},
+			{"View available contexts", "sqlcmd config get-contexts"},
 		},
-		"Context '%v' does not exist", c.name)
+			"Context '%v' does not exist", c.name)
 	}
 }

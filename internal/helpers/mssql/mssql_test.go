@@ -8,12 +8,12 @@ import (
 )
 
 func TestConnect(t *testing.T) {
- 	endpoint := Endpoint{
-		 EndpointDetails:  EndpointDetails{
-			 Address: "localhost",
-			 Port:    1433,
-		 },
-	 Name: "local-default-instance"}
+	endpoint := Endpoint{
+		EndpointDetails: EndpointDetails{
+			Address: "localhost",
+			Port:    1433,
+		},
+		Name: "local-default-instance"}
 
 	type args struct {
 		endpoint Endpoint
@@ -27,38 +27,38 @@ func TestConnect(t *testing.T) {
 		want int
 	}{
 		{
-			name: "connectTrusted", args: args{endpoint: endpoint, user: nil, console:  nil},
+			name: "connectTrusted", args: args{endpoint: endpoint, user: nil, console: nil},
 			want: 0,
 		},
 		{
 			name: "connectBasicPanic", args: args{
-			endpoint: endpoint,
-			user: &User{
-				Name:               "basicUser",
-				AuthenticationType: "basic",
-				BasicAuth:          &BasicAuthDetails{
-					Username:          "foo",
-					PasswordEncrypted: true,
-					Password:          "bar",
+				endpoint: endpoint,
+				user: &User{
+					Name:               "basicUser",
+					AuthenticationType: "basic",
+					BasicAuth: &BasicAuthDetails{
+						Username:          "foo",
+						PasswordEncrypted: true,
+						Password:          "bar",
+					},
 				},
+				console: nil,
 			},
-			console:  nil,
-		},
 			want: 0,
 		},
 		{
 			name: "invalidAuthTypePanic", args: args{
-			endpoint: endpoint,
-			user: &User{
-				Name:               "basicUser",
-				AuthenticationType: "badbad",
+				endpoint: endpoint,
+				user: &User{
+					Name:               "basicUser",
+					AuthenticationType: "badbad",
+				},
+				console: nil,
 			},
-			console:  nil,
-		},
 			want: 0,
 		},
 	}
-		for _, tt := range tests {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
 			// If test name ends in 'Panic' expect a Panic

@@ -4,7 +4,6 @@
 package formatter
 
 import (
-	"fmt"
 	"gopkg.in/yaml.v2"
 )
 
@@ -12,9 +11,12 @@ type Yaml struct {
 	Base
 }
 
-func (f *Yaml) Serialize(in interface{}) {
-	bytes, err := yaml.Marshal(in)
+func (f *Yaml) Serialize(in interface{}) (bytes []byte) {
+	var err error
+
+	bytes, err = yaml.Marshal(in)
 	f.Base.CheckErr(err)
-	_, err = fmt.Println(string(bytes))
-	f.Base.CheckErr(err)
+	f.Base.Output(bytes)
+
+	return
 }

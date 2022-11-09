@@ -12,9 +12,9 @@ import (
 type AddEndpoint struct {
 	AbstractBase
 
-	name string
+	name    string
 	address string
-	port int
+	port    int
 }
 
 func (c *AddEndpoint) DefineCommand() (command *Command) {
@@ -55,20 +55,20 @@ func (c *AddEndpoint) DefineCommand() (command *Command) {
 func (c *AddEndpoint) run(cmd *Command, args []string) {
 
 	endpoint := Endpoint{
-		EndpointDetails:  EndpointDetails{
+		EndpointDetails: EndpointDetails{
 			Address: c.address,
 			Port:    c.port,
 		},
-		Name:             c.name,
+		Name: c.name,
 	}
 
 	uniqueEndpointName := config.AddEndpoint(endpoint)
 	output.InfofWithHintExamples([][]string{
-			{"Add a context for this endpoint", fmt.Sprintf("sqlcmd config add-context --endpoint %v", uniqueEndpointName)},
-			{"View endpoint names", "sqlcmd config get-endpoints"},
-			{"View endpoint details", fmt.Sprintf("sqlcmd config get-endpoints %v", uniqueEndpointName) },
-			{"View all endpoints details", "sqlcmd config get-endpoints --detailed" },
-			{"Delete this endpoint", fmt.Sprintf("sqlcmd config delete-context %v", uniqueEndpointName) },
-		},
-	"Endpoint '%v' added (address: '%v', port: '%v')", uniqueEndpointName, c.address, c.port)
+		{"Add a context for this endpoint", fmt.Sprintf("sqlcmd config add-context --endpoint %v", uniqueEndpointName)},
+		{"View endpoint names", "sqlcmd config get-endpoints"},
+		{"View endpoint details", fmt.Sprintf("sqlcmd config get-endpoints %v", uniqueEndpointName)},
+		{"View all endpoints details", "sqlcmd config get-endpoints --detailed"},
+		{"Delete this endpoint", fmt.Sprintf("sqlcmd config delete-context %v", uniqueEndpointName)},
+	},
+		"Endpoint '%v' added (address: '%v', port: '%v')", uniqueEndpointName, c.address, c.port)
 }

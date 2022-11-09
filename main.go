@@ -19,7 +19,7 @@ func main() {
 	}
 }
 
-func isModernCliEnvVarEnabled() (modernCliEnabled bool)  {
+func isModernCliEnvVarEnabled() (modernCliEnabled bool) {
 	if os.Getenv("SQLCMD_MODERN") != "" {
 		modernCliEnabled = true
 	}

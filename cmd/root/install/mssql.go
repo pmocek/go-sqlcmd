@@ -10,6 +10,7 @@ import (
 
 type Mssql struct {
 	AbstractBase
+	MssqlBase
 
 	tag             string
 	registry        string
@@ -21,16 +22,23 @@ type Mssql struct {
 }
 
 func (c *Mssql) DefineCommand() (command *Command) {
+	const repo = "mssql/server"
+
 	const use = "mssql"
-	const short = "Install/Create Sql Server"
+	const short = "Install SQL Server"
+	const long = short
+	const example = `# Install SQL Server in a docker container
+  sqlcmd install mssql server`
 
 	command = c.SetCommand(Command{
-		Use:   use,
-		Short: short,
-		Long:  short,
-		Example: `# Install SQL Server in a local container
-  sqlcmd install mssql`,
-	})
+		Use:     use,
+		Short:   short,
+		Long:    long,
+		Example: example,
+		Args:    MaximumNArgs(2),
+		Run:     c.Run})
+
+	c.AddFlags(command, repo, "mssql")
 
 	return
 }

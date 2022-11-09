@@ -18,11 +18,11 @@ func TestCreateEmptyFileIfNotExists(t *testing.T) {
 		name string
 		args args
 	}{
-			{name: "default", args: args{filename: filename}},
-			{name: "alreadyExists", args: args{filename: filename}},
-			{name: "emptyInputPanic", args: args{filename: ""}},
-			{name: "incFolder", args: args{filename: filepath.Join(folderName, filename)}},
-		}
+		{name: "default", args: args{filename: filename}},
+		{name: "alreadyExists", args: args{filename: filename}},
+		{name: "emptyInputPanic", args: args{filename: ""}},
+		{name: "incFolder", args: args{filename: filepath.Join(folderName, filename)}},
+	}
 
 	cleanup(folderName, filename)
 	defer cleanup(folderName, filename)

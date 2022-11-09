@@ -3,7 +3,10 @@
 
 package formatter
 
+import "io"
+
 type Base struct {
+	StandardOutput io.WriteCloser
 	ErrorHandlerCallback func(err error)
 }
 
@@ -13,4 +16,8 @@ func (f *Base) CheckErr(err error) {
 	}
 
 	f.ErrorHandlerCallback(err)
+}
+
+func (f *Base) Output(bytes []byte) {
+	f.StandardOutput.Write(bytes)
 }

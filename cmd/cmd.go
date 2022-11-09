@@ -9,7 +9,6 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	. "github.com/spf13/cobra"
-	"os"
 )
 
 var rootCmd *Command
@@ -28,29 +27,8 @@ func init() {
 // parameters the user has passed in
 func RunCommandLine(negativeUnitTest bool) {
 	panicOnFailure = negativeUnitTest
-
-	// BUG(stuartpa): Temporary until I work out how to do this in the `mssql`
-	// subcommand
-	setDefaultSubCommandForInstallMssql()
-
 	err := rootCmd.Execute()
 	checkErr(err)
-}
-
-// setDefaultSubCommandForInstallMssql runs `sqlcmd install mssql server` if
-// no subcommand is added for 'mssql'
-//
-// BUG(stuartpa): Workout a way to  encapsulate this code in the install 'mssql' command
-// BUG(stuartpa): This doesn't work if use adds a flag like `sqlcmd install mssql -v 4`
-func setDefaultSubCommandForInstallMssql() {
-	if len(os.Args) == 3 {
-		if os.Args[1] == "install" || os.Args[1] == "create" {
-			if os.Args[2] == "mssql" {
-				args := append(os.Args[1:], "server")
-				rootCmd.SetArgs(args)
-			}
-		}
-	}
 }
 
 func initializeCobra() {
@@ -79,8 +57,9 @@ func initializeCobra() {
 //
 // DEVNOTE: cobra.CheckErr (last line of function), goes on to call os.Exit(1)
 // if error != nil, this will be an issue for negative Unit Tests (it will close
-// down the text executor, so you'll need inject a checkErr handler that doesn't
-// call os.Exit (probably one that just calls Panic(), which you catch as expected)
+// down the test executor, so you'll need inject a checkErr handler that doesn't
+// call os.Exit (probably one that just calls Panic(), which you recover from as
+// an expected panic)
 func checkErr(err error) {
 	if loggingLevel > 2 {
 		if err != nil {
@@ -102,7 +81,7 @@ func displayHints(hints []string) {
 		for i, hint := range hints {
 			output.Infof("  %d. %v", i+1, hint)
 		}
-		output.Infof("%v", "\n")
+		//output.Infof("%v", "\n")
 	}
 }
 

@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	lowerCharSet   = "abcdedfghijklmnopqrstuvwxyz"
-	upperCharSet   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	numberSet      = "0123456789"
+	lowerCharSet = "abcdedfghijklmnopqrstuvwxyz"
+	upperCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	numberSet    = "0123456789"
 )
 
 func Generate(passwordLength, minSpecialChar, minNum, minUpperCase int, specialCharSet string) string {

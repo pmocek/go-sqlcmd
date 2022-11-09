@@ -60,14 +60,14 @@ func (c *Root) addGlobalFlags(command *Command) {
 	command.PersistentFlags().String(
 		"sqlconfig",
 		configFile,
-		"",
+		"Location of sqlcmd configuration file",
 	)
 
 	command.PersistentFlags().StringP(
 		"output",
 		"o",
 		"yaml",
-		"output type (text, json or yaml)",
+		"output type (yaml, json or xml)",
 	)
 
 	command.PersistentFlags().IntP(

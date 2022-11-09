@@ -7,6 +7,7 @@ import (
 	"github.com/microsoft/go-sqlcmd/cmd/root"
 	"github.com/microsoft/go-sqlcmd/internal/helpers"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	"os"
 	"strings"
 	"testing"
@@ -14,37 +15,19 @@ import (
 
 // Set to true to run unit tests without a network connection
 var offlineMode = false
+var useCached = ""
 
-func TestRunCommandLine(t *testing.T) {
-	os.Setenv("SQLCMD_PASSWORD", "badpass")
-
-	useCached := "--cached"
-	if !offlineMode {
-		useCached = ""
+func TestCommandLineHelp(t *testing.T) {
+	setup()
+	tests := []struct {name string; args struct {args []string}}{
+		{"default", split("--help")},
 	}
+	run(t, tests)
+}
 
-	helpers.Initialize(
-		func(err error) {if err != nil {panic(err)}},
-		displayHints,
-		"sqlconfig-test-cmd-line",
-		"yaml",
-		4,
-	)
-
-	config.Clean()
-
-	type args struct {
-		args []string
-	}
-	split := func(cmd string) (args) {
-		return args{strings.Split(cmd, " ")}
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{"default",
-			split("--help")},
+func TestNegCommandLines(t *testing.T) {
+	setup()
+	tests := []struct {name string; args struct {args []string}}{
 		{"neg-config-use-context-double-name",
 			split("config use-context badbad --name andbad")},
 		{"neg-config-use-context-bad-name",
@@ -53,8 +36,13 @@ func TestRunCommandLine(t *testing.T) {
 			split("config get-contexts badbad")},
 		{"neg-config-get-endpoints-bad-endpoint",
 			split("config get-endpoints badbad")},
-		{"coverDefaultSubCommand",
-			split("install mssql")},
+	}
+	run(t, tests)
+}
+
+func TestConfigContexts(t *testing.T) {
+	setup()
+	tests := []struct {name string; args struct {args []string}}{
 		{"neg-config-add-context-no-endpoint",
 			split("config add-context")},
 		{"config-add-endpoint",
@@ -91,20 +79,21 @@ func TestRunCommandLine(t *testing.T) {
 			split("config delete-context")},
 		{"neg-config-delete-context",
 			split("config delete-context badbad-name")},
+
+		{"cleanup",
+			split("config delete-endpoint endpoint2")},
+	}
+
+	run(t, tests)
+}
+
+func TestConfigUsers(t *testing.T) {
+	setup()
+	tests := []struct {name string; args struct {args []string}}{
 		{"neg-config-get-users-bad-user",
 			split("config get-users badbad")},
 		{"config-add-user",
 			split("config add-user --username foobar")},
-		{"config-delete-endpoint",
-			split("config delete-endpoint endpoint2")},
-		{"neg-config-delete-endpoint-no-name",
-			split("config delete-endpoint")},
-		{"config-add-endpoint",
-			split("config add-endpoint --address localhost --port 1433")},
-		{"config-add-context",
-			split("config add-context --user user --endpoint endpoint --name my-context")},
-		{"config-delete-context-cascade",
-			split("config delete-context my-context --cascade")},
 		{"config-add-user",
 			split("config add-user --username foobar")},
 		{"config-get-users",
@@ -117,6 +106,35 @@ func TestRunCommandLine(t *testing.T) {
 			split("config add-user")},
 		{"neg-config-add-user-no-password",
 			split("config add-user --username foobar")},
+
+		// Cleanup
+		{"cleanup",
+			split("config delete-user user")},
+		{"cleanup",
+			split("config delete-user user2")},
+	}
+
+	run(t, tests)
+}
+
+func TestRunCommandLine(t *testing.T) {
+	setup()
+	tests := []struct {
+		name string
+		args struct {args []string}
+	}{
+		{"install",
+			split("install mssql --accept-eula")},
+		{"config-delete-endpoint",
+			split("config delete-endpoint endpoint2")},
+		{"neg-config-delete-endpoint-no-name",
+			split("config delete-endpoint")},
+		{"config-add-endpoint",
+			split("config add-endpoint --address localhost --port 1433")},
+		{"config-add-context",
+			split("config add-context --user user --endpoint endpoint --name my-context")},
+		{"config-delete-context-cascade",
+			split("config delete-context my-context --cascade")},
 		{"config-view",
 			split("config view")},
 		{"config-view",
@@ -132,9 +150,9 @@ func TestRunCommandLine(t *testing.T) {
 		{"get-tags",
 			split("install mssql get-tags")},
 		{"neg-install-no-eula",
-			split("install mssql server")},
+			split("install mssql")},
 		{"install",
-			split(fmt.Sprintf("install mssql server %v --user-database my-database --accept-eula --encrypt-password", useCached))},
+			split(fmt.Sprintf("install mssql %v --user-database my-database --accept-eula --encrypt-password", useCached))},
 		{"config-current-context",
 			split("config current-context")},
 		{"config-connection-strings",
@@ -151,45 +169,41 @@ func TestRunCommandLine(t *testing.T) {
 			split("uninstall")},*/
 		{"uninstall",
 			split("uninstall --yes --force")},
-
-		// BUG(stuartpa): Shouldn't need to clean up here
-		{"cleanup",
-			split("config delete-endpoint endpoint3")},
-		{"cleanup",
-			split("config delete-endpoint endpoint4")},
-
-		// BUG(stuartpa): Verify config is empty here
-	}
+			}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := Root{AbstractBase{SubCommands: root.Commands}}
-			rootCmd = r.DefineCommand()
-
-			rootCmd.SetArgs(tt.args.args)
-
-			t.Logf("Running: %v", tt.args.args)
-
-			if tt.name == "neg-config-add-user-no-password" {
-				os.Setenv("SQLCMD_PASSWORD", "")
-			}
-
-			if tt.name != "coverDefaultSubCommand" {
-				// If test name starts with 'neg-' expect a Panic
-				if strings.HasPrefix(tt.name, "neg-") {
-					defer func() {
-						if r := recover(); r == nil {
-							t.Errorf("The code did not panic")
-						}
-					}()
-
-					RunCommandLine(true)
-				}
-
-				RunCommandLine(false)
-			}
+			runTests(t, tt)
 		})
 	}
+}
+
+func runTests(t *testing.T, tt struct {
+	name string
+	args struct{ args []string }
+}) {
+	r := Root{AbstractBase{SubCommands: root.Commands}}
+	rootCmd = r.DefineCommand()
+	rootCmd.SetArgs(tt.args.args)
+
+	t.Logf("Running: %v", tt.args.args)
+
+	if tt.name == "neg-config-add-user-no-password" {
+		os.Setenv("SQLCMD_PASSWORD", "")
+	} else {
+		os.Setenv("SQLCMD_PASSWORD", "badpass")
+	}
+
+	// If test name starts with 'neg-' expect a Panic
+	if strings.HasPrefix(tt.name, "neg-") {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("The code did not panic")
+			}
+		}()
+		RunCommandLine(true)
+	}
+	RunCommandLine(false)
 }
 
 func Test_initializeCobra(t *testing.T) {
@@ -216,4 +230,52 @@ func Test_checkErr(t *testing.T) {
 	}()
 
 	checkErr(errors.New("Expected error"))
+}
+
+func run(t *testing.T, tests []struct {
+	name string
+	args struct{ args []string }
+}) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) { runTests(t, tt) })
+	}
+
+	if !config.IsEmpty() {
+		bytes := output.Struct(config.GetRedactedConfig(true))
+		t.Error(fmt.Sprintf(
+			"Config is not empty.\n%s\nConfig file used:%s",
+			string(bytes),
+			config.GetConfigFileUsed(),
+		))
+		t.Fail()
+	}
+}
+
+func setup() {
+	useCached = "--cached"
+	if !offlineMode {
+		useCached = ""
+	}
+
+	helpers.Initialize(
+		func(err error) {
+			if err != nil {
+				panic(err)
+			}
+		},
+		displayHints,
+		"sqlconfig-test-cmd-line",
+		"yaml",
+		4,
+	)
+
+	config.Clean()
+}
+
+type args struct {
+	args []string
+}
+
+func split(cmd string) args {
+	return args{strings.Split(cmd, " ")}
 }

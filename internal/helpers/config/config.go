@@ -17,6 +17,17 @@ func Clean() {
 	Save()
 }
 
+func IsEmpty() (isEmpty bool) {
+	if len(config.Users) == 0 &&
+		len(config.Contexts) == 0 &&
+		len(config.Endpoints) == 0 &&
+		config.CurrentContext == "" {
+		isEmpty = true
+	}
+
+	return
+}
+
 func AddContextWithContainer(
 	contextName string,
 	imageName string,
@@ -75,9 +86,9 @@ func AddContextWithContainer(
 	user := User{
 		AuthenticationType: "basic",
 		BasicAuth: &BasicAuthDetails{
-			Username: username,
+			Username:          username,
 			PasswordEncrypted: encryptPassword,
-			Password: encryptCallback(password, encryptPassword),
+			Password:          encryptCallback(password, encryptPassword),
 		},
 		Name: userName,
 	}

@@ -4,6 +4,6 @@
 package formatter
 
 type Formatter interface {
-	Serialize(in interface{})
+	Serialize(in interface{}) (bytes []byte)
 	CheckErr(err error)
 }

@@ -5,7 +5,11 @@ package net
 
 func init() {
 	Initialize(
-		func(err error) {if err != nil {panic(err)}},
+		func(err error) {
+			if err != nil {
+				panic(err)
+			}
+		},
 		func(format string, a ...any) {})
 }
 

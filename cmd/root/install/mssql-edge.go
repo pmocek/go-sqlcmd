@@ -1,20 +1,30 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package mssql
+package install
 
 import (
+	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	. "github.com/spf13/cobra"
 )
 
-type Edge struct {
-	Base
+type Mssql_Edge struct {
+	AbstractBase
+	MssqlBase
+
+	tag             string
+	registry        string
+	repo            string
+	installType     string
+	acceptEula      bool
+	contextName     string
+	defaultDatabase string
 }
 
-func (c *Edge) DefineCommand() (command *Command) {
+func (c *Mssql_Edge) DefineCommand() (command *Command) {
 	const repo = "azure-sql-edge"
 
-	const use = "edge"
+	const use = "mssql-edge"
 	const short = "Install SQL Server Edge"
 	const long = short
 	const example = `# Install SQL Server Edge in a docker container
@@ -26,9 +36,9 @@ func (c *Edge) DefineCommand() (command *Command) {
 		Long:    long,
 		Example: example,
 		Args:    MaximumNArgs(2),
-		Run:     c.run})
+		Run:     c.Run})
 
-	c.addFlags(command, repo, "edge")
+	c.AddFlags(command, repo, "edge")
 
 	return
 }

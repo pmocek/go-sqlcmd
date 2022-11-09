@@ -45,13 +45,13 @@ func (c *UseContext) DefineCommand() (command *Command) {
 	}
 
 	command = c.SetCommand(Command{
-		Use:        use,
-		Short:      short,
-		Long:       long,
-		Example:    example,
-		Args:       MaximumNArgs(1),
-		Aliases:    []string{"use", "change-context", "set-context"},
-		Run:        run})
+		Use:     use,
+		Short:   short,
+		Long:    long,
+		Example: example,
+		Args:    MaximumNArgs(1),
+		Aliases: []string{"use", "change-context", "set-context"},
+		Run:     run})
 
 	command.PersistentFlags().StringVar(
 		&c.name,

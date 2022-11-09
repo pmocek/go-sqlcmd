@@ -6,13 +6,18 @@ import (
 	"testing"
 )
 
-func TestController_EnsureImage(t *testing.T) {
+func TestController_ListTags(t *testing.T) {
 	const registry = "mcr.microsoft.com"
 	const repo = "mssql/server"
-	const tag = "latest"
-	const saPassword = "123456789abcde!!"
 
-	env := []string{"ACCEPT_EULA=Y", fmt.Sprintf("SA_PASSWORD=%s", saPassword)}
+	ListTags(repo, "https://" + registry)
+}
+
+func TestController_EnsureImage(t *testing.T) {
+	const registry = "docker.io"
+	const repo = "library/alpine"
+	const tag = "latest"
+	const port = 0
 
 	imageName := fmt.Sprintf(
 		"%s/%s:%s",
@@ -32,16 +37,20 @@ func TestController_EnsureImage(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{ "default", fields{nil}, args{imageName}, true },
+		{"default", fields{nil}, args{imageName}, true},
 	}
-		for _, tt := range tests {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := NewController()
-			ListTags("azure-sql-edge", "https://mcr.microsoft.com")
 			c.EnsureImage(tt.args.image)
-			id, err := c.ContainerRun(tt.args.image, env, 1499, []string{})
+			id, err := c.ContainerRun(
+				tt.args.image,
+				[]string{},
+				port,
+				[]string{"ash", "-c", "echo 'Hello World'; sleep 1"},
+			)
 			checkErr(err)
-			c.ContainerWaitForLogEntry(id, "The default language")
+			c.ContainerWaitForLogEntry(id, "Hello World")
 			c.ContainerExists(id)
 			c.ContainerFiles(id, "*.mdf")
 			c.ContainerStop(id)

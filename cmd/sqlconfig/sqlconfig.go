@@ -15,12 +15,12 @@ type ContainerDetails struct {
 
 type Endpoint struct {
 	*ContainerDetails `mapstructure:"container,omitempty" yaml:"container,omitempty"`
-	EndpointDetails  `mapstructure:"endpoint" yaml:"endpoint"`
-	Name            string `mapstructure:"name"`
+	EndpointDetails   `mapstructure:"endpoint" yaml:"endpoint"`
+	Name              string `mapstructure:"name"`
 }
 
 type ContextDetails struct {
-	Endpoint string `mapstructure:"endpoint"`
+	Endpoint string  `mapstructure:"endpoint"`
 	User     *string `mapstructure:"user,omitempty"`
 }
 
@@ -30,15 +30,15 @@ type Context struct {
 }
 
 type BasicAuthDetails struct {
-	Username string `mapstructure:"username"`
-	PasswordEncrypted bool `mapstructure:"password-encrypted" yaml:"password-encrypted"`
-	Password string `mapstructure:"password"`
+	Username          string `mapstructure:"username"`
+	PasswordEncrypted bool   `mapstructure:"password-encrypted" yaml:"password-encrypted"`
+	Password          string `mapstructure:"password"`
 }
 
 type User struct {
-	Name        string `mapstructure:"name"`
-	AuthenticationType string `mapstructure:"authentication-type" yaml:"authentication-type"`
-	BasicAuth* BasicAuthDetails `mapstructure:"basic-auth,omitempty" yaml:"basic-auth,omitempty"`
+	Name               string            `mapstructure:"name"`
+	AuthenticationType string            `mapstructure:"authentication-type" yaml:"authentication-type"`
+	BasicAuth          *BasicAuthDetails `mapstructure:"basic-auth,omitempty" yaml:"basic-auth,omitempty"`
 }
 
 type Sqlconfig struct {

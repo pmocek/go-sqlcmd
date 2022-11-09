@@ -22,7 +22,11 @@ func init() {
 	configFile := filepath.Join(home, ".sqlcmd", "sqlconfig")
 
 	Initialize(
-		func(err error) {if err != nil {panic(err)}},
+		func(err error) {
+			if err != nil {
+				panic(err)
+			}
+		},
 		output.Tracef,
 		secret.Encode,
 		secret.Decode,

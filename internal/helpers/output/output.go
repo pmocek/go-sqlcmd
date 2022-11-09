@@ -22,6 +22,7 @@ import (
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
 	"github.com/pkg/errors"
 	"io"
+	"regexp"
 	"strings"
 )
 
@@ -32,21 +33,32 @@ var runningUnitTests bool
 var standardWriteCloser io.WriteCloser
 var errorWriteCloser io.WriteCloser
 
-func Struct(in interface{}) {
-	formatter.Serialize(in)
+func Struct(in interface{}) (bytes []byte) {
+	bytes = formatter.Serialize(in)
+
+	return
 }
 
 func Tracef(format string, a ...any) {
 	if loggingLevel >= verbosity.Trace {
 		format = ensureEol(format)
-		printf("%v", "TRACE: ")
-		printf(format, a)
+		printf("TRACE: " + format, a...)
 	}
 }
 
 func printf(format string, a ...any) {
-	_, err := standardWriteCloser.Write([]byte(fmt.Sprintf(format, a...)))
+	text := fmt.Sprintf(format, a...)
+	text = maskSecrets(text)
+	_, err := standardWriteCloser.Write([]byte(text))
 	checkErr(err)
+}
+
+func maskSecrets(text string) string {
+
+	// Mask password from T/SQL e.g. ALTER LOGIN [sa] WITH PASSWORD = N'foo';
+	r := regexp.MustCompile("(PASSWORD.*\\s?=.*\\s?N?')(.*)(')")
+	text = r.ReplaceAllString(text, "$1********$3")
+	return text
 }
 
 func ensureEol(format string) string {
@@ -63,8 +75,7 @@ func ensureEol(format string) string {
 func Debugf(format string, a ...any) {
 	if loggingLevel >= verbosity.Debug {
 		format = ensureEol(format)
-		printf("DEBUG: ")
-		printf(format, a...)
+		printf("DEBUG: " + format, a...)
 	}
 }
 
@@ -80,7 +91,7 @@ func infofWithHints(hints []string, format string, a ...any) {
 	if loggingLevel >= verbosity.Info {
 		format = ensureEol(format)
 		if loggingLevel >= verbosity.Debug {
-			printf("INFO:  ")
+			format = "INFO:  " + format
 		}
 		printf(format, a...)
 		displayHints(hints)
@@ -91,7 +102,7 @@ func InfofWithHintExamples(hintExamples [][]string, format string, a ...any) {
 	if loggingLevel >= verbosity.Info || runningUnitTests {
 		format = ensureEol(format)
 		if loggingLevel >= verbosity.Debug {
-			printf("INFO:  ")
+			format = "INFO:  " + format
 		}
 		printf(format, a...)
 		displayHintExamples(hintExamples)
@@ -128,7 +139,7 @@ func Warnf(format string, a ...any) {
 	if loggingLevel >= verbosity.Warn {
 		format = ensureEol(format)
 		if loggingLevel >= verbosity.Debug {
-			printf("WARN:  ")
+			format = "WARN:  " + format
 		}
 		printf(format, a...)
 	}
@@ -138,7 +149,7 @@ func Errorf(format string, a ...any) {
 	if loggingLevel >= verbosity.Error {
 		format = ensureEol(format)
 		if loggingLevel >= verbosity.Debug {
-			printf("ERROR:  ")
+			format = "ERROR: " + format
 		}
 		printf(format, a...)
 	}

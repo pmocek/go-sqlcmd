@@ -24,7 +24,7 @@ func IsLocalPortAvailable(port int) (portAvailable bool) {
 	)
 	if err != nil {
 		trace(
-			"Expected connecting error '%v' connecting to local port %d, therefore port is available)",
+			"Expected connecting error '%v' on local port %d, therefore port is available)",
 			err,
 			port,
 		)
@@ -33,7 +33,7 @@ func IsLocalPortAvailable(port int) (portAvailable bool) {
 	if conn != nil {
 		err := conn.Close()
 		checkErr(err)
-		trace("Port '%d' is not available. Opened", port, net.JoinHostPort("localhost", strconv.Itoa(port)))
+		trace("Local port '%d' is not available", port)
 	} else {
 		trace("Local port '%d' is available", port)
 	}

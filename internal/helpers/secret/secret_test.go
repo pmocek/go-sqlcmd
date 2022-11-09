@@ -8,31 +8,31 @@ import (
 func TestEncryptAndDecrypt(t *testing.T) {
 	type args struct {
 		plainText string
-		encrypt bool
+		encrypt   bool
 	}
 	tests := []struct {
-		name           string
-		args           args
+		name          string
+		args          args
 		wantPlainText string
 	}{
 		{
-			name:           "noEncrypt",
-			args:           args{"plainText", false},
+			name:          "noEncrypt",
+			args:          args{"plainText", false},
 			wantPlainText: "plainText",
 		},
 		{
-			name:           "encrypt",
-			args:           args{"plainText", true},
+			name:          "encrypt",
+			args:          args{"plainText", true},
 			wantPlainText: "plainText",
 		},
 		{
-			name:           "emptyStringForEncryptPanic",
-			args:           args{"", true},
+			name:          "emptyStringForEncryptPanic",
+			args:          args{"", true},
 			wantPlainText: "",
 		},
 		{
-			name:           "emptyStringForDecryptPanic",
-			args:           args{"", true},
+			name:          "emptyStringForDecryptPanic",
+			args:          args{"", true},
 			wantPlainText: "",
 		},
 	}

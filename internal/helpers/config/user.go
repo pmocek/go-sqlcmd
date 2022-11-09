@@ -101,7 +101,7 @@ func FindUniqueUserName(name string) (uniqueUserName string) {
 	return
 }
 
-func OutputUsers(formatter func(interface{}), detailed bool) {
+func OutputUsers(formatter func(interface{}) []byte, detailed bool) {
 	if detailed {
 		formatter(config.Users)
 	} else {

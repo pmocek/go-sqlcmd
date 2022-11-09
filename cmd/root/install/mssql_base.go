@@ -1,11 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package mssql
+package install
 
 import (
 	"fmt"
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
@@ -19,9 +18,7 @@ import (
 	"runtime"
 )
 
-type Base struct {
-	AbstractBase
-
+type MssqlBase struct {
 	tag             string
 	registry        string
 	repo            string
@@ -29,22 +26,22 @@ type Base struct {
 	contextName     string
 	defaultDatabase string
 
-	passwordLength int
-	passwordMinSpecial int
-	passwordMinNumber int
-	passwordMinUpper int
+	passwordLength         int
+	passwordMinSpecial     int
+	passwordMinNumber      int
+	passwordMinUpper       int
 	passwordSpecialCharSet string
-	encryptPassword bool
+	encryptPassword        bool
 
-	useCached bool
+	useCached              bool
 	errorLogEntryToWaitFor string
-	defaultContextName string
-	collation string
+	defaultContextName     string
+	collation              string
 
 	sqlcmdPkg *sqlcmd.Sqlcmd
 }
 
-func (c *Base) addFlags(
+func (c *MssqlBase) AddFlags(
 	command *Command,
 	repo string,
 	defaultContextName string,
@@ -147,6 +144,10 @@ func (c *Base) addFlags(
 		"Don't download image.  Use already downloaded image",
 	)
 
+	// BUG(stuartpa): SQL Server bug: "SQL Server is now ready for client connections", oh no it isn't!!
+	// Wait for "Server name is" instead!  Nope, that doesn't work on edge
+	// Wait for "The default language" instead
+	// BUG(stuartpa): This obviously doesn't work for non US LCIDs
 	command.PersistentFlags().StringVar(
 		&c.errorLogEntryToWaitFor,
 		"errorlog-to-wait-for",
@@ -162,7 +163,7 @@ func (c *Base) addFlags(
 	)
 }
 
-func (c *Base) run(*Command, []string) {
+func (c *MssqlBase) Run(*Command, []string) {
 	var imageName string
 
 	if !c.acceptEula && viper.GetString("ACCEPT_EULA") == "" {
@@ -185,7 +186,7 @@ func (c *Base) run(*Command, []string) {
 	c.installDockerImage(imageName, c.contextName)
 }
 
-func (c *Base) installDockerImage(imageName string, contextName string) {
+func (c *MssqlBase) installDockerImage(imageName string, contextName string) {
 	saPassword := c.generatePassword()
 
 	env := []string{
@@ -254,10 +255,6 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		config.GetConfigFileUsed(),
 	)
 
-	// BUG(stuartpa): SQL Server bug: "SQL Server is now ready for client connections", oh no it isn't!!
-	// Wait for "Server name is" instead!  Nope, that doesn't work on edge
-	// Wait for "The default language" instead
-	// BUG(stuartpa): This obviously doesn't work for non US LCIDs
 	controller.ContainerWaitForLogEntry(
 		containerId, c.errorLogEntryToWaitFor)
 
@@ -271,9 +268,9 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 		&sqlconfig.User{
 			AuthenticationType: "basic",
 			BasicAuth: &sqlconfig.BasicAuthDetails{
-				Username: "sa",
+				Username:          "sa",
 				PasswordEncrypted: c.encryptPassword,
-				Password: secret.Encode(saPassword, c.encryptPassword),
+				Password:          secret.Encode(saPassword, c.encryptPassword),
 			},
 			Name: "sa",
 		},
@@ -305,7 +302,7 @@ func (c *Base) installDockerImage(imageName string, contextName string) {
 	)
 }
 
-func (c *Base) createNonSaUser(userName string, password string) {
+func (c *MssqlBase) createNonSaUser(userName string, password string) {
 	defaultDatabase := "master"
 
 	if c.defaultDatabase != "" {
@@ -328,15 +325,17 @@ CHECK_POLICY=OFF`
 
 	// Correct safety protocol is to rotate the sa password, because the first
 	// sa password has been in the docker environment (as SA_PASSWORD)
-	c.Query(fmt.Sprintf("ALTER LOGIN [sa] WITH PASSWORD = '%s';", c.generatePassword()))
+	c.Query(fmt.Sprintf("ALTER LOGIN [sa] WITH PASSWORD = N'%s';",
+		c.generatePassword()))
 	c.Query("ALTER LOGIN [sa] DISABLE")
 
 	if c.defaultDatabase != "" {
-		c.Query(fmt.Sprintf("ALTER AUTHORIZATION ON DATABASE::[%s] TO %s", defaultDatabase, userName))
+		c.Query(fmt.Sprintf("ALTER AUTHORIZATION ON DATABASE::[%s] TO %s",
+			defaultDatabase, userName))
 	}
 }
 
-func (c *Base) generatePassword() (password string) {
+func (c *MssqlBase) generatePassword() (password string) {
 	password = secret.Generate(
 		c.passwordLength,
 		c.passwordMinSpecial,
@@ -347,8 +346,8 @@ func (c *Base) generatePassword() (password string) {
 	return
 }
 
-func (c *Base) Query(commandText string) {
-	output.Tracef("%v", commandText)
+func (c *MssqlBase) Query(commandText string) {
+	output.Tracef(commandText)
 
 	//BUG(stuartpa): Need to check for errors
 	mssql.Query(c.sqlcmdPkg, commandText)

@@ -13,8 +13,8 @@ func TestIsLocalPortAvailable(t *testing.T) {
 		args              args
 		wantPortAvailable bool
 	}{
-			{name: "expectedToNotBeAvailable", args: args{port: 80}, wantPortAvailable: false},
-			{name: "expectedToBeAvailable", args: args{port: 9999}, wantPortAvailable: true},
+		{name: "expectedToNotBeAvailable", args: args{port: 80}, wantPortAvailable: false},
+		{name: "expectedToBeAvailable", args: args{port: 9999}, wantPortAvailable: true},
 	}
 
 	for _, tt := range tests {

@@ -12,9 +12,9 @@ import (
 type AddContext struct {
 	AbstractBase
 
-	name string
+	name         string
 	endpointName string
-	userName string
+	userName     string
 }
 
 func (c *AddContext) DefineCommand() (command *Command) {
@@ -58,7 +58,7 @@ func (c *AddContext) run(cmd *Command, args []string) {
 			Endpoint: c.endpointName,
 			User:     &c.userName,
 		},
-		Name:           c.name,
+		Name: c.name,
 	}
 
 	if c.endpointName == "" || !config.EndpointExists(c.endpointName) {
@@ -66,7 +66,7 @@ func (c *AddContext) run(cmd *Command, args []string) {
 			{"View existing endpoints to choose from", "sqlcmd config get-endpoints"},
 			{"Add a new local endpoint", "sqlcmd install"},
 			{"Add an already existing endpoint", "sqlcmd config add-endpoint --address localhost --port 1433"}},
-		"Endpoint required to add context.  Endpoint '%v' does not exist.  Use --endpoint flag", c.endpointName)
+			"Endpoint required to add context.  Endpoint '%v' does not exist.  Use --endpoint flag", c.endpointName)
 	}
 
 	if c.userName != "" {
@@ -82,8 +82,8 @@ func (c *AddContext) run(cmd *Command, args []string) {
 	config.AddContext(context)
 	config.SetCurrentContextName(context.Name)
 	output.InfofWithHintExamples([][]string{
-			{"To start interactive query session", "sqlcmd query"},
-			{"To run a query", "sqlcmd query \"SELECT @@version\""},
-		},
-	"Current Context '%v'", context.Name)
+		{"To start interactive query session", "sqlcmd query"},
+		{"To run a query", "sqlcmd query \"SELECT @@version\""},
+	},
+		"Current Context '%v'", context.Name)
 }

@@ -14,15 +14,19 @@ func TestInitialize(t *testing.T) {
 		name string
 		args args
 	}{
-		{ "default", args{
-			func(err error) {if err != nil {panic(err)}},
+		{"default", args{
+			func(err error) {
+				if err != nil {
+					panic(err)
+				}
+			},
 			nil,
 			"sqlconfig-test",
 			"yaml",
-			0 ,
+			0,
 		}},
 	}
-		for _, tt := range tests {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			Initialize(
 				tt.args.errorHandler,
