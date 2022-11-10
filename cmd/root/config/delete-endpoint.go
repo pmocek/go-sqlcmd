@@ -12,7 +12,7 @@ import (
 )
 
 type DeleteEndpoint struct {
-	AbstractBase
+	BaseCommand
 
 	name string
 }

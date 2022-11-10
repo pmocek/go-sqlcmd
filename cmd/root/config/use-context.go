@@ -11,7 +11,7 @@ import (
 )
 
 type UseContext struct {
-	AbstractBase
+	BaseCommand
 
 	name string
 }

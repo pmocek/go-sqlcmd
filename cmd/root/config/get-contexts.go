@@ -11,7 +11,7 @@ import (
 )
 
 type GetContexts struct {
-	AbstractBase
+	BaseCommand
 
 	detailed bool
 }

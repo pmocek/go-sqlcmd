@@ -195,7 +195,7 @@ func runTests(t *testing.T, tt struct {
 	name string
 	args struct{ args []string }
 }) {
-	r := Root{AbstractBase{SubCommands: root.Commands}}
+	r := Root{BaseCommand{SubCommands: root.Commands}}
 	rootCmd = r.DefineCommand()
 	rootCmd.SetArgs(tt.args.args)
 

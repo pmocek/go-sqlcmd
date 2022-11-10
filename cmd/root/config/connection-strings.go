@@ -15,7 +15,7 @@ import (
 )
 
 type ConnectionStrings struct {
-	AbstractBase
+	BaseCommand
 }
 
 func (c *ConnectionStrings) DefineCommand() (command *Command) {

@@ -11,7 +11,7 @@ import (
 )
 
 type View struct {
-	AbstractBase
+	BaseCommand
 
 	raw bool
 }

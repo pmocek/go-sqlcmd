@@ -11,7 +11,7 @@ import (
 )
 
 type DeleteContext struct {
-	AbstractBase
+	BaseCommand
 
 	name    string
 	cascade bool

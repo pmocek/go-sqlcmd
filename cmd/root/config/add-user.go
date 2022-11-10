@@ -12,7 +12,7 @@ import (
 )
 
 type AddUser struct {
-	AbstractBase
+	BaseCommand
 
 	name            string
 	authType        string
@@ -92,7 +92,8 @@ func (c *AddUser) run(cmd *Command, args []string) {
 
 		if c.username == "" {
 			output.FatalfWithHintExamples([][]string{
-				{"Provide a username with the --username flag", "sqlcmd config add-user --username stuartpa"},
+				{"Provide a username with the --username flag",
+					"sqlcmd config add-user --username stuartpa"},
 			},
 				"Username not provider")
 		}

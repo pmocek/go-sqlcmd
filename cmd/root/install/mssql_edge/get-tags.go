@@ -11,7 +11,7 @@ import (
 )
 
 type GetTags struct {
-	AbstractBase
+	BaseCommand
 }
 
 func (c *GetTags) DefineCommand() (command *Command) {

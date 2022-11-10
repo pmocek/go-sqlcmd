@@ -10,8 +10,8 @@ import (
 )
 
 var Commands = []Commander{
-	&Config{AbstractBase{SubCommands: config.Commands}},
+	&Config{BaseCommand{SubCommands: config.Commands}},
 	&Query{},
-	&Install{AbstractBase{SubCommands: install.Commands}},
+	&Install{BaseCommand{SubCommands: install.Commands}},
 	&Uninstall{},
 }

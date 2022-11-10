@@ -15,7 +15,7 @@ import (
 )
 
 type Uninstall struct {
-	AbstractBase
+	BaseCommand
 
 	force bool
 	yes   bool

@@ -10,7 +10,7 @@ import (
 )
 
 type AddEndpoint struct {
-	AbstractBase
+	BaseCommand
 
 	name    string
 	address string

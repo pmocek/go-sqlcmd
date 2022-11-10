@@ -11,6 +11,11 @@ func TestAbstractBase_DefineCommand(t *testing.T) {
 		}
 	}()
 
-	c := AbstractBase{}
+	c := BaseCommand{}
 	c.DefineCommand()
+}
+
+func Test_EndToEnd(t *testing.T) {
+
+
 }

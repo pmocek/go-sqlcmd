@@ -39,8 +39,10 @@ func CurrentContextEndpointHasContainer() (exists bool) {
 		if c.Name == currentContextName {
 			for _, e := range config.Endpoints {
 				if e.Name == c.Endpoint {
-					if e.ContainerDetails != nil {
-						exists = true
+					if e.AssetDetails != nil {
+						if e.AssetDetails.ContainerDetails != nil {
+							exists = true
+						}
 					}
 					break
 				}

@@ -10,7 +10,7 @@ import (
 )
 
 type AddContext struct {
-	AbstractBase
+	BaseCommand
 
 	name         string
 	endpointName string

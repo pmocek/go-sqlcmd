@@ -9,7 +9,7 @@ import (
 )
 
 type Mssql struct {
-	AbstractBase
+	BaseCommand
 	MssqlBase
 
 	tag             string

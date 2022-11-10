@@ -11,7 +11,7 @@ import (
 )
 
 type GetUsers struct {
-	AbstractBase
+	BaseCommand
 
 	detailed bool
 }

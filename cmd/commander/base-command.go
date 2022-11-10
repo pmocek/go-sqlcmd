@@ -5,26 +5,26 @@ package commander
 
 import . "github.com/spf13/cobra"
 
-func (c *AbstractBase) DefineCommand() *Command {
-	panic("Must implement definition of your command")
+func (c *BaseCommand) DefineCommand() *Command {
+	panic("Must implement command definition")
 }
 
-func (c *AbstractBase) SetCommand(command Command) *Command {
+func (c *BaseCommand) SetCommand(command Command) *Command {
 	c.command = &command
 	c.addSubCommands()
 
 	return c.command
 }
 
-func (c *AbstractBase) Name() string {
+func (c *BaseCommand) Name() string {
 	return c.command.Name()
 }
 
-func (c *AbstractBase) Aliases() []string {
+func (c *BaseCommand) Aliases() []string {
 	return c.command.Aliases
 }
 
-func (c *AbstractBase) addSubCommands() {
+func (c *BaseCommand) addSubCommands() {
 	if c.SubCommands != nil {
 		for _, sc := range c.SubCommands {
 			if c.command != nil {

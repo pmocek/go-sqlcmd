@@ -11,7 +11,7 @@ import (
 )
 
 type CurrentContext struct {
-	AbstractBase
+	BaseCommand
 }
 
 func (c *CurrentContext) DefineCommand() (command *Command) {

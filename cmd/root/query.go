@@ -14,7 +14,7 @@ import (
 )
 
 type Query struct {
-	AbstractBase
+	BaseCommand
 
 	text string
 }

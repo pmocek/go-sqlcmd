@@ -9,7 +9,7 @@ import (
 )
 
 type Mssql_Edge struct {
-	AbstractBase
+	BaseCommand
 	MssqlBase
 
 	tag             string

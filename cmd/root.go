@@ -11,12 +11,11 @@ import (
 )
 
 type Root struct {
-	AbstractBase
+	BaseCommand
 }
 
 func (c *Root) DefineCommand() (command *Command) {
 	const short = "sqlcmd: a command-line interface for the #SQLFamily."
-
 	command = c.SetCommand(Command{
 		Use:   "sqlcmd",
 		Short: short,

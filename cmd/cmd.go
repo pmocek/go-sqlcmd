@@ -17,7 +17,7 @@ var panicOnFailure bool
 
 // init initializes the command-line interface
 func init() {
-	r := Root{AbstractBase{SubCommands: root.Commands}}
+	r := Root{BaseCommand{SubCommands: root.Commands}}
 	rootCmd = r.DefineCommand()
 
 	OnInitialize(initializeCobra)
@@ -81,7 +81,6 @@ func displayHints(hints []string) {
 		for i, hint := range hints {
 			output.Infof("  %d. %v", i+1, hint)
 		}
-		//output.Infof("%v", "\n")
 	}
 }
 

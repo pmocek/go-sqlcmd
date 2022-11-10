@@ -9,7 +9,7 @@ import (
 )
 
 type Config struct {
-	AbstractBase
+	BaseCommand
 }
 
 func (c *Config) DefineCommand() (command *Command) {

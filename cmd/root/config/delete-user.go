@@ -11,7 +11,7 @@ import (
 )
 
 type DeleteUser struct {
-	AbstractBase
+	BaseCommand
 
 	name string
 }

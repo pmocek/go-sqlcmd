@@ -11,7 +11,7 @@ import (
 )
 
 type GetEndpoints struct {
-	AbstractBase
+	BaseCommand
 
 	detailed bool
 }
