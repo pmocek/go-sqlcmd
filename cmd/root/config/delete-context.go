@@ -7,7 +7,6 @@ import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	. "github.com/spf13/cobra"
 )
 
 type DeleteContext struct {
@@ -17,40 +16,38 @@ type DeleteContext struct {
 	cascade bool
 }
 
-func (c *DeleteContext) DefineCommand() (command *Command) {
-	const use = "delete-context NAME"
-	const short = "Delete a context"
-	const long = short
-	const example = `Delete a context
-	sqlcmd config delete-context --name my-context --cascade`
+func (c *DeleteContext) DefineCommand() {
+	c.BaseCommand.Info = CommandInfo{
+		Use: "delete-context",
+		Short: "Delete a context",
+		Examples: []ExampleInfo{
+			{
+				Description: "Delete a context",
+				Steps: []string{
+					"sqlcmd config delete-context --name my-context --cascade",
+					"sqlcmd config delete-context my-context --cascade"},
+			},
+		},
+		Run: c.run,
 
-	command = c.SetCommand(Command{
-		Use:     use,
-		Short:   short,
-		Long:    long,
-		Example: example,
-		Run:     c.run})
-
-	command.PersistentFlags().StringVar(
-		&c.name,
-		"name",
-		"",
-		"Name of context to delete")
-
-	command.PersistentFlags().BoolVar(
-		&c.cascade,
-		"cascade",
-		true,
-		"Delete the context's endpoint and user as well")
-
-	return
-}
-
-func (c *DeleteContext) run(cmd *Command, args []string) {
-	if len(args) == 1 {
-		c.name = args[0]
+		FirstArgAlternativeForFlag: &AlternativeForFlagInfo{Flag: "name", Value: &c.name},
 	}
 
+	c.BaseCommand.DefineCommand()
+
+	c.AddFlag(FlagInfo{
+		String: &c.name,
+		Name: "name",
+		Usage: "Name of context to delete"})
+
+	c.AddFlag(FlagInfo{
+		Bool: &c.cascade,
+		Name: "cascade",
+		DefaultBool: true,
+		Usage: "Delete the context's endpoint and user as well"})
+}
+
+func (c *DeleteContext) run(args []string) {
 	if c.name == "" {
 		output.FatalWithHints([]string{"Use the --name flag to pass in a context name to delete"},
 			"A 'name' is required")

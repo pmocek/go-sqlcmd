@@ -4,43 +4,22 @@
 package cmd
 
 import (
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
+	"github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/root"
 	"github.com/microsoft/go-sqlcmd/internal/helpers"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	. "github.com/spf13/cobra"
 )
 
-var rootCmd *Command
 var loggingLevel int
+var outputType string
+var configFilename string
 var panicOnFailure bool
+var rootCmd commander.Commander
 
 // init initializes the command-line interface
 func init() {
-	r := Root{BaseCommand{SubCommands: root.Commands}}
-	rootCmd = r.DefineCommand()
 
-	OnInitialize(initializeCobra)
-}
-
-// RunCommandLine runs the application based on the command-line
-// parameters the user has passed in
-func RunCommandLine(negativeUnitTest bool) {
-	panicOnFailure = negativeUnitTest
-	err := rootCmd.Execute()
-	checkErr(err)
-}
-
-func initializeCobra() {
-	var configFilename, outputType string
-	var err error
-
-	configFilename, err = rootCmd.Flags().GetString("sqlconfig")
-	checkErr(err)
-	outputType, err = rootCmd.Flags().GetString("output")
-	checkErr(err)
-	loggingLevel, err = rootCmd.Flags().GetInt("verbosity")
-	checkErr(err)
+	rootCmd = commander.NewCommand[*Root]()
 
 	helpers.Initialize(
 		checkErr,
@@ -49,6 +28,14 @@ func initializeCobra() {
 		outputType,
 		loggingLevel,
 	)
+}
+
+// RunCommandLine runs the application based on the command-line
+// parameters the user has passed in
+func RunCommandLine(negativeUnitTest bool) {
+	panicOnFailure = negativeUnitTest
+
+	rootCmd.Execute()
 }
 
 // checkErr uses Cobra to check err, and halts the application if err is not
@@ -69,7 +56,7 @@ func checkErr(err error) {
 	if panicOnFailure && err != nil {
 		panic(err)
 	} else {
-		CheckErr(err)
+		rootCmd.CheckErr(err)
 	}
 }
 
@@ -85,7 +72,7 @@ func displayHints(hints []string) {
 }
 
 func IsValidRootCommand(command string) (valid bool) {
-	for _, c := range root.Commands {
+	for _, c := range root.SubCommands {
 		if command == c.Name() {
 			valid = true
 			return

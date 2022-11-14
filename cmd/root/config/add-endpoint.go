@@ -6,7 +6,6 @@ import (
 	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	. "github.com/spf13/cobra"
 )
 
 type AddEndpoint struct {
@@ -17,42 +16,45 @@ type AddEndpoint struct {
 	port    int
 }
 
-func (c *AddEndpoint) DefineCommand() (command *Command) {
-	const use = "add-endpoint"
-	const short = "Add an endpoint."
-	const long = short
-	const example = `Add a default endpoint
-	sqlcmd config add-endpoint --name my-endpoint --address localhost --port 1433`
+func (c *AddEndpoint) DefineCommand() {
+	c.BaseCommand.Info = CommandInfo{
+		Use: "add-endpoint",
+		Short: "Add an endpoint",
+		Examples: []ExampleInfo{
+			{
+				Description: "Add a default endpoint",
+				Steps: []string{"sqlcmd config add-endpoint --name my-endpoint --address localhost --port 1433"},
+			},
+		},
+		Run: c.run,
+	}
 
-	command = c.SetCommand(Command{
-		Use:     use,
-		Short:   short,
-		Long:    long,
-		Example: example,
-		Run:     c.run})
+	c.BaseCommand.DefineCommand()
 
-	command.PersistentFlags().StringVar(
-		&c.name,
-		"name",
-		"endpoint",
-		"Display name for the endpoint")
 
-	command.PersistentFlags().StringVar(
-		&c.address,
-		"address",
-		"localhost",
-		"The network address to connect to, e.g. 127.0.0.1 etc.")
+	c.AddFlag(FlagInfo{
+		String: &c.name,
+		Name: "name",
+		DefaultString: "endpoint",
+		Usage: "Display name for the endpoint",
+	})
 
-	command.PersistentFlags().IntVar(
-		&c.port,
-		"port",
-		1433,
-		"The network port to connect to, e.g. 1433 etc.")
+	c.AddFlag(FlagInfo{
+		String: &c.address,
+		Name: "address",
+		DefaultString: "localhost",
+		Usage: "The network address to connect to, e.g. 127.0.0.1 etc.",
+	})
 
-	return
+	c.AddFlag(FlagInfo{
+		Int: &c.port,
+		Name: "port",
+		DefaultInt: 1433,
+		Usage: "The network port to connect to, e.g. 1433 etc.",
+	})
 }
 
-func (c *AddEndpoint) run(cmd *Command, args []string) {
+func (c *AddEndpoint) run(args []string) {
 
 	endpoint := Endpoint{
 		EndpointDetails: EndpointDetails{

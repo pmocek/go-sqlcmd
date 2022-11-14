@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	"github.com/microsoft/go-sqlcmd/cmd/root"
 	"github.com/microsoft/go-sqlcmd/internal/helpers"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
@@ -195,9 +194,8 @@ func runTests(t *testing.T, tt struct {
 	name string
 	args struct{ args []string }
 }) {
-	r := Root{BaseCommand{SubCommands: root.Commands}}
-	rootCmd = r.DefineCommand()
-	rootCmd.SetArgs(tt.args.args)
+	r := NewCommand[*Root]()
+	r.ArgsForUnitTesting(tt.args.args)
 
 	t.Logf("Running: %v", tt.args.args)
 
@@ -219,9 +217,6 @@ func runTests(t *testing.T, tt struct {
 	RunCommandLine(false)
 }
 
-func Test_initializeCobra(t *testing.T) {
-	initializeCobra()
-}
 
 func Test_displayHints(t *testing.T) {
 	displayHints([]string{"Test Hint"})

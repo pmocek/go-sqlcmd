@@ -3,13 +3,16 @@
 
 package commander
 
-import (
-	. "github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 type Commander interface {
-	SetCommand(command Command) *Command
-	DefineCommand() *Command
+	DefineCommand()
+	AddSubCommands(command []Commander)
+	Command() *cobra.Command
 	Name() string
 	Aliases() []string
+	Execute()
+	CheckErr(err error)
+
+	ArgsForUnitTesting(args []string)
 }

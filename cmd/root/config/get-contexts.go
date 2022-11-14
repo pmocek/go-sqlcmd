@@ -7,57 +7,61 @@ import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	config "github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	. "github.com/spf13/cobra"
 )
 
 type GetContexts struct {
 	BaseCommand
 
+	name string
 	detailed bool
 }
 
-func (c *GetContexts) DefineCommand() (command *Command) {
-	const use = "get-contexts [CONTEXT_NAME]"
-	const short = "Display one or many contexts from the sqlconfig file."
-	const long = short
-	const example = `# List all the context names in your sqlconfig file
-  sqlcmd config get-contexts
+func (c *GetContexts) DefineCommand() {
+	c.BaseCommand.Info = CommandInfo{
+		Use: "get-contexts",
+		Short: "Display one or many contexts from the sqlconfig file",
+		Examples: []ExampleInfo{
+			{
+				Description: "List all the context names in your sqlconfig file",
+				Steps: []string{"sqlcmd config get-contexts"},
+			},
+			{
+				Description: "List all the contexts in your sqlconfig file",
+				Steps: []string{"sqlcmd config get-contexts --detailed"},
+			},
+			{
+				Description: "Describe one context in your sqlconfig file",
+				Steps: []string{"sqlcmd config get-contexts my-context"},
+			},
+		},
+		Run: c.run,
 
-# List all the contexts in your sqlconfig file
-  sqlcmd config get-contexts --detail
+		FirstArgAlternativeForFlag: &AlternativeForFlagInfo{Flag: "name", Value: &c.name},
+	}
 
-  # Describe one context in your sqlconfig file
-  sqlcmd config get-contexts my-context`
+	c.BaseCommand.DefineCommand()
 
-	command = c.SetCommand(Command{
-		Use:     use,
-		Short:   short,
-		Long:    long,
-		Example: example,
-		Args:    MaximumNArgs(1),
-		Run:     c.run})
+	c.AddFlag(FlagInfo{
+		String: &c.name,
+		Name: "name",
+		Usage: "Context name to view details of"})
 
-	command.PersistentFlags().BoolVar(
-		&c.detailed,
-		"detailed",
-		false,
-		"Include context details")
-
-	return
+	c.AddFlag(FlagInfo{
+		Bool: &c.detailed,
+		Name: "detailed",
+		Usage: "Include context details"})
 }
 
-func (c *GetContexts) run(cmd *Command, args []string) {
-	if len(args) > 0 {
-		name := args[0]
-
-		if config.ContextExists(name) {
-			context := config.GetContext(name)
+func (c *GetContexts) run(args []string) {
+	if c.name != "" {
+		if config.ContextExists(c.name) {
+			context := config.GetContext(c.name)
 			output.Struct(context)
 		} else {
 			output.FatalfWithHints(
 				[]string{"To view available contexts run `sqlcmd config get-contexts`"},
 				"error: no context exists with the name: \"%v\"",
-				name)
+				c.name)
 		}
 	} else {
 		config.OutputContexts(output.Struct, c.detailed)

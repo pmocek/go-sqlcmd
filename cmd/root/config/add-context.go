@@ -6,7 +6,6 @@ import (
 	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	. "github.com/spf13/cobra"
 )
 
 type AddContext struct {
@@ -17,42 +16,38 @@ type AddContext struct {
 	userName     string
 }
 
-func (c *AddContext) DefineCommand() (command *Command) {
-	const use = "add-context"
-	const short = "Add a context"
-	const long = short
-	const example = `Add a default context
-	sqlcmd config add-context --name my-context`
+func (c *AddContext) DefineCommand() {
+	c.BaseCommand.Info = CommandInfo{Use: "add-context",
+		Short: "Add a context",
+		Examples: []ExampleInfo{
+			{
+				Description: "Add a default context",
+				Steps: []string{
+					"sqlcmd config add-context --name my-context"},
+			},
+		},
+		Run: c.run}
 
-	command = c.SetCommand(Command{
-		Use:     use,
-		Short:   short,
-		Long:    long,
-		Example: example,
-		Run:     c.run})
+	c.BaseCommand.DefineCommand()
 
-	command.PersistentFlags().StringVar(
-		&c.name,
-		"name",
-		"context",
-		"Display name for the context")
+	c.AddFlag(FlagInfo{
+		String: &c.name,
+		Name: "name",
+		DefaultString: "context",
+		Usage: "Display name for the context"})
 
-	command.PersistentFlags().StringVar(
-		&c.endpointName,
-		"endpoint",
-		"",
-		"Name of endpoint this context will use, use `sqlcmd config get-endpoints` to see list")
+	c.AddFlag(FlagInfo{
+		String: &c.endpointName,
+		Name: "endpoint",
+		Usage: "Name of endpoint this context will use, use `sqlcmd config get-endpoints` to see list"})
 
-	command.PersistentFlags().StringVar(
-		&c.userName,
-		"user",
-		"",
-		"Name of user this context will use, use `sqlcmd config get-users` to see list")
-
-	return
+	c.AddFlag(FlagInfo{
+			String: &c.userName,
+			Name: "user",
+			Usage: "Name of user this context will use, use `sqlcmd config get-users` to see list"})
 }
 
-func (c *AddContext) run(cmd *Command, args []string) {
+func (c *AddContext) run(args []string) {
 	context := sqlconfig.Context{
 		ContextDetails: sqlconfig.ContextDetails{
 			Endpoint: c.endpointName,

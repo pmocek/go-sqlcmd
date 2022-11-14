@@ -5,6 +5,7 @@ package install
 
 import (
 	"fmt"
+	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
@@ -12,13 +13,14 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
-	. "github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
 	"runtime"
 )
 
 type MssqlBase struct {
+	BaseCommand
+
 	tag             string
 	registry        string
 	repo            string
@@ -42,128 +44,122 @@ type MssqlBase struct {
 }
 
 func (c *MssqlBase) AddFlags(
-	command *Command,
 	repo string,
 	defaultContextName string,
 ) {
 	c.defaultContextName = defaultContextName
 
-	command.PersistentFlags().StringVar(
-		&c.registry,
-		"registry",
-		"mcr.microsoft.com",
-		"Docker registry",
-	)
+	c.AddFlag(FlagInfo{
+		String: &c.registry,
+		Name: "registry",
+		DefaultString: "mcr.microsoft.com",
+		Usage: "Container registry",
+	})
 
-	command.PersistentFlags().StringVar(
-		&c.repo,
-		"repo",
-		repo,
-		"Registry repository",
-	)
+	c.AddFlag(FlagInfo{
+		String: &c.repo,
+		Name: "repo",
+		DefaultString: repo,
+		Usage: "Container repository",
+	})
 
-	command.PersistentFlags().StringVar(
-		&c.tag,
-		"tag",
-		"latest",
-		"Use get-tags to see list of tags",
-	)
+	c.AddFlag(FlagInfo{
+		String: &c.tag,
+		Name: "tag",
+		DefaultString: "latest",
+		Usage: "Tag to use, use get-tags to see list of tags",
+	})
 
-	command.PersistentFlags().StringVarP(
-		&c.contextName,
-		"context-name",
-		"c",
-		"",
-		"Context name (a default context name will be created if not provided)",
-	)
+	c.AddFlag(FlagInfo{
+		String: &c.contextName,
+		Name: "context-name",
+		Shorthand: "c",
+		Usage: "Context name (a default context name will be created if not provided)",
+	})
 
-	command.PersistentFlags().StringVarP(
-		&c.defaultDatabase,
-		"user-database",
-		"u",
-		"",
-		"Create a user database and set it as the default for login",
-	)
+	c.AddFlag(FlagInfo{
+		String: &c.defaultDatabase,
+		Name: "user-database",
+		Shorthand: "u",
+		Usage: "Create a user database and set it as the default for login",
+	})
 
-	command.PersistentFlags().BoolVar(
-		&c.acceptEula,
-		"accept-eula",
-		false,
-		"Accept the SQL Server EULA",
-	)
+	c.AddFlag(FlagInfo{
+		Bool: &c.acceptEula,
+		Name: "accept-eula",
+		Usage: "Accept the SQL Server EULA",
+	})
 
-	command.PersistentFlags().IntVar(
-		&c.passwordLength,
-		"password-length",
-		50,
-		"Generated password length",
-	)
+	c.AddFlag(FlagInfo{
+		Int: &c.passwordLength,
+		DefaultInt: 50,
+		Name: "password-length",
+		Usage: "Generated password length",
+	})
 
-	command.PersistentFlags().IntVar(
-		&c.passwordMinSpecial,
-		"password-min-special",
-		10,
-		"Minimum number of special characters",
-	)
+	c.AddFlag(FlagInfo{
+		Int: &c.passwordMinSpecial,
+		DefaultInt: 10,
+		Name: "password-min-special",
+		Usage: "Minimum number of special characters",
+	})
 
-	command.PersistentFlags().IntVar(
-		&c.passwordMinNumber,
-		"password-min-number",
-		10,
-		"Minimum number of numeric characters",
-	)
+	c.AddFlag(FlagInfo{
+		Int: &c.passwordMinNumber,
+		DefaultInt: 10,
+		Name: "password-min-number",
+		Usage: "Minimum number of numeric characters",
+	})
 
-	command.PersistentFlags().IntVar(
-		&c.passwordMinUpper,
-		"password-min-upper",
-		10,
-		"Minimum number of upper characters",
-	)
+	c.AddFlag(FlagInfo{
+		Int: &c.passwordMinUpper,
+		DefaultInt: 10,
+		Name: "password-min-upper",
+		Usage: "Minimum number of upper characters",
+	})
 
-	command.PersistentFlags().StringVar(
-		&c.passwordSpecialCharSet,
-		"password-special-chars",
-		"!@#$%&*",
-		"Special character set to include in password",
-	)
+	c.AddFlag(FlagInfo{
+		String: &c.passwordSpecialCharSet,
+		DefaultString: "!@#$%&*",
+		Name: "password-special-chars",
+		Usage: "Special character set to include in password",
+	})
 
 	// Windows has the DPAPI which allows securely encrypting
 	if runtime.GOOS == "windows" {
-		command.PersistentFlags().BoolVar(
-			&c.encryptPassword,
-			"encrypt-password",
-			false,
-			"Encode the generated password in the sqlconfig file",
-		)
+		c.AddFlag(FlagInfo{
+			Bool: &c.encryptPassword,
+			Name: "encrypt-password",
+			Usage: "Encode the generated password in the sqlconfig file",
+		})
 	}
 
-	command.PersistentFlags().BoolVar(
-		&c.useCached,
-		"cached",
-		false,
-		"Don't download image.  Use already downloaded image",
-	)
+	c.AddFlag(FlagInfo{
+		Bool: &c.useCached,
+		Name: "cached",
+		Usage: "Don't download image.  Use already downloaded image",
+	})
 
 	// BUG(stuartpa): SQL Server bug: "SQL Server is now ready for client connections", oh no it isn't!!
 	// Wait for "Server name is" instead!  Nope, that doesn't work on edge
 	// Wait for "The default language" instead
 	// BUG(stuartpa): This obviously doesn't work for non US LCIDs
-	command.PersistentFlags().StringVar(
-		&c.errorLogEntryToWaitFor,
-		"errorlog-to-wait-for",
-		"The default language",
-		"The line in the errorlog to wait for before connecting to disable the 'sa' account",
-	)
+	c.AddFlag(FlagInfo{
+		String: &c.errorLogEntryToWaitFor,
+		DefaultString: "The default language",
+		Name: "errorlog-to-wait-for",
+		Usage: "The line in the errorlog to wait for before connecting to disable the 'sa' account",
+	})
 
-	command.PersistentFlags().StringVar(
-		&c.collation,
-		"collation",
-		"SQL_Latin1_General_CP1_CI_AS",
-		"The SQL Server collation",
-	)
+	c.AddFlag(FlagInfo{
+		String: &c.collation,
+		DefaultString: "SQL_Latin1_General_CP1_CI_AS",
+		Name: "collation",
+		Usage: "The SQL Server collation",
+	})
 }
 
-func (c *MssqlBase) Run(*Command, []string) {
+func (c *MssqlBase) Run([]string) {
 	var imageName string
 
 	if !c.acceptEula && viper.GetString("ACCEPT_EULA") == "" {

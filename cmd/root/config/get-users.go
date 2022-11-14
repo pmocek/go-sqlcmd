@@ -7,57 +7,61 @@ import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	config "github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	. "github.com/spf13/cobra"
 )
 
 type GetUsers struct {
 	BaseCommand
 
+	name string
 	detailed bool
 }
 
-func (c *GetUsers) DefineCommand() (command *Command) {
-	const use = "get-users [USER_NAME]"
-	const short = "Display one or many users from the sqlconfig file."
-	const long = short
-	const example = `# List all the users in your sqlconfig file
-  sqlcmd config get-users
+func (c *GetUsers) DefineCommand() {
+	c.BaseCommand.Info = CommandInfo{
+		Use: "get-users",
+		Short: "Display one or many users from the sqlconfig file",
+		Examples: []ExampleInfo{
+			{
+				Description: "List all the users in your sqlconfig file",
+				Steps: []string{"sqlcmd config get-users"},
+			},
+			{
+				Description: "List all the users in your sqlconfig file",
+				Steps: []string{"sqlcmd config get-users --detailed"},
+			},
+			{
+				Description: "Describe one user in your sqlconfig file",
+				Steps: []string{"sqlcmd config get-users user1"},
+			},
+		},
+		Run: c.run,
 
-# List all the users in your sqlconfig file
-  sqlcmd config get-users --detail
+		FirstArgAlternativeForFlag: &AlternativeForFlagInfo{Flag: "name", Value: &c.name},
+	}
 
-  # Describe one user in your sqlconfig file
-  sqlcmd config get-users myalias`
+	c.BaseCommand.DefineCommand()
 
-	command = c.SetCommand(Command{
-		Use:     use,
-		Short:   short,
-		Long:    long,
-		Example: example,
-		Args:    MaximumNArgs(1),
-		Run:     c.run})
+	c.AddFlag(FlagInfo{
+		String: &c.name,
+		Name: "name",
+		Usage: "User name to view details of"})
 
-	command.PersistentFlags().BoolVar(
-		&c.detailed,
-		"detailed",
-		false,
-		"Include user details")
-
-	return
+	c.AddFlag(FlagInfo{
+		Bool: &c.detailed,
+		Name: "detailed",
+		Usage: "Include user details"})
 }
 
-func (c *GetUsers) run(cmd *Command, args []string) {
-	if len(args) > 0 {
-		name := args[0]
-
-		if config.UserExists(name) {
-			user := config.GetUser(name)
+func (c *GetUsers) run(args []string) {
+	if c.name != "" {
+		if config.UserExists(c.name) {
+			user := config.GetUser(c.name)
 			output.Struct(user)
 		} else {
 			output.FatalfWithHints(
 				[]string{"To view available users run `sqlcmd config get-users"},
 				"error: no user exists with the name: \"%v\"",
-				name)
+				c.name)
 		}
 	} else {
 		config.OutputUsers(output.Struct, c.detailed)

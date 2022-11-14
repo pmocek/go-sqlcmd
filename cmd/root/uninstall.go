@@ -32,44 +32,43 @@ var systemDatabases = [...]string{
 	"/var/opt/mssql/data/master.mdf",
 }
 
-func (c *Uninstall) DefineCommand() (command *Command) {
+func (c *Uninstall) DefineCommand() {
 	const short = "Uninstall/Delete the current context"
 
-	command = c.SetCommand(Command{
-		Use:   "uninstall",
-		Short: short,
-		Long:  short,
-		Example: `# Uninstall/Delete the current context (includes the endpoint and user)
-  sqlcmd uninstall
-
-# Uninstall/Delete the current context, no user prompt
-  sqlcmd uninstall --yes
-
-# Uninstall/Delete the current context, no user prompt and override safety check for user databases
-  sqlcmd uninstall --yes --force`,
-		Args:    MaximumNArgs(0),
+	c.BaseCommand.Info = CommandInfo{
+		Use: "query",
+		Short: "Uninstall/Delete the current context",
+		Examples: []ExampleInfo{
+			{
+				Description: "Uninstall/Delete the current context (includes the endpoint and user)",
+				Steps: []string{`sqlcmd uninstall`}},
+			{
+				Description: "Uninstall/Delete the current context, no user prompt",
+				Steps: []string{`sqlcmd uninstall --yes`}},
+			{
+				Description: "Uninstall/Delete the current context, no user prompt and override safety check for user databases",
+				Steps: []string{`sqlcmd uninstall --yes --force`}},
+		},
 		Aliases: []string{"delete", "drop"},
-		Run:     c.run,
+		Run: c.run,
+	}
+
+	c.BaseCommand.DefineCommand()
+
+	c.AddFlag(FlagInfo{
+		Bool: &c.yes,
+		Name: "yes",
+		Usage: "Quiet mode (do not stop for user input to confirm the operation)",
 	})
 
-	command.PersistentFlags().BoolVar(
-		&c.yes,
-		"yes",
-		false,
-		"Quiet mode (do not stop for user input to confirm the operation)",
-	)
-
-	command.PersistentFlags().BoolVar(
-		&c.force,
-		"force",
-		false,
-		"Complete the operation even if non-system (user) database files are present",
-	)
-
-	return
+	c.AddFlag(FlagInfo{
+		Bool: &c.force,
+		Name: "force",
+		Usage: "Complete the operation even if non-system (user) database files are present",
+	})
 }
 
-func (c *Uninstall) run(*Command, []string) {
+func (c *Uninstall) run([]string) {
 	if config.GetCurrentContextName() == "" {
 		output.FatalfWithHintExamples([][]string{
 			{"To view available contexts", "sqlcmd config get-contexts"},

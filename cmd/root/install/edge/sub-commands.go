@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package mssql
+package edge
 
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 )
 
-var Commands = []Commander{
-	&GetTags{},
+var SubCommands = []Commander{
+	NewCommand[*GetTags](),
 }

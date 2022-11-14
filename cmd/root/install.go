@@ -5,27 +5,20 @@ package root
 
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	. "github.com/spf13/cobra"
+	"github.com/microsoft/go-sqlcmd/cmd/root/install"
 )
 
 type Install struct {
 	BaseCommand
 }
 
-func (c *Install) DefineCommand() (command *Command) {
-	const short = "Install/Create #SQLFamliy and Tools"
-
-	command = c.SetCommand(Command{
-		Use:     "install",
-		Short:   short,
-		Long:    short,
-		Args:    ExactArgs(1),
+func (c *Install) DefineCommand() {
+	c.BaseCommand.Info = CommandInfo{
+		Use: "install",
+		Short: "Install/Create #SQLFamily and Tools",
 		Aliases: []string{"create"},
-		Example: `# Install SQL Server in a docker container
-  sqlcmd install mssql
+	}
+	c.BaseCommand.DefineCommand()
+	c.AddSubCommands(install.SubCommands)
 
-# Install SQL Server Edge in a docker container
-  sqlcmd install mssql --type edge`})
-
-	return
 }

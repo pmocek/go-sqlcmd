@@ -6,7 +6,6 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
-	. "github.com/spf13/cobra"
 	"os"
 	"runtime"
 )
@@ -20,51 +19,53 @@ type AddUser struct {
 	encryptPassword bool
 }
 
-func (c *AddUser) DefineCommand() (command *Command) {
-	const use = "add-user"
-	const short = "Add a user"
-	const long = short
-	const example = `Add a user
-	SET SQLCMD_PASSWORD="AComp!exPa$$w0rd"
-	sqlcmd config add-user --name my-user --name user1`
-
-	command = c.SetCommand(Command{
-		Use:     use,
-		Short:   short,
-		Long:    long,
-		Example: example,
-		Run:     c.run})
-
-	command.PersistentFlags().StringVar(
-		&c.name,
-		"name",
-		"user",
-		"Display name for the user (this is not the username)")
-
-	command.PersistentFlags().StringVar(
-		&c.authType,
-		"auth-type",
-		"basic",
-		"Authentication type this user will use (basic | other)")
-
-	command.PersistentFlags().StringVar(
-		&c.username,
-		"username",
-		"",
-		"The username (provide password in SQLCMD_PASSWORD environment variable)")
-
-	if runtime.GOOS == "windows" {
-		command.PersistentFlags().BoolVar(
-			&c.encryptPassword,
-			"encrypt-password",
-			false,
-			"Encode the password")
+func (c *AddUser) DefineCommand() {
+	c.BaseCommand.Info = CommandInfo{
+		Use: "add-user",
+		Short: "Add a user",
+		Examples: []ExampleInfo{
+			{
+				Description: "Add a user",
+				Steps: []string{
+					`SET SQLCMD_PASSWORD="AComp!exPa$$w0rd"`,
+					"sqlcmd config add-user --name my-user --name user1"},
+			},
+		},
+		Run: c.run,
 	}
 
-	return
+	c.BaseCommand.DefineCommand()
+
+	c.AddFlag(FlagInfo{
+		String: &c.name,
+		Name: "name",
+		DefaultString: "user",
+		Usage: "Display name for the user (this is not the username)",
+	})
+
+	c.AddFlag(FlagInfo{
+		String: &c.authType,
+		Name: "auth-type",
+		DefaultString: "basic",
+		Usage: "Authentication type this user will use (basic | other)",
+	})
+
+	c.AddFlag(FlagInfo{
+		String: &c.username,
+		Name: "username",
+		Usage: "The username (provide password in SQLCMD_PASSWORD environment variable)",
+	})
+
+	if runtime.GOOS == "windows" {
+		c.AddFlag(FlagInfo{
+			Bool: &c.encryptPassword,
+			Name: "encrypt-password",
+			Usage: "Encode the password",
+		})
+	}
 }
 
-func (c *AddUser) run(cmd *Command, args []string) {
+func (c *AddUser) run(args []string) {
 	if c.authType != "basic" &&
 		c.authType != "other" {
 		output.FatalfWithHints([]string{"Authentication type must be 'basic' or 'other'"},

@@ -19,32 +19,29 @@ type Query struct {
 	text string
 }
 
-func (c *Query) DefineCommand() (command *Command) {
-	const short = "Run a query against the current context"
+func (c *Query) DefineCommand() {
+	c.BaseCommand.Info = CommandInfo{
+		Use: "query",
+		Short: "Run a query against the current context",
+		Examples: []ExampleInfo{
+			{Description: "Run a query", Steps: []string{`sqlcmd query "SELECT @@SERVERNAME"`}}},
+		Run: c.run,
+		FirstArgAlternativeForFlag: &AlternativeForFlagInfo{
+			Flag:  "query",
+			Value: &c.text,
+		},
+	}
 
-	command = c.SetCommand(Command{
-		Use:   "query COMMAND_TEXT",
-		Short: short,
-		Long:  short,
-		Example: `
-Run a query
-  # sqlcmd query "SELECT @@SERVERNAME"`,
-		ArgAliases: []string{"text"},
-		Args:       MaximumNArgs(1),
-		Run:        c.run,
-	})
+	c.BaseCommand.DefineCommand()
 
-	command.PersistentFlags().StringVarP(
-		&c.text,
-		"query",
-		"q",
-		"",
-		"Command text to run")
-
-	return
+	c.AddFlag(FlagInfo{
+		String: &c.text,
+		Name: "query",
+		Shorthand: "q",
+		Usage: "Command text to run"})
 }
 
-func (c *Query) run(cmd *Command, args []string) {
+func (c *Query) run(args []string) {
 	if len(args) > 0 && args[0] != "" && c.text != "" {
 		output.FatalWithHints([]string{"Provide the query command text either as the first argument or using the --query flag"},
 			"Two queries have been provided, as an argument '%v' and using the --query flag '%v'", args[0], c.text)

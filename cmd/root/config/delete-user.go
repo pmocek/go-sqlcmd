@@ -7,7 +7,6 @@ import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	. "github.com/spf13/cobra"
 )
 
 type DeleteUser struct {
@@ -16,35 +15,31 @@ type DeleteUser struct {
 	name string
 }
 
-func (c *DeleteUser) DefineCommand() (command *Command) {
-	const use = "delete-user NAME"
-	const short = "Delete a user"
-	const long = short
-	const example = `Delete a user
-	sqlcmd config delete-user --name my-user`
+func (c *DeleteUser) DefineCommand() {
+	c.BaseCommand.Info = CommandInfo{
+		Use: "delete-user",
+		Short: "Delete a user",
+		Examples: []ExampleInfo{
+			{
+				Description: "Delete a user",
+				Steps: []string{
+					"sqlcmd config delete-user --name user1",
+					"sqlcmd config delete-user user1"}},
+		},
+		Run: c.run,
 
-	command = c.SetCommand(Command{
-		Use:     use,
-		Short:   short,
-		Long:    long,
-		Example: example,
-		Run:     c.run})
-
-	command.PersistentFlags().StringVar(
-		&c.name,
-		"name",
-		"",
-		"Name of user to delete")
-
-	return
-}
-
-func (c *DeleteUser) run(cmd *Command, args []string) {
-	if len(args) == 1 {
-		c.name = args[0]
+		FirstArgAlternativeForFlag: &AlternativeForFlagInfo{Flag: "name", Value: &c.name},
 	}
 
-	config.DeleteUser(c.name)
+	c.BaseCommand.DefineCommand()
 
+	c.AddFlag(FlagInfo{
+		String: &c.name,
+		Name: "name",
+		Usage: "Name of user to delete"})
+}
+
+func (c *DeleteUser) run(args []string) {
+	config.DeleteUser(c.name)
 	output.Infof("User '%v' deleted", c.name)
 }

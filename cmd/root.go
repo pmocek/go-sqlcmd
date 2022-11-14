@@ -5,7 +5,7 @@ package cmd
 
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	. "github.com/spf13/cobra"
+	"github.com/microsoft/go-sqlcmd/cmd/root"
 	"os"
 	"path/filepath"
 )
@@ -14,65 +14,63 @@ type Root struct {
 	BaseCommand
 }
 
-func (c *Root) DefineCommand() (command *Command) {
-	const short = "sqlcmd: a command-line interface for the #SQLFamily."
-	command = c.SetCommand(Command{
-		Use:   "sqlcmd",
-		Short: short,
-		Long:  short,
-	})
+func (c *Root) DefineCommand() {
+	c.BaseCommand.Info = CommandInfo{
+		Use: "sqlcmd",
+		Short: "sqlcmd: a command-line interface for the #SQLFamily",
+		Examples: []ExampleInfo{
+			{Description: "Run a query", Steps: []string{`sqlcmd query "SELECT @@SERVERNAME"`}}},
+	}
 
-	c.addGlobalFlags(command)
-
-	return
+	c.BaseCommand.DefineCommand()
+	c.AddSubCommands(root.SubCommands)
+	c.addGlobalFlags()
 }
 
-func (c *Root) addGlobalFlags(command *Command) {
-	command.PersistentFlags().BoolVarP(
-		&GlobalOptions.TrustServerCertificate,
-		"trust-server-certificate",
-		"C",
-		false,
-		"Whether to trust the certificate presented by the endpoint for encryption",
-	)
+func (c *Root) addGlobalFlags() {
+	c.AddFlag(FlagInfo{
+		Bool: &GlobalOptions.TrustServerCertificate,
+		Name: "trust-server-certificate",
+		Shorthand: "C",
+		Usage: "Whether to trust the certificate presented by the endpoint for encryption",
+	})
 
-	command.PersistentFlags().StringVarP(
-		&GlobalOptions.DatabaseName,
-		"database-name",
-		"d",
-		"",
-		"The initial database for the connection",
-	)
+	c.AddFlag(FlagInfo{
+		String: &GlobalOptions.DatabaseName,
+		Name: "database-name",
+		Shorthand: "d",
+		Usage: "The initial database for the connection",
+	})
 
-	command.PersistentFlags().BoolVarP(
-		&GlobalOptions.UseTrustedConnection,
-		"use-trusted-connection",
-		"E",
-		false,
-		"Whether to use integrated security",
-	)
+	c.AddFlag(FlagInfo{
+		Bool: &GlobalOptions.UseTrustedConnection,
+		Name: "use-trusted-connection",
+		Shorthand: "E",
+		Usage: "Whether to use integrated security",
+	})
 
-	home, err := os.UserHomeDir()
-	checkErr(err)
-	configFile := filepath.Join(home, ".sqlcmd", "sqlconfig")
+	home, _ := os.UserHomeDir()
+	//checkErr(err)
+	configFilename = filepath.Join(home, ".sqlcmd", "sqlconfig")
 
-	command.PersistentFlags().String(
-		"sqlconfig",
-		configFile,
-		"Location of sqlcmd configuration file",
-	)
+	c.AddFlag(FlagInfo{
+		String: &configFilename,
+		DefaultString: configFilename,
+		Name: "sqlconfig",
+		Usage: "Location of sqlcmd configuration file",
+	})
 
-	command.PersistentFlags().StringP(
-		"output",
-		"o",
-		"yaml",
-		"output type (yaml, json or xml)",
-	)
+	c.AddFlag(FlagInfo{
+		String: &outputType,
+		DefaultString: "yaml",
+		Name: "output",
+		Usage: "output type (yaml, json or xml)",
+	})
 
-	command.PersistentFlags().IntP(
-		"verbosity",
-		"v",
-		2,
-		"Log level, error = 0, warn = 1, info = 2, debug = 3, trace = 4",
-	)
+	c.AddFlag(FlagInfo{
+		Int: &loggingLevel,
+		DefaultInt: 2,
+		Name: "verbosity",
+		Usage: "Log level, error = 0, warn = 1, info = 2, debug = 3, trace = 4",
+	})
 }

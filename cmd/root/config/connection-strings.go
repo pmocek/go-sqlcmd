@@ -9,7 +9,6 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
-	. "github.com/spf13/cobra"
 	"runtime"
 	"strconv"
 )
@@ -18,29 +17,24 @@ type ConnectionStrings struct {
 	BaseCommand
 }
 
-func (c *ConnectionStrings) DefineCommand() (command *Command) {
-	const use = "connection-strings"
-	const short = "Display connections strings for the current context."
-	const long = short
-	const example = `# List connection strings for all client drivers
-  sqlcmd config connection-strings
-
-# Or
-  sqlcmd config cs`
-
-	command = c.SetCommand(Command{
-		Use:     use,
-		Short:   short,
-		Long:    long,
-		Example: example,
+func (c *ConnectionStrings) DefineCommand() {
+	c.BaseCommand.Info = CommandInfo{
+		Use: "connection-strings",
+		Short: "Display connections strings for the current context",
+		Examples: []ExampleInfo{
+			{
+				Description: "List connection strings for all client drivers",
+				Steps: []string{
+					"sqlcmd config connection-strings",
+					"sqlcmd config cs"},
+			},
+		},
+		Run: c.run,
 		Aliases: []string{"cs"},
-		Args:    MaximumNArgs(1),
-		Run:     c.run})
-
-	return
+	}
 }
 
-func (c *ConnectionStrings) run(*Command, []string) {
+func (c *ConnectionStrings) run([]string) {
 	// connectionStringFormats borrowed from "portal.azure.com" "connection strings" pane
 	var connectionStringFormats = map[string]string{
 		"ADO.NET": "Server=tcp:%s,%s;Initial Catalog=%s;Persist Security Info=False;User ID=%s;Password=%s;MultipleActiveResultSets=False;Encode=True;TrustServerCertificate=False;Connection Timeout=30;",

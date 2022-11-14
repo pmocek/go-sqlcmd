@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package mssql
+package edge
 
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
@@ -15,25 +15,24 @@ type GetTags struct {
 
 func (c *GetTags) DefineCommand() {
 	c.BaseCommand.Info = CommandInfo{
-		Use: "get-tags",
-		Short: "Get tags available for mssql install",
+		Use:   "get-tags",
+		Short: "Get tags available for mssql edge install",
 		Examples: []ExampleInfo{
 			{
 				Description: "List tags",
-				Steps: []string{"sqlcmd install mssql get-tags"},
+				Steps:       []string{"sqlcmd install mssql-edge get-tags"},
 			},
 		},
 		Aliases: []string{"gt", "lt"},
-		Run: c.run,
+		Run:     c.run,
 	}
 
 	c.BaseCommand.DefineCommand()
-
 }
 
 func (c *GetTags) run([]string) {
 	tags := docker.ListTags(
-		"mssql/server",
+		"azure-sql-edge",
 		"https://mcr.microsoft.com",
 	)
 	output.Struct(tags)

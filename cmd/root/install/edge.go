@@ -5,10 +5,10 @@ package install
 
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	"github.com/microsoft/go-sqlcmd/cmd/root/install/mssql"
+	"github.com/microsoft/go-sqlcmd/cmd/root/install/edge"
 )
 
-type Mssql struct {
+type Edge struct {
 	BaseCommand
 	MssqlBase
 
@@ -21,24 +21,22 @@ type Mssql struct {
 	defaultDatabase string
 }
 
-func (c *Mssql) DefineCommand() {
-	const repo = "mssql/server"
+func (c *Edge) DefineCommand() {
+	const repo = "azure-sql-edge"
 
 	c.BaseCommand.Info = CommandInfo{
-		Use: "mssql",
-		Short: "Install SQL Server",
+		Use: "mssql-edge",
+		Short: "Install SQL Server Edge",
 		Examples: []ExampleInfo{
 			{
-				Description: "Install SQL Server in a container",
-				Steps: []string{"sqlcmd install mssql"},
+				Description: "Install SQL Server Edge in a container",
+				Steps: []string{"sqlcmd install mssql-edge"},
 			},
 		},
 		Run: c.MssqlBase.Run,
 	}
 
 	c.BaseCommand.DefineCommand()
-	c.AddSubCommands(mssql.SubCommands)
-	c.AddFlags(repo, "mssql")
-
-	return
+	c.AddSubCommands(edge.SubCommands)
+	c.AddFlags(repo, "edge")
 }
