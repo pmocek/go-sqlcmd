@@ -23,19 +23,15 @@ func (c *GetEndpoints) DefineCommand() {
 		Examples: []ExampleInfo{
 			{
 				Description: "List all the endpoints in your sqlconfig file",
-				Steps: []string{"sqlcmd config get-endpoints"},
-			},
+				Steps: []string{"sqlcmd config get-endpoints"}},
 			{
 				Description: "List all the endpoints in your sqlconfig file",
-				Steps: []string{"sqlcmd config get-endpoints --detailed"},
-			},
+				Steps: []string{"sqlcmd config get-endpoints --detailed"}},
 			{
 				Description: "Describe one endpoint in your sqlconfig file",
-				Steps: []string{"sqlcmd config get-endpoints my-endpoint"},
-			},
+				Steps: []string{"sqlcmd config get-endpoints my-endpoint"}},
 		},
 		Run: c.run,
-
 		FirstArgAlternativeForFlag: &AlternativeForFlagInfo{Flag: "name", Value: &c.name},
 	}
 

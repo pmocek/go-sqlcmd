@@ -3,7 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
+	"github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/internal/helpers"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
@@ -142,7 +142,7 @@ func TestLocalContext(t *testing.T) {
 		{"neg-config-add-user-bad-auth-type",
 			split("config add-user --username foobar --auth-type badbad")},
 		{"neg-config-add-user-bad-use-encrypted",
-			split("config add-user --username foobar  --auth-type other --encrypt-password")},
+			split("config add-user --username foobar --auth-type other --encrypt-password")},
 	}
 
 	run(t, tests)
@@ -168,7 +168,7 @@ func TestMssqlInstall(t *testing.T) {
 		args struct {args []string}
 	}{
 		{"install",
-			split(fmt.Sprintf("install mssql %v --user-database my-database --accept-eula --encrypt-password", useCached))},
+			split(fmt.Sprintf("install mssql%v --user-database my-database --accept-eula --encrypt-password", useCached))},
 		{"config-current-context",
 			split("config current-context")},
 		{"config-connection-strings",
@@ -194,8 +194,8 @@ func runTests(t *testing.T, tt struct {
 	name string
 	args struct{ args []string }
 }) {
-	r := NewCommand[*Root]()
-	r.ArgsForUnitTesting(tt.args.args)
+	cmd := commander.NewCommand[*Root]()
+	cmd.ArgsForUnitTesting(tt.args.args)
 
 	t.Logf("Running: %v", tt.args.args)
 
@@ -212,11 +212,10 @@ func runTests(t *testing.T, tt struct {
 				t.Errorf("The code did not panic")
 			}
 		}()
-		RunCommandLine(true)
+		cmd.Execute()
 	}
-	RunCommandLine(false)
+	cmd.Execute()
 }
-
 
 func Test_displayHints(t *testing.T) {
 	displayHints([]string{"Test Hint"})
@@ -248,6 +247,10 @@ func run(t *testing.T, tests []struct {
 		t.Run(tt.name, func(t *testing.T) { runTests(t, tt) })
 	}
 
+	verifyConfigIsEmpty(t)
+}
+
+func verifyConfigIsEmpty(t *testing.T) {
 	if !config.IsEmpty() {
 		bytes := output.Struct(config.GetRedactedConfig(true))
 		t.Error(fmt.Sprintf(
@@ -260,7 +263,7 @@ func run(t *testing.T, tests []struct {
 }
 
 func setup() {
-	useCached = "--cached"
+	useCached = " --cached"
 	if !offlineMode {
 		useCached = ""
 	}

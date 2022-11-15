@@ -23,7 +23,7 @@ func (c *Root) DefineCommand() {
 	}
 
 	c.BaseCommand.DefineCommand()
-	c.AddSubCommands(root.SubCommands)
+	c.AddSubCommands(root.SubCommands())
 	c.addGlobalFlags()
 }
 

@@ -35,7 +35,7 @@ func (c *SubCommand1) DefineCommand() {
 	c.BaseCommand.DefineCommand()
 }
 
-func (c *SubCommand1) run(args []string) {
+func (c *SubCommand1) run() {
 	fmt.Println("Sub Command 1")
 }
 
@@ -52,7 +52,7 @@ func (c *SubCommand11) DefineCommand() {
 	c.BaseCommand.DefineCommand()
 }
 
-func (c *SubCommand11) run(args []string) {
+func (c *SubCommand11) run() {
 	fmt.Println("Sub Command 11")
 }
 

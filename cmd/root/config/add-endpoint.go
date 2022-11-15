@@ -69,7 +69,7 @@ func (c *AddEndpoint) run() {
 		{"View endpoint names", "sqlcmd config get-endpoints"},
 		{"View endpoint details", fmt.Sprintf("sqlcmd config get-endpoints %v", uniqueEndpointName)},
 		{"View all endpoints details", "sqlcmd config get-endpoints --detailed"},
-		{"Delete this endpoint", fmt.Sprintf("sqlcmd config delete-context %v", uniqueEndpointName)},
+		{"Delete this endpoint", fmt.Sprintf("sqlcmd config delete-endpoint %v", uniqueEndpointName)},
 	},
 		"Endpoint '%v' added (address: '%v', port: '%v')", uniqueEndpointName, c.address, c.port)
 }

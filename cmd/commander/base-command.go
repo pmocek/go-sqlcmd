@@ -60,9 +60,8 @@ func (c *BaseCommand) ArgsForUnitTesting(args []string) {
 	c.command.SetArgs(args)
 }
 
-func (c *BaseCommand) Execute() (err error) {
-	err = c.command.Execute()
-	return
+func (c *BaseCommand) Execute() error {
+	return c.command.Execute()
 }
 
 func (c *BaseCommand) Name() string {

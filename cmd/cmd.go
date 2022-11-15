@@ -4,6 +4,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/root"
 	"github.com/microsoft/go-sqlcmd/internal/helpers"
@@ -13,12 +14,10 @@ import (
 var loggingLevel int
 var outputType string
 var configFilename string
-var panicOnFailure bool
 var rootCmd commander.Commander
 
 // init initializes the command-line interface
 func init() {
-
 	rootCmd = commander.NewCommand[*Root]()
 
 	helpers.Initialize(
@@ -30,13 +29,16 @@ func init() {
 	)
 }
 
+func SetArgsForUnitTests(args []string) {
+	rootCmd = commander.NewCommand[*Root]()
+	rootCmd.ArgsForUnitTesting(args)
+}
+
 // RunCommandLine runs the application based on the command-line
 // parameters the user has passed in
 func RunCommandLine(negativeUnitTest bool) {
-	panicOnFailure = negativeUnitTest
-
 	err := rootCmd.Execute()
-	checkErr(err)
+	checkErr2(err, negativeUnitTest)
 }
 
 // checkErr uses Cobra to check err, and halts the application if err is not
@@ -48,13 +50,28 @@ func RunCommandLine(negativeUnitTest bool) {
 // down the test executor, so you'll need inject a checkErr handler that doesn't
 // call os.Exit (probably one that just calls Panic(), which you recover from as
 // an expected panic)
+
 func checkErr(err error) {
 	if loggingLevel > 2 {
 		if err != nil {
 			panic(err)
 		}
 	}
+	rootCmd.CheckErr(err)
+}
+
+func checkErr2(err error, panicOnFailure bool) {
+	if loggingLevel > 2 {
+		if err != nil {
+			panic(err)
+		}
+	}
+	fmt.Println("GOT HERE2")
+	fmt.Println(err)
+	fmt.Println(panicOnFailure)
+
 	if panicOnFailure && err != nil {
+		fmt.Println("GOT HERE")
 		panic(err)
 	} else {
 		rootCmd.CheckErr(err)
@@ -73,7 +90,7 @@ func displayHints(hints []string) {
 }
 
 func IsValidRootCommand(command string) (valid bool) {
-	for _, c := range root.SubCommands {
+	for _, c := range root.SubCommands() {
 		if command == c.Name() {
 			valid = true
 			return
