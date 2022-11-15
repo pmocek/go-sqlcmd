@@ -4,6 +4,8 @@
 package commander
 
 import (
+	"fmt"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	"github.com/spf13/cobra"
 )
 
@@ -20,24 +22,37 @@ func (c *BaseCommand) DefineCommand() {
 		Use: c.Info.Use,
 		Short: c.Info.Short,
 		Long: c.Info.Long,
-		Run: func(cmd *cobra.Command, args []string) {
-			if c.Info.FirstArgAlternativeForFlag != nil {
-				if len(args) > 0 {
-					c.Info.FirstArgAlternativeForFlag.Value = &args[0]
-				}
-			}
-
-			if c.Info.Run != nil {
-				c.Info.Run(args)
-			}
-		},
 		Aliases: c.Info.Aliases,
+		Run: c.run,
 	}
 
 	if c.Info.FirstArgAlternativeForFlag != nil {
 		c.command.Args = cobra.MaximumNArgs(1)
 	} else {
-		c.command.Args = cobra.MaximumNArgs(2)
+		c.command.Args = cobra.MaximumNArgs(0)
+	}
+}
+
+func (c *BaseCommand) run(_ *cobra.Command, args []string) {
+	if c.Info.FirstArgAlternativeForFlag != nil {
+		if len(args) > 0 {
+
+			flag, err := c.command.PersistentFlags().GetString(c.Info.FirstArgAlternativeForFlag.Flag)
+			c.CheckErr(err)
+			if  flag != "" {
+				output.Fatal(fmt.Sprintf("Both an argument and the --%v flag have been provided.  Please provide either an argument or the --%v flag",
+					c.Info.FirstArgAlternativeForFlag.Flag,
+					c.Info.FirstArgAlternativeForFlag.Flag))
+			}
+			if c.Info.FirstArgAlternativeForFlag.Value == nil {
+				panic ("Must set Value")
+			}
+			*c.Info.FirstArgAlternativeForFlag.Value = args[0]
+		}
+	}
+
+	if c.Info.Run != nil {
+		c.Info.Run()
 	}
 }
 
@@ -45,8 +60,9 @@ func (c *BaseCommand) ArgsForUnitTesting(args []string) {
 	c.command.SetArgs(args)
 }
 
-func (c *BaseCommand) Execute() {
-	c.command.Execute()
+func (c *BaseCommand) Execute() (err error) {
+	err = c.command.Execute()
+	return
 }
 
 func (c *BaseCommand) Name() string {

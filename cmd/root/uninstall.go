@@ -33,10 +33,8 @@ var systemDatabases = [...]string{
 }
 
 func (c *Uninstall) DefineCommand() {
-	const short = "Uninstall/Delete the current context"
-
 	c.BaseCommand.Info = CommandInfo{
-		Use: "query",
+		Use: "uninstall",
 		Short: "Uninstall/Delete the current context",
 		Examples: []ExampleInfo{
 			{
@@ -68,7 +66,7 @@ func (c *Uninstall) DefineCommand() {
 	})
 }
 
-func (c *Uninstall) run([]string) {
+func (c *Uninstall) run() {
 	if config.GetCurrentContextName() == "" {
 		output.FatalfWithHintExamples([][]string{
 			{"To view available contexts", "sqlcmd config get-contexts"},
@@ -117,7 +115,7 @@ func (c *Uninstall) run([]string) {
 		if newContextName != "" {
 			output.Infof("Current context is now %s", newContextName)
 		} else {
-			output.Infof("%v\n", "Operation completed successfully")
+			output.Infof("%v", "Operation completed successfully")
 		}
 	}
 }

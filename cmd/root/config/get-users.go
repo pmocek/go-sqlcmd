@@ -52,7 +52,7 @@ func (c *GetUsers) DefineCommand() {
 		Usage: "Include user details"})
 }
 
-func (c *GetUsers) run(args []string) {
+func (c *GetUsers) run() {
 	if c.name != "" {
 		if config.UserExists(c.name) {
 			user := config.GetUser(c.name)

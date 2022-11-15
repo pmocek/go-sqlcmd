@@ -27,18 +27,15 @@ func (c *Mssql) DefineCommand() {
 	c.BaseCommand.Info = CommandInfo{
 		Use: "mssql",
 		Short: "Install SQL Server",
-		Examples: []ExampleInfo{
-			{
+		Examples: []ExampleInfo{{
 				Description: "Install SQL Server in a container",
-				Steps: []string{"sqlcmd install mssql"},
-			},
-		},
+				Steps: []string{"sqlcmd install mssql"}}},
 		Run: c.MssqlBase.Run,
 	}
 
 	c.BaseCommand.DefineCommand()
 	c.AddSubCommands(mssql.SubCommands)
-	c.AddFlags(repo, "mssql")
+	c.AddFlags(c.AddFlag, repo, "mssql")
 
 	return
 }

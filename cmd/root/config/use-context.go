@@ -39,10 +39,7 @@ func (c *UseContext) DefineCommand() {
 		Usage: "Name of context to set as current context"})
 }
 
-func (c *UseContext) run(args []string) {
-	if c.name != "" {
-		output.Fatal("Both an argument and the --name flag have been provided.  Please provide either an argument or the --name flag")
-	}
+func (c *UseContext) run() {
 	if config.ContextExists(c.name) {
 		config.SetCurrentContextName(c.name)
 		output.InfofWithHints([]string{

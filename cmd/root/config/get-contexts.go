@@ -52,7 +52,7 @@ func (c *GetContexts) DefineCommand() {
 		Usage: "Include context details"})
 }
 
-func (c *GetContexts) run(args []string) {
+func (c *GetContexts) run() {
 	if c.name != "" {
 		if config.ContextExists(c.name) {
 			context := config.GetContext(c.name)

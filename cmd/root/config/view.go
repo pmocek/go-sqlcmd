@@ -43,7 +43,7 @@ func (c *View) DefineCommand() {
 	})
 }
 
-func (c *View) run([]string) {
+func (c *View) run() {
 	config := config.GetRedactedConfig(c.raw)
 	output.Struct(config)
 }

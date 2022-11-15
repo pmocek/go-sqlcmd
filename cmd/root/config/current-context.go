@@ -30,6 +30,6 @@ func (c *CurrentContext) DefineCommand() {
 	c.BaseCommand.DefineCommand()
 }
 
-func (c *CurrentContext) run(args []string) {
+func (c *CurrentContext) run() {
 	output.Infof("%v\n", config.GetCurrentContextName())
 }

@@ -35,7 +35,8 @@ func init() {
 func RunCommandLine(negativeUnitTest bool) {
 	panicOnFailure = negativeUnitTest
 
-	rootCmd.Execute()
+	err := rootCmd.Execute()
+	checkErr(err)
 }
 
 // checkErr uses Cobra to check err, and halts the application if err is not

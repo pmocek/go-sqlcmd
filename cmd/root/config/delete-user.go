@@ -39,7 +39,7 @@ func (c *DeleteUser) DefineCommand() {
 		Usage: "Name of user to delete"})
 }
 
-func (c *DeleteUser) run(args []string) {
+func (c *DeleteUser) run() {
 	config.DeleteUser(c.name)
 	output.Infof("User '%v' deleted", c.name)
 }

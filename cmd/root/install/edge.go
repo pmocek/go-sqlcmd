@@ -27,16 +27,13 @@ func (c *Edge) DefineCommand() {
 	c.BaseCommand.Info = CommandInfo{
 		Use: "mssql-edge",
 		Short: "Install SQL Server Edge",
-		Examples: []ExampleInfo{
-			{
+		Examples: []ExampleInfo{{
 				Description: "Install SQL Server Edge in a container",
-				Steps: []string{"sqlcmd install mssql-edge"},
-			},
-		},
+				Steps: []string{"sqlcmd install mssql-edge"}}},
 		Run: c.MssqlBase.Run,
 	}
 
 	c.BaseCommand.DefineCommand()
 	c.AddSubCommands(edge.SubCommands)
-	c.AddFlags(repo, "edge")
+	c.AddFlags(c.AddFlag, repo, "edge")
 }

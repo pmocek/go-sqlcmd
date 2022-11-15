@@ -65,7 +65,7 @@ func (c *AddUser) DefineCommand() {
 	}
 }
 
-func (c *AddUser) run(args []string) {
+func (c *AddUser) run() {
 	if c.authType != "basic" &&
 		c.authType != "other" {
 		output.FatalfWithHints([]string{"Authentication type must be 'basic' or 'other'"},

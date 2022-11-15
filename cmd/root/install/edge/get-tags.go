@@ -30,7 +30,7 @@ func (c *GetTags) DefineCommand() {
 	c.BaseCommand.DefineCommand()
 }
 
-func (c *GetTags) run([]string) {
+func (c *GetTags) run() {
 	tags := docker.ListTags(
 		"azure-sql-edge",
 		"https://mcr.microsoft.com",

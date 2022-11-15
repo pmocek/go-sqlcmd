@@ -8,8 +8,8 @@ IF EXIST "c:\users\stuartpa\.sqlcmd" (
 sqlcmd install mssql get-tags || GOTO error
 sqlcmd install mssql || GOTO error
 sqlcmd install mssql --tag 2019-latest --encrypt-password || GOTO error
-sqlcmd query "SELECT @@version"
-sqlcmd uninstall --yes
+sqlcmd query "SELECT @@version" || GOTO error
+sqlcmd uninstall --yes || GOTO error
 sqlcmd create mssql-edge || GOTO error
 sqlcmd query "SELECT @@SERVERNAME" || GOTO error
 sqlcmd config use-context mssql || GOTO error
@@ -30,11 +30,11 @@ sqlcmd uninstall --yes --force || GOTO error
 sqlcmd install mssql -u foo || GOTO error
 sqlcmd query "SELECT DB_NAME()" || GOTO error
 sqlcmd config use-context mssql2 || GOTO error
-sqlcmd config current-context mssql2 || GOTO error
-sqlcmd install mssql edge -u foo || GOTO error
+sqlcmd config current-context || GOTO error
+sqlcmd install mssql-edge -u foo || GOTO error
 sqlcmd query "SELECT DB_NAME()" || GOTO error
-sqlcmd install mssql get-tags
-sqlcmd install mssql-edge get-tags
+sqlcmd install mssql get-tags || GOTO error
+sqlcmd install mssql-edge get-tags || GOTO error
 sqlcmd uninstall --yes --force  || GOTO error
 sqlcmd delete --yes --force || GOTO error
 sqlcmd drop --yes --force || GOTO error

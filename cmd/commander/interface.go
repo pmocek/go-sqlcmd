@@ -11,7 +11,7 @@ type Commander interface {
 	Command() *cobra.Command
 	Name() string
 	Aliases() []string
-	Execute()
+	Execute() error
 	CheckErr(err error)
 
 	ArgsForUnitTesting(args []string)

@@ -19,5 +19,4 @@ func (c *Config) DefineCommand() {
 	}
 	c.BaseCommand.DefineCommand()
 	c.AddSubCommands(config.SubCommands)
-
 }

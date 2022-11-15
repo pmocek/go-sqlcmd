@@ -54,8 +54,7 @@ func (c *AddEndpoint) DefineCommand() {
 	})
 }
 
-func (c *AddEndpoint) run(args []string) {
-
+func (c *AddEndpoint) run() {
 	endpoint := Endpoint{
 		EndpointDetails: EndpointDetails{
 			Address: c.address,

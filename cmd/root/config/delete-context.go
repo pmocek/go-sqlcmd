@@ -47,7 +47,7 @@ func (c *DeleteContext) DefineCommand() {
 		Usage: "Delete the context's endpoint and user as well"})
 }
 
-func (c *DeleteContext) run(args []string) {
+func (c *DeleteContext) run() {
 	if c.name == "" {
 		output.FatalWithHints([]string{"Use the --name flag to pass in a context name to delete"},
 			"A 'name' is required")

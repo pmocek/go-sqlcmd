@@ -44,81 +44,82 @@ type MssqlBase struct {
 }
 
 func (c *MssqlBase) AddFlags(
+	addFlag func(FlagInfo),
 	repo string,
 	defaultContextName string,
 ) {
 	c.defaultContextName = defaultContextName
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		String: &c.registry,
 		Name: "registry",
 		DefaultString: "mcr.microsoft.com",
 		Usage: "Container registry",
 	})
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		String: &c.repo,
 		Name: "repo",
 		DefaultString: repo,
 		Usage: "Container repository",
 	})
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		String: &c.tag,
 		Name: "tag",
 		DefaultString: "latest",
 		Usage: "Tag to use, use get-tags to see list of tags",
 	})
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		String: &c.contextName,
 		Name: "context-name",
 		Shorthand: "c",
 		Usage: "Context name (a default context name will be created if not provided)",
 	})
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		String: &c.defaultDatabase,
 		Name: "user-database",
 		Shorthand: "u",
 		Usage: "Create a user database and set it as the default for login",
 	})
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		Bool: &c.acceptEula,
 		Name: "accept-eula",
 		Usage: "Accept the SQL Server EULA",
 	})
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		Int: &c.passwordLength,
 		DefaultInt: 50,
 		Name: "password-length",
 		Usage: "Generated password length",
 	})
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		Int: &c.passwordMinSpecial,
 		DefaultInt: 10,
 		Name: "password-min-special",
 		Usage: "Minimum number of special characters",
 	})
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		Int: &c.passwordMinNumber,
 		DefaultInt: 10,
 		Name: "password-min-number",
 		Usage: "Minimum number of numeric characters",
 	})
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		Int: &c.passwordMinUpper,
 		DefaultInt: 10,
 		Name: "password-min-upper",
 		Usage: "Minimum number of upper characters",
 	})
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		String: &c.passwordSpecialCharSet,
 		DefaultString: "!@#$%&*",
 		Name: "password-special-chars",
@@ -127,14 +128,14 @@ func (c *MssqlBase) AddFlags(
 
 	// Windows has the DPAPI which allows securely encrypting
 	if runtime.GOOS == "windows" {
-		c.AddFlag(FlagInfo{
+		addFlag(FlagInfo{
 			Bool: &c.encryptPassword,
 			Name: "encrypt-password",
 			Usage: "Encode the generated password in the sqlconfig file",
 		})
 	}
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		Bool: &c.useCached,
 		Name: "cached",
 		Usage: "Don't download image.  Use already downloaded image",
@@ -144,14 +145,14 @@ func (c *MssqlBase) AddFlags(
 	// Wait for "Server name is" instead!  Nope, that doesn't work on edge
 	// Wait for "The default language" instead
 	// BUG(stuartpa): This obviously doesn't work for non US LCIDs
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		String: &c.errorLogEntryToWaitFor,
 		DefaultString: "The default language",
-		Name: "errorlog-to-wait-for",
-		Usage: "The line in the errorlog to wait for before connecting to disable the 'sa' account",
+		Name: "errorlog-wait-line",
+		Usage: "Line in errorlog to wait for before connecting to disable 'sa' account",
 	})
 
-	c.AddFlag(FlagInfo{
+	addFlag(FlagInfo{
 		String: &c.collation,
 		DefaultString: "SQL_Latin1_General_CP1_CI_AS",
 		Name: "collation",
@@ -159,7 +160,7 @@ func (c *MssqlBase) AddFlags(
 	})
 }
 
-func (c *MssqlBase) Run([]string) {
+func (c *MssqlBase) Run() {
 	var imageName string
 
 	if !c.acceptEula && viper.GetString("ACCEPT_EULA") == "" {

@@ -18,7 +18,7 @@ type CommandInfo struct {
 	Long string
 	Examples []ExampleInfo
 	Aliases []string
-	Run func([]string)
+	Run func()
 	FirstArgAlternativeForFlag *AlternativeForFlagInfo
 }
 

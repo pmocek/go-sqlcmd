@@ -31,7 +31,7 @@ func (c *GetTags) DefineCommand() {
 
 }
 
-func (c *GetTags) run([]string) {
+func (c *GetTags) run() {
 	tags := docker.ListTags(
 		"mssql/server",
 		"https://mcr.microsoft.com",

@@ -57,13 +57,14 @@ func (c *Root) addGlobalFlags() {
 		String: &configFilename,
 		DefaultString: configFilename,
 		Name: "sqlconfig",
-		Usage: "Location of sqlcmd configuration file",
+		Usage: "Configuration file",
 	})
 
 	c.AddFlag(FlagInfo{
 		String: &outputType,
 		DefaultString: "yaml",
 		Name: "output",
+		Shorthand: "o",
 		Usage: "output type (yaml, json or xml)",
 	})
 
@@ -71,6 +72,7 @@ func (c *Root) addGlobalFlags() {
 		Int: &loggingLevel,
 		DefaultInt: 2,
 		Name: "verbosity",
+		Shorthand: "v",
 		Usage: "Log level, error = 0, warn = 1, info = 2, debug = 3, trace = 4",
 	})
 }

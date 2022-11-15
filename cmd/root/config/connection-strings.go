@@ -32,9 +32,11 @@ func (c *ConnectionStrings) DefineCommand() {
 		Run: c.run,
 		Aliases: []string{"cs"},
 	}
+
+	c.BaseCommand.DefineCommand()
 }
 
-func (c *ConnectionStrings) run([]string) {
+func (c *ConnectionStrings) run() {
 	// connectionStringFormats borrowed from "portal.azure.com" "connection strings" pane
 	var connectionStringFormats = map[string]string{
 		"ADO.NET": "Server=tcp:%s,%s;Initial Catalog=%s;Persist Security Info=False;User ID=%s;Password=%s;MultipleActiveResultSets=False;Encode=True;TrustServerCertificate=False;Connection Timeout=30;",

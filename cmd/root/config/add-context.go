@@ -22,9 +22,7 @@ func (c *AddContext) DefineCommand() {
 		Examples: []ExampleInfo{
 			{
 				Description: "Add a default context",
-				Steps: []string{
-					"sqlcmd config add-context --name my-context"},
-			},
+				Steps: []string{"sqlcmd config add-context --name my-context"}},
 		},
 		Run: c.run}
 
@@ -47,7 +45,7 @@ func (c *AddContext) DefineCommand() {
 			Usage: "Name of user this context will use, use `sqlcmd config get-users` to see list"})
 }
 
-func (c *AddContext) run(args []string) {
+func (c *AddContext) run() {
 	context := sqlconfig.Context{
 		ContextDetails: sqlconfig.ContextDetails{
 			Endpoint: c.endpointName,

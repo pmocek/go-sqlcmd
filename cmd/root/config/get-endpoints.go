@@ -52,7 +52,7 @@ func (c *GetEndpoints) DefineCommand() {
 		Usage: "Include endpoint details"})
 }
 
-func (c *GetEndpoints) run(args []string) {
+func (c *GetEndpoints) run() {
 	if c.name != "" {
 		if config.EndpointExists(c.name) {
 			context := config.GetEndpoint(c.name)
