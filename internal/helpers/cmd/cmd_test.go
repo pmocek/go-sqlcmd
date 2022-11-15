@@ -1,4 +1,4 @@
-package commander
+package cmd
 
 import (
 	"fmt"
@@ -6,33 +6,33 @@ import (
 )
 
 type TopLevelCommand struct {
-	BaseCommand
+	Base
 }
 
 func (c *TopLevelCommand) DefineCommand() {
-	c.Info = CommandInfo{
+	c.Info = Info{
 		Use: "top-level",
 		Short: "Hello-World",
-		Examples: []ExampleInfo{
+		Examples: []cmd.ExampleInfo{
 			{	Description: "First example",
 				Steps: []string{"This is the example"}},
 		},
 	}
 
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 }
 
 type SubCommand1 struct {
-	BaseCommand
+	Base
 }
 
 func (c *SubCommand1) DefineCommand() {
-	c.Info = CommandInfo{
+	c.Info = Info{
 		Use: "sub-command1",
 		Short: "Sub Command 1",
 		Run: c.run,
 	}
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 }
 
 func (c *SubCommand1) run() {
@@ -40,16 +40,16 @@ func (c *SubCommand1) run() {
 }
 
 type SubCommand11 struct {
-	BaseCommand
+	Base
 }
 
 func (c *SubCommand11) DefineCommand() {
-	c.Info = CommandInfo{
+	c.Info = Info{
 		Use: "sub-command11",
 		Short: "Sub Command 11",
 		Run: c.run,
 	}
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 }
 
 func (c *SubCommand11) run() {
@@ -57,26 +57,26 @@ func (c *SubCommand11) run() {
 }
 
 type SubCommand2 struct {
-	BaseCommand
+	Base
 }
 
 func (c *SubCommand2) DefineCommand() {
-	c.Info = CommandInfo{
+	c.Info = Info{
 		Use: "sub-command2",
 		Short: "Sub Command 2",
 	}
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 }
 
 
 func Test_EndToEnd(t *testing.T) {
-	topLevel := NewCommand[*TopLevelCommand]()
+	topLevel := New[*TopLevelCommand]()
 
-	subCmd1 := NewCommand[*SubCommand1]()
+	subCmd1 := New[*SubCommand1]()
 
 	topLevel.AddSubCommand(subCmd1)
-	topLevel.AddSubCommand(NewCommand[*SubCommand2]())
-	subCmd1.AddSubCommand(NewCommand[*SubCommand11]())
+	topLevel.AddSubCommand(New[*SubCommand2]())
+	subCmd1.AddSubCommand(New[*SubCommand11]())
 
 	topLevel.ArgsForUnitTesting([]string{"--help"})
 	topLevel.Execute()
@@ -98,6 +98,6 @@ func TestAbstractBase_DefineCommand(t *testing.T) {
 		}
 	}()
 
-	c := BaseCommand{}
+	c := Base{}
 	c.DefineCommand()
 }

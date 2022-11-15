@@ -4,22 +4,22 @@
 package config
 
 import (
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 )
 
 type View struct {
-	BaseCommand
+	cmd.Base
 
 	raw bool
 }
 
 func (c *View) DefineCommand() {
-	c.BaseCommand.Info = CommandInfo{
+	c.Base.Info = cmd.Info{
 		Use: "view",
 		Short: "Display merged sqlconfig settings or a specified sqlconfig file",
-		Examples: []ExampleInfo{
+		Examples: []cmd.ExampleInfo{
 			{
 				Description: "Show merged sqlconfig settings",
 				Steps: []string{"sqlcmd config view"},
@@ -34,9 +34,9 @@ func (c *View) DefineCommand() {
 		Run: c.run,
 	}
 
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		Name: "raw",
 		Bool: &c.raw,
 		Usage: "Display raw byte data",

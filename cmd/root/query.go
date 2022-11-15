@@ -4,7 +4,7 @@
 package root
 
 import (
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/mssql"
 	"github.com/microsoft/go-sqlcmd/pkg/console"
@@ -13,38 +13,38 @@ import (
 )
 
 type Query struct {
-	BaseCommand
+	cmd.Base
 
 	text string
 }
 
 func (c *Query) DefineCommand() {
-	c.BaseCommand.Info = CommandInfo{
+	c.Base.Info = cmd.Info{
 		Use: "query",
 		Short: "Run a query against the current context",
-		Examples: []ExampleInfo{
+		Examples: []cmd.ExampleInfo{
 			{Description: "Run a query", Steps: []string{
 				`sqlcmd query "SELECT @@SERVERNAME"`,
 				`sqlcmd query --text "SELECT @@SERVERNAME"`,
 				`sqlcmd query --query "SELECT @@SERVERNAME"`,
 			}}},
 		Run: c.run,
-		FirstArgAlternativeForFlag: &AlternativeForFlagInfo{
+		FirstArgAlternativeForFlag: &cmd.AlternativeForFlagInfo{
 			Flag:  "text",
 			Value: &c.text,
 		},
 	}
 
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		String: &c.text,
 		Name: "text",
 		Shorthand: "t",
 		Usage: "Command text to run"})
 
 	// BUG(stuartpa): Decide on if --text or --query is best
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		String: &c.text,
 		Name: "query",
 		Shorthand: "q",

@@ -5,22 +5,22 @@ package config
 
 import (
 	"fmt"
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 )
 
 type DeleteEndpoint struct {
-	BaseCommand
+	cmd.Base
 
 	name string
 }
 
 func (c *DeleteEndpoint) DefineCommand() {
-	c.BaseCommand.Info = CommandInfo{
+	c.Base.Info = cmd.Info{
 		Use: "delete-endpoint",
 		Short: "Delete an endpoint",
-		Examples: []ExampleInfo{
+		Examples: []cmd.ExampleInfo{
 			{
 				Description: "Delete an endpoint",
 				Steps: []string{
@@ -30,12 +30,12 @@ func (c *DeleteEndpoint) DefineCommand() {
 		},
 		Run: c.run,
 
-		FirstArgAlternativeForFlag: &AlternativeForFlagInfo{Flag: "name", Value: &c.name},
+		FirstArgAlternativeForFlag: &cmd.AlternativeForFlagInfo{Flag: "name", Value: &c.name},
 	}
 
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		String: &c.name,
 		Name: "name",
 		Usage: "Name of endpoint to delete"})

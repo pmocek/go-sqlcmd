@@ -3,7 +3,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/internal/helpers"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
@@ -194,7 +193,7 @@ func runTests(t *testing.T, tt struct {
 	name string
 	args struct{ args []string }
 }) {
-	cmd := commander.NewCommand[*Root]()
+	cmd := cmd.NewCommand[*Root]()
 	cmd.ArgsForUnitTesting(tt.args.args)
 
 	t.Logf("Running: %v", tt.args.args)

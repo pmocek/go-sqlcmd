@@ -4,20 +4,20 @@
 package config
 
 import (
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 )
 
 type CurrentContext struct {
-	BaseCommand
+	cmd.Base
 }
 
 func (c *CurrentContext) DefineCommand() {
-	c.BaseCommand.Info = CommandInfo{
+	c.Base.Info = cmd.Info{
 		Use: "current-context",
 		Short: "Display the current-context",
-		Examples: []ExampleInfo{
+		Examples: []cmd.ExampleInfo{
 			{
 				Description: "Display the current-context",
 				Steps: []string{
@@ -27,7 +27,7 @@ func (c *CurrentContext) DefineCommand() {
 		Run: c.run,
 	}
 
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 }
 
 func (c *CurrentContext) run() {

@@ -4,12 +4,12 @@
 package install
 
 import (
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/root/install/mssql"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 )
 
 type Mssql struct {
-	BaseCommand
+	cmd.Base
 	MssqlBase
 
 	tag             string
@@ -24,16 +24,16 @@ type Mssql struct {
 func (c *Mssql) DefineCommand() {
 	const repo = "mssql/server"
 
-	c.BaseCommand.Info = CommandInfo{
+	c.Base.Info = cmd.Info{
 		Use: "mssql",
 		Short: "Install SQL Server",
-		Examples: []ExampleInfo{{
+		Examples: []cmd.ExampleInfo{{
 				Description: "Install SQL Server in a container",
 				Steps: []string{"sqlcmd install mssql"}}},
 		Run: c.MssqlBase.Run,
 	}
 
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 	c.AddSubCommands(mssql.SubCommands)
 	c.AddFlags(c.AddFlag, repo, "mssql")
 

@@ -4,23 +4,23 @@
 package config
 
 import (
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	config "github.com/microsoft/go-sqlcmd/internal/helpers/config"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 )
 
 type GetContexts struct {
-	BaseCommand
+	cmd.Base
 
 	name string
 	detailed bool
 }
 
 func (c *GetContexts) DefineCommand() {
-	c.BaseCommand.Info = CommandInfo{
+	c.Base.Info = cmd.Info{
 		Use: "get-contexts",
 		Short: "Display one or many contexts from the sqlconfig file",
-		Examples: []ExampleInfo{
+		Examples: []cmd.ExampleInfo{
 			{
 				Description: "List all the context names in your sqlconfig file",
 				Steps: []string{"sqlcmd config get-contexts"},
@@ -36,17 +36,17 @@ func (c *GetContexts) DefineCommand() {
 		},
 		Run: c.run,
 
-		FirstArgAlternativeForFlag: &AlternativeForFlagInfo{Flag: "name", Value: &c.name},
+		FirstArgAlternativeForFlag: &cmd.AlternativeForFlagInfo{Flag: "name", Value: &c.name},
 	}
 
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		String: &c.name,
 		Name: "name",
 		Usage: "Context name to view details of"})
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		Bool: &c.detailed,
 		Name: "detailed",
 		Usage: "Include context details"})

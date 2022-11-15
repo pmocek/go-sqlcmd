@@ -1,5 +1,4 @@
-package commander
-
+package cmd
 
 //Per golang design doc "an unfortunately necessary kludge":
 // https://go.googlesource.com/proposal/+/refs/heads/master/design/43651-type-parameters.md#pointer-method-example
@@ -9,7 +8,7 @@ type PtrIsInterface[T any] interface {
 	*T
 }
 
-func NewCommand[T PtrIsInterface[Value], Value any]() T {
+func New[T PtrIsInterface[Value], Value any]() T {
 	var commander T = new(Value)
 	commander.DefineCommand()
 	return commander

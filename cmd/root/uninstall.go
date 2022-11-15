@@ -5,7 +5,7 @@ package root
 
 import (
 	"fmt"
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
@@ -15,7 +15,7 @@ import (
 )
 
 type Uninstall struct {
-	BaseCommand
+	cmd.Base
 
 	force bool
 	yes   bool
@@ -33,10 +33,10 @@ var systemDatabases = [...]string{
 }
 
 func (c *Uninstall) DefineCommand() {
-	c.BaseCommand.Info = CommandInfo{
+	c.Base.Info = cmd.Info{
 		Use: "uninstall",
 		Short: "Uninstall/Delete the current context",
-		Examples: []ExampleInfo{
+		Examples: []cmd.ExampleInfo{
 			{
 				Description: "Uninstall/Delete the current context (includes the endpoint and user)",
 				Steps: []string{`sqlcmd uninstall`}},
@@ -51,15 +51,15 @@ func (c *Uninstall) DefineCommand() {
 		Run: c.run,
 	}
 
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		Bool: &c.yes,
 		Name: "yes",
 		Usage: "Quiet mode (do not stop for user input to confirm the operation)",
 	})
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		Bool: &c.force,
 		Name: "force",
 		Usage: "Complete the operation even if non-system (user) database files are present",

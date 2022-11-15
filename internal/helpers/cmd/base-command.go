@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package commander
+package cmd
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func (c *BaseCommand) DefineCommand() {
+func (c *Base) DefineCommand() {
 	if c.Info.Use == "" {
 		panic("Must implement command definition")
 	}
@@ -33,7 +33,7 @@ func (c *BaseCommand) DefineCommand() {
 	}
 }
 
-func (c *BaseCommand) run(_ *cobra.Command, args []string) {
+func (c *Base) run(_ *cobra.Command, args []string) {
 	if c.Info.FirstArgAlternativeForFlag != nil {
 		if len(args) > 0 {
 
@@ -56,33 +56,33 @@ func (c *BaseCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (c *BaseCommand) ArgsForUnitTesting(args []string) {
+func (c *Base) ArgsForUnitTesting(args []string) {
 	c.command.SetArgs(args)
 }
 
-func (c *BaseCommand) Execute() error {
+func (c *Base) Execute() error {
 	return c.command.Execute()
 }
 
-func (c *BaseCommand) Name() string {
+func (c *Base) Name() string {
 	return c.command.Name()
 }
 
-func (c *BaseCommand) Aliases() []string {
+func (c *Base) Aliases() []string {
 	return c.command.Aliases
 }
 
-func (c *BaseCommand) AddSubCommands(commands []Commander) {
+func (c *Base) AddSubCommands(commands []Commander) {
 	for _, subcmd := range commands {
 		c.command.AddCommand(subcmd.Command())
 	}
 }
 
-func (c *BaseCommand) AddSubCommand(command Commander) {
+func (c *Base) AddSubCommand(command Commander) {
 	c.command.AddCommand(command.Command())
 }
 
-func (c *BaseCommand) Command() *cobra.Command {
+func (c *Base) Command() *cobra.Command {
 	return &c.command
 }
 
@@ -102,11 +102,11 @@ type FlagInfo struct {
 	DefaultBool bool
 }
 
-func (c *BaseCommand) CheckErr(err error) {
+func (c *Base) CheckErr(err error) {
 	cobra.CheckErr(err)
 }
 
-func (c *BaseCommand) AddFlag(info FlagInfo) {
+func (c *Base) AddFlag(info FlagInfo) {
 
 	// BUG(stuartpa): verify info
 
@@ -142,4 +142,20 @@ func (c *BaseCommand) AddFlag(info FlagInfo) {
 			info.DefaultBool,
 			info.Usage)
 	}
+}
+
+func (c *Base) IsSubCommand(command string) (valid bool) {
+	for _, c := range c.command.Commands() {
+		if command == c.Name() {
+			valid = true
+			return
+		}
+		for _, alias := range c.ArgAliases {
+			if alias == command {
+				valid = true
+				return
+			}
+		}
+	}
+	return
 }

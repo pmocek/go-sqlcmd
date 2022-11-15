@@ -3,10 +3,8 @@
 
 package edge
 
-import (
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-)
+import "github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 
-var SubCommands = []Commander{
-	NewCommand[*GetTags](),
+var SubCommands = []cmd.Commander{
+	cmd.New[*GetTags](),
 }

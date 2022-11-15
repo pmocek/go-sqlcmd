@@ -4,12 +4,12 @@
 package install
 
 import (
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/root/install/edge"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 )
 
 type Edge struct {
-	BaseCommand
+	cmd.Base
 	MssqlBase
 
 	tag             string
@@ -24,16 +24,16 @@ type Edge struct {
 func (c *Edge) DefineCommand() {
 	const repo = "azure-sql-edge"
 
-	c.BaseCommand.Info = CommandInfo{
+	c.Base.Info = cmd.Info{
 		Use: "mssql-edge",
 		Short: "Install SQL Server Edge",
-		Examples: []ExampleInfo{{
+		Examples: []cmd.ExampleInfo{{
 				Description: "Install SQL Server Edge in a container",
 				Steps: []string{"sqlcmd install mssql-edge"}}},
 		Run: c.MssqlBase.Run,
 	}
 
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 	c.AddSubCommands(edge.SubCommands)
 	c.AddFlags(c.AddFlag, repo, "edge")
 }

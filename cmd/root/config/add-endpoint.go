@@ -2,14 +2,14 @@ package config
 
 import (
 	"fmt"
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
+	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 )
 
 type AddEndpoint struct {
-	BaseCommand
+	cmd.Base
 
 	name    string
 	address string
@@ -17,10 +17,10 @@ type AddEndpoint struct {
 }
 
 func (c *AddEndpoint) DefineCommand() {
-	c.BaseCommand.Info = CommandInfo{
+	c.Base.Info = cmd.Info{
 		Use: "add-endpoint",
 		Short: "Add an endpoint",
-		Examples: []ExampleInfo{
+		Examples: []cmd.ExampleInfo{
 			{
 				Description: "Add a default endpoint",
 				Steps: []string{"sqlcmd config add-endpoint --name my-endpoint --address localhost --port 1433"},
@@ -29,24 +29,24 @@ func (c *AddEndpoint) DefineCommand() {
 		Run: c.run,
 	}
 
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		String: &c.name,
 		Name: "name",
 		DefaultString: "endpoint",
 		Usage: "Display name for the endpoint",
 	})
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		String: &c.address,
 		Name: "address",
 		DefaultString: "localhost",
 		Usage: "The network address to connect to, e.g. 127.0.0.1 etc.",
 	})
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		Int: &c.port,
 		Name: "port",
 		DefaultInt: 1433,
@@ -55,8 +55,8 @@ func (c *AddEndpoint) DefineCommand() {
 }
 
 func (c *AddEndpoint) run() {
-	endpoint := Endpoint{
-		EndpointDetails: EndpointDetails{
+	endpoint := sqlconfig.Endpoint{
+		EndpointDetails: sqlconfig.EndpointDetails{
 			Address: c.address,
 			Port:    c.port,
 		},

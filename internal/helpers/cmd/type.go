@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package commander
+package cmd
 
 import . "github.com/spf13/cobra"
 
-type BaseCommand struct {
-	Info CommandInfo
+type Base struct {
+	Info Info
 
 	command     Command
 	subCommands []Commander
 }
 
-type CommandInfo struct {
+type Info struct {
 	Use string
 	Short string
 	Long string

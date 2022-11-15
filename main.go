@@ -10,37 +10,25 @@ import (
 )
 
 func main() {
-	if isModernCliEnvVarEnabled() &&
-		isAnArgProvided() &&
-		isFirstArgAModernCliRootCommand() {
-		cmd.RunCommandLine(false)
+	if isModernCliEnabled() && isFirstArgValidSubCommand() {
+		cmd.RunCommandLine()
 	} else {
 		legacyMain.BackCompatMode()
 	}
 }
 
-func isModernCliEnvVarEnabled() (modernCliEnabled bool) {
+func isModernCliEnabled() (modernCliEnabled bool) {
 	if os.Getenv("SQLCMD_MODERN") != "" {
 		modernCliEnabled = true
 	}
-
 	return
 }
 
-func isFirstArgAModernCliRootCommand() (isNewCliCommand bool) {
-	if cmd.IsValidRootCommand(os.Args[1]) {
-		isNewCliCommand = true
-	} else if os.Args[1] == "--help" {
-		isNewCliCommand = true
-	} else if os.Args[1] == "completion" {
-		isNewCliCommand = true
+func isFirstArgValidSubCommand() (isNewCliCommand bool) {
+	if len(os.Args) > 0 {
+		if cmd.IsValidSubCommand(os.Args[1]) {
+			isNewCliCommand = true
+		}
 	}
-
-	return
-}
-
-func isAnArgProvided() (isMoreThanOneArg bool) {
-	isMoreThanOneArg = len(os.Args) > 1
-
 	return
 }

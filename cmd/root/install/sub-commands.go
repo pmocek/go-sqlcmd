@@ -3,11 +3,9 @@
 
 package install
 
-import (
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
-)
+import "github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 
-var SubCommands = []Commander{
-	NewCommand[*Mssql](),
-	NewCommand[*Edge](),
+var SubCommands = []cmd.Commander{
+	cmd.New[*Mssql](),
+	cmd.New[*Edge](),
 }

@@ -3,22 +3,22 @@
 
 package config
 
-import . "github.com/microsoft/go-sqlcmd/cmd/commander"
+import "github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 
-func SubCommands() []Commander {
-	return []Commander{
-		NewCommand[*AddContext](),
-		NewCommand[*AddEndpoint](),
-		NewCommand[*AddUser](),
-		NewCommand[*ConnectionStrings](),
-		NewCommand[*CurrentContext](),
-		NewCommand[*DeleteContext](),
-		NewCommand[*DeleteEndpoint](),
-		NewCommand[*DeleteUser](),
-		NewCommand[*GetContexts](),
-		NewCommand[*GetEndpoints](),
-		NewCommand[*GetUsers](),
-		NewCommand[*UseContext](),
-		NewCommand[*View](),
+func SubCommands() []cmd.Commander {
+	return []cmd.Commander{
+		cmd.New[*AddContext](),
+		cmd.New[*AddEndpoint](),
+		cmd.New[*AddUser](),
+		cmd.New[*ConnectionStrings](),
+		cmd.New[*CurrentContext](),
+		cmd.New[*DeleteContext](),
+		cmd.New[*DeleteEndpoint](),
+		cmd.New[*DeleteUser](),
+		cmd.New[*GetContexts](),
+		cmd.New[*GetEndpoints](),
+		cmd.New[*GetUsers](),
+		cmd.New[*UseContext](),
+		cmd.New[*View](),
 	}
 }

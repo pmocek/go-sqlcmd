@@ -5,8 +5,8 @@ package install
 
 import (
 	"fmt"
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/mssql"
@@ -14,12 +14,14 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
 	"github.com/spf13/viper"
+
+	//"github.com/spf13/viper"
 	"os"
 	"runtime"
 )
 
 type MssqlBase struct {
-	BaseCommand
+	cmd.Base
 
 	tag             string
 	registry        string
@@ -44,82 +46,82 @@ type MssqlBase struct {
 }
 
 func (c *MssqlBase) AddFlags(
-	addFlag func(FlagInfo),
+	addFlag func(cmd.FlagInfo),
 	repo string,
 	defaultContextName string,
 ) {
 	c.defaultContextName = defaultContextName
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		String: &c.registry,
 		Name: "registry",
 		DefaultString: "mcr.microsoft.com",
 		Usage: "Container registry",
 	})
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		String: &c.repo,
 		Name: "repo",
 		DefaultString: repo,
 		Usage: "Container repository",
 	})
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		String: &c.tag,
 		Name: "tag",
 		DefaultString: "latest",
 		Usage: "Tag to use, use get-tags to see list of tags",
 	})
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		String: &c.contextName,
 		Name: "context-name",
 		Shorthand: "c",
 		Usage: "Context name (a default context name will be created if not provided)",
 	})
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		String: &c.defaultDatabase,
 		Name: "user-database",
 		Shorthand: "u",
 		Usage: "Create a user database and set it as the default for login",
 	})
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		Bool: &c.acceptEula,
 		Name: "accept-eula",
 		Usage: "Accept the SQL Server EULA",
 	})
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		Int: &c.passwordLength,
 		DefaultInt: 50,
 		Name: "password-length",
 		Usage: "Generated password length",
 	})
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		Int: &c.passwordMinSpecial,
 		DefaultInt: 10,
 		Name: "password-min-special",
 		Usage: "Minimum number of special characters",
 	})
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		Int: &c.passwordMinNumber,
 		DefaultInt: 10,
 		Name: "password-min-number",
 		Usage: "Minimum number of numeric characters",
 	})
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		Int: &c.passwordMinUpper,
 		DefaultInt: 10,
 		Name: "password-min-upper",
 		Usage: "Minimum number of upper characters",
 	})
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		String: &c.passwordSpecialCharSet,
 		DefaultString: "!@#$%&*",
 		Name: "password-special-chars",
@@ -128,14 +130,14 @@ func (c *MssqlBase) AddFlags(
 
 	// Windows has the DPAPI which allows securely encrypting
 	if runtime.GOOS == "windows" {
-		addFlag(FlagInfo{
+		addFlag(cmd.FlagInfo{
 			Bool: &c.encryptPassword,
 			Name: "encrypt-password",
 			Usage: "Encode the generated password in the sqlconfig file",
 		})
 	}
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		Bool: &c.useCached,
 		Name: "cached",
 		Usage: "Don't download image.  Use already downloaded image",
@@ -145,14 +147,14 @@ func (c *MssqlBase) AddFlags(
 	// Wait for "Server name is" instead!  Nope, that doesn't work on edge
 	// Wait for "The default language" instead
 	// BUG(stuartpa): This obviously doesn't work for non US LCIDs
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		String: &c.errorLogEntryToWaitFor,
 		DefaultString: "The default language",
 		Name: "errorlog-wait-line",
 		Usage: "Line in errorlog to wait for before connecting to disable 'sa' account",
 	})
 
-	addFlag(FlagInfo{
+	addFlag(cmd.FlagInfo{
 		String: &c.collation,
 		DefaultString: "SQL_Latin1_General_CP1_CI_AS",
 		Name: "collation",

@@ -4,45 +4,45 @@
 package cmd
 
 import (
-	. "github.com/microsoft/go-sqlcmd/cmd/commander"
 	"github.com/microsoft/go-sqlcmd/cmd/root"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 	"os"
 	"path/filepath"
 )
 
 type Root struct {
-	BaseCommand
+	cmd.Base
 }
 
 func (c *Root) DefineCommand() {
-	c.BaseCommand.Info = CommandInfo{
+	c.Base.Info = cmd.Info{
 		Use: "sqlcmd",
 		Short: "sqlcmd: a command-line interface for the #SQLFamily",
-		Examples: []ExampleInfo{
+		Examples: []cmd.ExampleInfo{
 			{Description: "Run a query", Steps: []string{`sqlcmd query "SELECT @@SERVERNAME"`}}},
 	}
 
-	c.BaseCommand.DefineCommand()
+	c.Base.DefineCommand()
 	c.AddSubCommands(root.SubCommands())
 	c.addGlobalFlags()
 }
 
 func (c *Root) addGlobalFlags() {
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		Bool: &GlobalOptions.TrustServerCertificate,
 		Name: "trust-server-certificate",
 		Shorthand: "C",
 		Usage: "Whether to trust the certificate presented by the endpoint for encryption",
 	})
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		String: &GlobalOptions.DatabaseName,
 		Name: "database-name",
 		Shorthand: "d",
 		Usage: "The initial database for the connection",
 	})
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		Bool: &GlobalOptions.UseTrustedConnection,
 		Name: "use-trusted-connection",
 		Shorthand: "E",
@@ -53,14 +53,14 @@ func (c *Root) addGlobalFlags() {
 	//checkErr(err)
 	configFilename = filepath.Join(home, ".sqlcmd", "sqlconfig")
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		String: &configFilename,
 		DefaultString: configFilename,
 		Name: "sqlconfig",
 		Usage: "Configuration file",
 	})
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		String: &outputType,
 		DefaultString: "yaml",
 		Name: "output",
@@ -68,7 +68,7 @@ func (c *Root) addGlobalFlags() {
 		Usage: "output type (yaml, json or xml)",
 	})
 
-	c.AddFlag(FlagInfo{
+	c.AddFlag(cmd.FlagInfo{
 		Int: &loggingLevel,
 		DefaultInt: 2,
 		Name: "verbosity",
