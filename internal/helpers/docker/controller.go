@@ -57,7 +57,7 @@ func (c *Controller) ContainerRun(
 	env []string,
 	port int,
 	command []string,
-) (id string, err error) {
+) string {
 	hostConfig := &container.HostConfig{
 		PortBindings: nat.PortMap{
 			nat.Port("1433/tcp"): []nat.PortBinding{
@@ -75,10 +75,7 @@ func (c *Controller) ContainerRun(
 		Cmd:   command,
 		Env:   env,
 	}, hostConfig, nil, nil, "")
-
-	if err != nil {
-		return "", err
-	}
+	checkErr(err)
 
 	err = c.cli.ContainerStart(
 		context.Background(),
@@ -86,10 +83,16 @@ func (c *Controller) ContainerRun(
 		types.ContainerStartOptions{},
 	)
 	if err != nil {
-		return resp.ID, err
+		// Remove the container, because we haven't persisted to config yet, so
+		// uninstall won't work yet
+		if resp.ID != "" {
+			err := c.ContainerRemove(resp.ID)
+			checkErr(err)
+		}
 	}
+	checkErr(err)
 
-	return resp.ID, nil
+	return resp.ID
 }
 
 // ContainerWaitForLogEntry waits for text substring in containers logs
@@ -173,9 +176,6 @@ func (c *Controller) ContainerFiles(id string, filespec string) (files []string)
 	case err := <-outputDone:
 		checkErr(err)
 		break
-	case <-context.Background().Done():
-		checkErr(context.Background().Err())
-		break
 	}
 	stdout, err := ioutil.ReadAll(&outBuf)
 	checkErr(err)
@@ -205,6 +205,10 @@ func (c *Controller) ContainerExists(id string) (exists bool) {
 }
 
 func (c *Controller) ContainerRemove(id string) (err error) {
+	if id == "" {
+		panic("Must pass in non-empty id")
+	}
+
 	options := types.ContainerRemoveOptions{
 		RemoveVolumes: false,
 		RemoveLinks:   false,

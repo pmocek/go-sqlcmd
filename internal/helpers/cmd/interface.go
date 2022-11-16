@@ -5,15 +5,16 @@ package cmd
 
 import "github.com/spf13/cobra"
 
-type Commander interface {
-	DefineCommand()
-	AddSubCommands([]Commander)
-	Command() *cobra.Command
-	Name() string
-	Aliases() []string
-	Execute() error
-	CheckErr(error)
-	IsSubCommand(command string) bool
-
+type Command interface {
 	ArgsForUnitTesting(args []string)
+	CheckErr(error)
+	Command() *cobra.Command
+	DefineCommand(subCommands ...Command)
+	Execute()
+
+	// IsSubCommand is TEMPORARY code that will be removed when the
+	// new cobra CLI is enabled by default.  It returns true if the command-line
+	// provided by the user looks like they want the new cobra CLI, e.g.
+	// sqlcmd query, sqlcmd install, sqlcmd --help etc.
+	IsSubCommand(command string) bool
 }

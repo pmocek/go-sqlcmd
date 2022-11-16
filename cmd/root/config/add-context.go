@@ -16,7 +16,7 @@ type AddContext struct {
 	userName     string
 }
 
-func (c *AddContext) DefineCommand() {
+func (c *AddContext) DefineCommand(subCommands ...cmd.Command) {
 	c.Base.Info = cmd.Info{Use: "add-context",
 		Short: "Add a context",
 		Examples: []cmd.ExampleInfo{

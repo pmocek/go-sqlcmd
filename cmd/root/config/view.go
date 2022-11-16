@@ -15,7 +15,7 @@ type View struct {
 	raw bool
 }
 
-func (c *View) DefineCommand() {
+func (c *View) DefineCommand(subCommands ...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "view",
 		Short: "Display merged sqlconfig settings or a specified sqlconfig file",

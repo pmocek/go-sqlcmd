@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package secret
+package pal
 
 var errorCallback func(err error)
 

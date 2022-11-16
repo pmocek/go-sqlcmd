@@ -9,7 +9,6 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	. "github.com/spf13/cobra"
 	"path/filepath"
 	"strings"
 )
@@ -32,7 +31,7 @@ var systemDatabases = [...]string{
 	"/var/opt/mssql/data/master.mdf",
 }
 
-func (c *Uninstall) DefineCommand() {
+func (c *Uninstall) DefineCommand(subCommands ...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "uninstall",
 		Short: "Uninstall/Delete the current context",
@@ -85,7 +84,7 @@ func (c *Uninstall) run() {
 					config.GetCurrentContextName(),
 				)
 				_, err := fmt.Scanln(&input)
-				CheckErr(err)
+				c.CheckErr(err)
 
 				if strings.ToLower(input) != "yes" && strings.ToLower(input) != "y" {
 					output.Fatal("Operation cancelled.")
@@ -101,11 +100,11 @@ func (c *Uninstall) run() {
 				endpoint.ContainerDetails.Image,
 			)
 			err := controller.ContainerStop(id)
-			CheckErr(err)
+			c.CheckErr(err)
 
 			output.Infof("Removing context %s", config.GetCurrentContextName())
 			err = controller.ContainerRemove(id)
-			CheckErr(err)
+			c.CheckErr(err)
 		}
 
 		config.RemoveCurrentContext()

@@ -3,13 +3,17 @@
 
 package root
 
-import "github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
+import (
+	"github.com/microsoft/go-sqlcmd/cmd/root/config"
+	"github.com/microsoft/go-sqlcmd/cmd/root/install"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
+)
 
-func SubCommands() []cmd.Commander {
-	return []cmd.Commander{
-		cmd.New[*Config](),
+func SubCommands() []cmd.Command {
+	return []cmd.Command{
+		cmd.New[*Config](config.SubCommands()...),
 		cmd.New[*Query](),
-		cmd.New[*Install](),
+		cmd.New[*Install](install.SubCommands...),
 		cmd.New[*Uninstall](),
 	}
 }

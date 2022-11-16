@@ -16,7 +16,7 @@ type GetEndpoints struct {
 	detailed bool
 }
 
-func (c *GetEndpoints) DefineCommand() {
+func (c *GetEndpoints) DefineCommand(subCommands ...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "get-endpoints",
 		Short: "Display one or many endpoints from the sqlconfig file",

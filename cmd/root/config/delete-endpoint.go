@@ -16,7 +16,7 @@ type DeleteEndpoint struct {
 	name string
 }
 
-func (c *DeleteEndpoint) DefineCommand() {
+func (c *DeleteEndpoint) DefineCommand(subCommands ...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "delete-endpoint",
 		Short: "Delete an endpoint",

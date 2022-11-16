@@ -5,8 +5,8 @@ package config
 
 import "github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 
-func SubCommands() []cmd.Commander {
-	return []cmd.Commander{
+func SubCommands() []cmd.Command {
+	return []cmd.Command{
 		cmd.New[*AddContext](),
 		cmd.New[*AddEndpoint](),
 		cmd.New[*AddUser](),

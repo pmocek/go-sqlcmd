@@ -9,7 +9,6 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/mssql"
 	"github.com/microsoft/go-sqlcmd/pkg/console"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
-	. "github.com/spf13/cobra"
 )
 
 type Query struct {
@@ -18,7 +17,7 @@ type Query struct {
 	text string
 }
 
-func (c *Query) DefineCommand() {
+func (c *Query) DefineCommand(subCommands ...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "query",
 		Short: "Run a query against the current context",
@@ -62,7 +61,7 @@ func (c *Query) run() {
 	s := mssql.Connect(endpoint, user, line)
 	if c.text == "" {
 		err := s.Run(false, false)
-		CheckErr(err)
+		c.CheckErr(err)
 	} else {
 		mssql.Query(s, c.text)
 	}

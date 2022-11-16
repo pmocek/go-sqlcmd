@@ -4,7 +4,6 @@
 package install
 
 import (
-	"github.com/microsoft/go-sqlcmd/cmd/root/install/mssql"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 )
 
@@ -21,7 +20,7 @@ type Mssql struct {
 	defaultDatabase string
 }
 
-func (c *Mssql) DefineCommand() {
+func (c *Mssql) DefineCommand(subCommands ...cmd.Command) {
 	const repo = "mssql/server"
 
 	c.Base.Info = cmd.Info{
@@ -33,8 +32,7 @@ func (c *Mssql) DefineCommand() {
 		Run: c.MssqlBase.Run,
 	}
 
-	c.Base.DefineCommand()
-	c.AddSubCommands(mssql.SubCommands)
+	c.Base.DefineCommand(subCommands...)
 	c.AddFlags(c.AddFlag, repo, "mssql")
 
 	return

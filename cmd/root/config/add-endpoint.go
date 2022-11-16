@@ -16,7 +16,7 @@ type AddEndpoint struct {
 	port    int
 }
 
-func (c *AddEndpoint) DefineCommand() {
+func (c *AddEndpoint) DefineCommand(subCommands ...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "add-endpoint",
 		Short: "Add an endpoint",

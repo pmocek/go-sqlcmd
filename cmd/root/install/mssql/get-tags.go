@@ -13,7 +13,7 @@ type GetTags struct {
 	cmd.Base
 }
 
-func (c *GetTags) DefineCommand() {
+func (c *GetTags) DefineCommand(subCommands ...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "get-tags",
 		Short: "Get tags available for mssql install",

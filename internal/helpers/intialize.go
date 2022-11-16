@@ -11,6 +11,7 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/net"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/pal"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
 	"os"
 )
@@ -52,4 +53,5 @@ func Initialize(
 	docker.Initialize(info.ErrorHandler, info.TraceHandler)
 	secret.Initialize(info.ErrorHandler)
 	net.Initialize(info.ErrorHandler, info.TraceHandler)
+	pal.Initialize(info.ErrorHandler)
 }

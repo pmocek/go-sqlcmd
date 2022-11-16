@@ -5,6 +5,6 @@ package mssql
 
 import "github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 
-var SubCommands = []cmd.Commander{
+var SubCommands = []cmd.Command{
 	cmd.New[*GetTags](),
 }

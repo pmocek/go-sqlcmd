@@ -4,7 +4,6 @@
 package install
 
 import (
-	"github.com/microsoft/go-sqlcmd/cmd/root/install/edge"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 )
 
@@ -21,7 +20,7 @@ type Edge struct {
 	defaultDatabase string
 }
 
-func (c *Edge) DefineCommand() {
+func (c *Edge) DefineCommand(subCommands ...cmd.Command) {
 	const repo = "azure-sql-edge"
 
 	c.Base.Info = cmd.Info{
@@ -33,7 +32,6 @@ func (c *Edge) DefineCommand() {
 		Run: c.MssqlBase.Run,
 	}
 
-	c.Base.DefineCommand()
-	c.AddSubCommands(edge.SubCommands)
+	c.Base.DefineCommand(subCommands...)
 	c.AddFlags(c.AddFlag, repo, "edge")
 }

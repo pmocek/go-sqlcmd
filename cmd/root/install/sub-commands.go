@@ -3,9 +3,13 @@
 
 package install
 
-import "github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
+import (
+	"github.com/microsoft/go-sqlcmd/cmd/root/install/edge"
+	"github.com/microsoft/go-sqlcmd/cmd/root/install/mssql"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
+)
 
-var SubCommands = []cmd.Commander{
-	cmd.New[*Mssql](),
-	cmd.New[*Edge](),
+var SubCommands = []cmd.Command{
+	cmd.New[*Mssql](mssql.SubCommands...),
+	cmd.New[*Edge](edge.SubCommands...),
 }

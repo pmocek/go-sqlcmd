@@ -19,7 +19,7 @@ type AddUser struct {
 	encryptPassword bool
 }
 
-func (c *AddUser) DefineCommand() {
+func (c *AddUser) DefineCommand(subCommands ...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "add-user",
 		Short: "Add a user",

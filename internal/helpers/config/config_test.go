@@ -32,6 +32,8 @@ func TestConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			config = tt.args.Config
+			Clean()
+			IsEmpty()
 			GetConfigFileUsed()
 			GetRedactedConfig(false)
 			GetRedactedConfig(true)
@@ -244,6 +246,47 @@ func Test_userOrdinal(t *testing.T) {
 			if gotOrdinal := userOrdinal(tt.args.name); gotOrdinal != tt.wantOrdinal {
 				t.Errorf("userOrdinal() = %v, want %v", gotOrdinal, tt.wantOrdinal)
 			}
+		})
+	}
+}
+
+func TestAddContextWithContainerPanic(t *testing.T) {
+	type args struct {
+		contextName     string
+		imageName       string
+		portNumber      int
+		containerId     string
+		username        string
+		password        string
+		encryptPassword bool
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{ 	name: "AddContextWithContainerDefensePanics",
+			args: args{ "", "image", 1433, "id", "user", "password", false}},
+		{ 	name: "AddContextWithContainerDefensePanics",
+			args: args{ "context", "", 1433, "id", "user", "password", false}},
+		{ 	name: "AddContextWithContainerDefensePanics",
+			args: args{ "context", "image", 1433, "", "user", "password", false}},
+		{ 	name: "AddContextWithContainerDefensePanics",
+			args: args{ "context", "image", 0, "id", "user", "password", false}},
+		{ 	name: "AddContextWithContainerDefensePanics",
+			args: args{ "context", "image", 1433, "id", "", "password", false}},
+		{ 	name: "AddContextWithContainerDefensePanics",
+			args: args{ "context", "image", 1433, "id", "user", "", false}},
+	}
+		for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			defer func() {
+				if r := recover(); r == nil {
+					t.Errorf("The code did not panic")
+				}
+			}()
+
+			AddContextWithContainer(tt.args.contextName, tt.args.imageName, tt.args.portNumber, tt.args.containerId, tt.args.username, tt.args.password, tt.args.encryptPassword)
 		})
 	}
 }

@@ -4,26 +4,25 @@
 package cmd
 
 import (
-	"github.com/microsoft/go-sqlcmd/cmd/root"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"os"
-	"path/filepath"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/pal"
 )
 
 type Root struct {
 	cmd.Base
 }
 
-func (c *Root) DefineCommand() {
+func (c *Root) DefineCommand(subCommands ...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "sqlcmd",
 		Short: "sqlcmd: a command-line interface for the #SQLFamily",
 		Examples: []cmd.ExampleInfo{
-			{Description: "Run a query", Steps: []string{`sqlcmd query "SELECT @@SERVERNAME"`}}},
+			{
+				Description: "Run a query",
+				Steps: []string{`sqlcmd query "SELECT @@SERVERNAME"`}}},
 	}
 
-	c.Base.DefineCommand()
-	c.AddSubCommands(root.SubCommands())
+	c.Base.DefineCommand(subCommands...)
 	c.addGlobalFlags()
 }
 
@@ -49,9 +48,9 @@ func (c *Root) addGlobalFlags() {
 		Usage: "Whether to use integrated security",
 	})
 
-	home, _ := os.UserHomeDir()
-	//checkErr(err)
-	configFilename = filepath.Join(home, ".sqlcmd", "sqlconfig")
+	configFilename = pal.FilenameInUserHomeDotDirectory(
+		".sqlcmd",
+		"sqlconfig")
 
 	c.AddFlag(cmd.FlagInfo{
 		String: &configFilename,

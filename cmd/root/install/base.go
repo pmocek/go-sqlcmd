@@ -211,17 +211,7 @@ func (c *MssqlBase) installDockerImage(imageName string, contextName string) {
 	}
 
 	output.Infof("Starting %v", imageName)
-	containerId, err := controller.ContainerRun(imageName, env, port, []string{})
-	if err != nil {
-		// Remove the container, because we haven't persisted to config yet, so
-		// uninstall won't work yet
-		if containerId != "" {
-			err := controller.ContainerRemove(containerId)
-			output.FatalErr(err)
-		}
-		output.FatalErr(err)
-	}
-
+	containerId := controller.ContainerRun(imageName, env, port, []string{})
 	previousContextName := config.GetCurrentContextName()
 
 	var userName string

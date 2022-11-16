@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/microsoft/go-sqlcmd/internal/helpers"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/pal"
 	"os"
 	"strings"
 	"testing"
@@ -193,7 +195,7 @@ func runTests(t *testing.T, tt struct {
 	name string
 	args struct{ args []string }
 }) {
-	cmd := cmd.NewCommand[*Root]()
+	cmd := cmd.New[*Root]()
 	cmd.ArgsForUnitTesting(tt.args.args)
 
 	t.Logf("Running: %v", tt.args.args)
@@ -221,9 +223,14 @@ func Test_displayHints(t *testing.T) {
 }
 
 func TestIsValidRootCommand(t *testing.T) {
-	IsValidRootCommand("install")
-	IsValidRootCommand("create")
-	IsValidRootCommand("nope")
+	IsValidSubCommand("install")
+	IsValidSubCommand("create")
+	IsValidSubCommand("nope")
+}
+
+func TestRunCommand(t *testing.T) {
+	loggingLevel = 4
+	RunCommandLine()
 }
 
 func Test_checkErr(t *testing.T) {
@@ -274,7 +281,10 @@ func setup() {
 			}
 		},
 		displayHints,
-		"sqlconfig-test-cmd-line",
+		pal.FilenameInUserHomeDotDirectory(
+			".sqlcmd",
+			"sqlconfig-test-cmd-line",
+		),
 		"yaml",
 		4,
 	)

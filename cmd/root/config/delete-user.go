@@ -15,7 +15,7 @@ type DeleteUser struct {
 	name string
 }
 
-func (c *DeleteUser) DefineCommand() {
+func (c *DeleteUser) DefineCommand(subCommands ...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "delete-user",
 		Short: "Delete a user",

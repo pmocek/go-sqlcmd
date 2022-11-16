@@ -1,6 +1,9 @@
 package helpers
 
-import "testing"
+import (
+	"github.com/microsoft/go-sqlcmd/internal/helpers/pal"
+	"testing"
+)
 
 func TestInitialize(t *testing.T) {
 	type args struct {
@@ -21,7 +24,9 @@ func TestInitialize(t *testing.T) {
 				}
 			},
 			nil,
-			"sqlconfig-test",
+			pal.FilenameInUserHomeDotDirectory(
+				".sqlcmd",
+				"sqlconfig-test"),
 			"yaml",
 			0,
 		}},

@@ -16,7 +16,7 @@ type ConnectionStrings struct {
 	cmd.Base
 }
 
-func (c *ConnectionStrings) DefineCommand() {
+func (c *ConnectionStrings) DefineCommand(subCommands ...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "connection-strings",
 		Short: "Display connections strings for the current context",

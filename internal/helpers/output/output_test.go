@@ -30,6 +30,7 @@ func TestTracef(t *testing.T) {
 			Infof(tt.args.format, tt.args.a...)
 			Warnf(tt.args.format, tt.args.a...)
 			Errorf(tt.args.format, tt.args.a...)
+			Struct(tt.args.a)
 
 			InfofWithHints([]string{}, tt.args.format, tt.args.a...)
 			InfofWithHintExamples([][]string{}, tt.args.format, tt.args.a...)
@@ -312,4 +313,8 @@ func TestInfofWithHintExamples(t *testing.T) {
 			runningUnitTests = false
 		})
 	}
+}
+
+func Test_ensureEol(t *testing.T) {
+	ensureEol("")
 }

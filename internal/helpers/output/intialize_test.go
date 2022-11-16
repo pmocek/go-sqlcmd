@@ -34,6 +34,30 @@ func TestInitialize(t *testing.T) {
 				verbosity:      0,
 			},
 		},
+		{
+			name: "initWithXml",
+			args: args{
+				errorHandler:   errorCallback,
+				traceHandler:   traceCallback,
+				hintHandler:    hintCallback,
+				standardOutput: os.Stdout,
+				errorOutput:    os.Stderr,
+				format:         "xml",
+				verbosity:      0,
+			},
+		},
+		{
+			name: "initWithJson",
+			args: args{
+				errorHandler:   errorCallback,
+				traceHandler:   traceCallback,
+				hintHandler:    hintCallback,
+				standardOutput: os.Stdout,
+				errorOutput:    os.Stderr,
+				format:         "json",
+				verbosity:      0,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
