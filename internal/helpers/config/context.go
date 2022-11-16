@@ -22,7 +22,7 @@ func AddContext(context Context) {
 	Save()
 }
 
-func DeleteContext(name string, cascade bool) {
+func DeleteContext(name string) {
 	if ContextExists(name) {
 		ordinal := contextOrdinal(name)
 		config.Contexts = append(config.Contexts[:ordinal], config.Contexts[ordinal+1:]...)

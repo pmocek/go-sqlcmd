@@ -13,7 +13,7 @@ type CurrentContext struct {
 	cmd.Base
 }
 
-func (c *CurrentContext) DefineCommand(subCommands ...cmd.Command) {
+func (c *CurrentContext) DefineCommand(...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "current-context",
 		Short: "Display the current-context",

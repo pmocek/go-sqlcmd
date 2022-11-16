@@ -5,7 +5,7 @@ package main
 
 import (
 	"github.com/microsoft/go-sqlcmd/cmd"
-	legacyMain "github.com/microsoft/go-sqlcmd/cmd/sqlcmd"
+	legacyCmd "github.com/microsoft/go-sqlcmd/cmd/sqlcmd"
 	"os"
 )
 
@@ -15,9 +15,9 @@ import (
 // implementations, main decides which CLI framework to use
 func main() {
 	if isModernCliEnabled() && isFirstArgValidSubCommand() {
-		cmd.RunCommandLine()
+		cmd.Execute()
 	} else {
-		legacyMain.BackCompatMode()
+		legacyCmd.Execute()
 	}
 }
 

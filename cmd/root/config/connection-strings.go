@@ -8,15 +8,15 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/pal"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
-	"runtime"
 )
 
 type ConnectionStrings struct {
 	cmd.Base
 }
 
-func (c *ConnectionStrings) DefineCommand(subCommands ...cmd.Command) {
+func (c *ConnectionStrings) DefineCommand(...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "connection-strings",
 		Short: "Display connections strings for the current context",
@@ -53,12 +53,10 @@ func (c *ConnectionStrings) run() {
 			secret.Decode(user.BasicAuth.Password, user.BasicAuth.PasswordEncrypted))
 	}
 
-	var format string
-	if runtime.GOOS == "windows" {
-		format = "SET \"SQLCMDPASSWORD=%s\" & sqlcmd -S %s,%d -U %s"
-	} else {
-		format = "export 'SQLCMDPASSWORD=%s'; sqlcmd -S %s,%d -U %s"
-	}
+	format := pal.CmdLineWithEnvVars(
+		[]string{"SQLCMDPASSWORD=%s"},
+		"sqlcmd -S %s,%d -U %s",
+	)
 
 	connectionStringFormats["SQLCMD"] = fmt.Sprintf(format,
 		secret.Decode(user.BasicAuth.Password, user.BasicAuth.PasswordEncrypted),

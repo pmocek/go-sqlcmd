@@ -230,7 +230,7 @@ func TestIsValidRootCommand(t *testing.T) {
 
 func TestRunCommand(t *testing.T) {
 	loggingLevel = 4
-	RunCommandLine()
+	Execute()
 }
 
 func Test_checkErr(t *testing.T) {

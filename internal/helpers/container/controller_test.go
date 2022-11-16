@@ -1,4 +1,4 @@
-package docker
+package container
 
 import (
 	"fmt"
@@ -52,7 +52,8 @@ func TestController_EnsureImage(t *testing.T) {
 			}
 
 			c := NewController()
-			c.EnsureImage(tt.args.image)
+			err := c.EnsureImage(tt.args.image)
+			checkErr(err)
 			id := c.ContainerRun(
 				tt.args.image,
 				[]string{},
@@ -62,8 +63,10 @@ func TestController_EnsureImage(t *testing.T) {
 			c.ContainerWaitForLogEntry(id, "Hello World")
 			c.ContainerExists(id)
 			c.ContainerFiles(id, "*.mdf")
-			c.ContainerStop(id)
-			c.ContainerRemove(id)
+			err = c.ContainerStop(id)
+			checkErr(err)
+			err = c.ContainerRemove(id)
+			checkErr(err)
 		})
 	}
 }
@@ -128,7 +131,8 @@ func TestController_ContainerStopNeg2(t *testing.T) {
 	}()
 
 	c := NewController()
-	c.ContainerStop("")
+	err := c.ContainerStop("")
+	checkErr(err)
 }
 
 func TestController_ContainerRemoveNeg(t *testing.T) {
@@ -139,7 +143,8 @@ func TestController_ContainerRemoveNeg(t *testing.T) {
 	}()
 
 	c := NewController()
-	c.ContainerRemove("")
+	err := c.ContainerRemove("")
+	checkErr(err)
 }
 
 func TestController_ContainerFilesNeg(t *testing.T) {

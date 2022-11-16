@@ -102,7 +102,7 @@ func AddContextWithContainer(
 
 func GetRedactedConfig(raw bool) (c Sqlconfig) {
 	c = config
-	for i, _ := range c.Users {
+	for i := range c.Users {
 		user := c.Users[i]
 		if user.AuthenticationType == "basic" {
 			if raw {

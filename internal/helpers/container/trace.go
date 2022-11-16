@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package docker
+package container
 
 var traceCallback func(format string, a ...any)
 

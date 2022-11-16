@@ -15,23 +15,36 @@ var outputType string
 var configFilename string
 var rootCmd command.Command
 
-// init initializes the command-line interface
+// init initializes the command-line interface. The func passed into
+// command.Initialize is called after the command-line from the user has been
+// parsed, so the helpers are initialized with the values from the command-line
+// like '-v 4' which sets the logging level to maximum etc.
 func init() {
-	rootCmd = command.New[*Root](root.SubCommands()...)
+	command.Initialize(func() {
+		helpers.Initialize(
+			checkErr,
+			displayHints,
+			configFilename,
+			outputType,
+			loggingLevel,
+		)
+	})
 
-	helpers.Initialize(
-		checkErr,
-		displayHints,
-		configFilename,
-		outputType,
-		loggingLevel,
-	)
+	rootCmd = command.New[*Root](root.SubCommands()...)
 }
 
-// RunCommandLine runs the application based on the command-line
-// parameters the user has passed in
-func RunCommandLine() {
+// Execute runs the application based on the command-line
+// parameters the user has passed in.
+func Execute() {
 	rootCmd.Execute()
+}
+
+// IsValidSubCommand is TEMPORARY code, that will be removed when
+// we enable the new cobra based CLI by default.  It returns true if the
+// command-line provided by the user indicates they want the new cobra
+// based CLI, e.g. sqlcmd install, or sqlcmd query, or sqlcmd --help etc.
+func IsValidSubCommand(command string) bool {
+	return rootCmd.IsSubCommand(command)
 }
 
 // checkErr uses Cobra to check err, and halts the application if err is not
@@ -40,12 +53,6 @@ func RunCommandLine() {
 //
 // To aid debugging issues, if the logging level is > 2 (e.g. -v 3 or -4), we
 // panic which outputs a stacktrace.
-//
-// DEVNOTE: cobra.CheckErr (last line of function), goes on to call os.Exit(1)
-// if error != nil, this will be an issue for negative Unit Tests (it will close
-// down the test executor, so you'll need inject a checkErr handler that doesn't
-// call os.Exit (probably one that just calls Panic(), which you recover from as
-// an expected panic)
 func checkErr(err error) {
 	if loggingLevel > 2 {
 		if err != nil {
@@ -64,12 +71,4 @@ func displayHints(hints []string) {
 			output.Infof("  %d. %v", i+1, hint)
 		}
 	}
-}
-
-// IsValidSubCommand is TEMPORARY code, that will be removed when
-// we enable the new cobra based CLI by default.  It returns true if the
-// command-line provided by the user indicates they want the new cobra
-// based CLI, e.g sqlcmd install, or sqlcmd query, or sqlcmd --help etc.
-func IsValidSubCommand(command string) bool {
-	return rootCmd.IsSubCommand(command)
 }

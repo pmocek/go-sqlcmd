@@ -19,5 +19,6 @@ func (f *Base) CheckErr(err error) {
 }
 
 func (f *Base) Output(bytes []byte) {
-	f.StandardOutput.Write(bytes)
+	_, err := f.StandardOutput.Write(bytes)
+	f.CheckErr(err)
 }

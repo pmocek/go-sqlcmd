@@ -8,16 +8,13 @@ import (
 	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/container"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/mssql"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/pal"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
 	"github.com/spf13/viper"
-
-	//"github.com/spf13/viper"
-	"os"
-	"runtime"
 )
 
 type MssqlBase struct {
@@ -128,14 +125,7 @@ func (c *MssqlBase) AddFlags(
 		Usage: "Special character set to include in password",
 	})
 
-	// Windows has the DPAPI which allows securely encrypting
-	if runtime.GOOS == "windows" {
-		addFlag(cmd.FlagInfo{
-			Bool: &c.encryptPassword,
-			Name: "encrypt-password",
-			Usage: "Encode the generated password in the sqlconfig file",
-		})
-	}
+	c.encryptPasswordFlag(addFlag)
 
 	addFlag(cmd.FlagInfo{
 		Bool: &c.useCached,
@@ -194,7 +184,7 @@ func (c *MssqlBase) installDockerImage(imageName string, contextName string) {
 		fmt.Sprintf("MSSQL_COLLATION=%s", c.collation),
 	}
 	port := config.FindFreePortForTds()
-	controller := docker.NewController()
+	controller := container.NewController()
 
 	if !c.useCached {
 		output.Infof("Downloading %v", imageName)
@@ -214,16 +204,7 @@ func (c *MssqlBase) installDockerImage(imageName string, contextName string) {
 	containerId := controller.ContainerRun(imageName, env, port, []string{})
 	previousContextName := config.GetCurrentContextName()
 
-	var userName string
-	if runtime.GOOS == "windows" {
-		userName = os.Getenv("USERNAME")
-	} else {
-		userName = os.Getenv("USER")
-	}
-	if userName == "" {
-		panic("Unable to get username, set env var USERNAME or USER")
-	}
-
+	userName := pal.UserName()
 	password := c.generatePassword()
 
 	// Save the config now, so user can uninstall, even if mssql in the container

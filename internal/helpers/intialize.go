@@ -5,7 +5,7 @@ package helpers
 
 import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/container"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/file"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/mssql"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/net"
@@ -37,7 +37,6 @@ func Initialize(
 		info.TraceHandler,
 		hintHandler,
 		os.Stdout,
-		os.Stderr,
 		outputType,
 		verbosity.Enum(loggingLevel),
 	)
@@ -50,7 +49,7 @@ func Initialize(
 		file.CreateEmptyFileIfNotExists,
 		sqlconfigFilename,
 	)
-	docker.Initialize(info.ErrorHandler, info.TraceHandler)
+	container.Initialize(info.ErrorHandler, info.TraceHandler)
 	secret.Initialize(info.ErrorHandler)
 	net.Initialize(info.ErrorHandler, info.TraceHandler)
 	pal.Initialize(info.ErrorHandler)

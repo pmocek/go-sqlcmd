@@ -75,7 +75,6 @@ func TestInitialize(t *testing.T) {
 				tt.args.traceHandler,
 				tt.args.hintHandler,
 				tt.args.standardOutput,
-				tt.args.errorOutput,
 				tt.args.format,
 				tt.args.verbosity,
 			)

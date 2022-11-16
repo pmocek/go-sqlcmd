@@ -16,7 +16,7 @@ type GetUsers struct {
 	detailed bool
 }
 
-func (c *GetUsers) DefineCommand(subCommands ...cmd.Command) {
+func (c *GetUsers) DefineCommand(...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "get-users",
 		Short: "Display one or many users from the sqlconfig file",

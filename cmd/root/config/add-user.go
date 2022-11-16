@@ -7,7 +7,6 @@ import (
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
 	"os"
-	"runtime"
 )
 
 type AddUser struct {
@@ -19,7 +18,7 @@ type AddUser struct {
 	encryptPassword bool
 }
 
-func (c *AddUser) DefineCommand(subCommands ...cmd.Command) {
+func (c *AddUser) DefineCommand(...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "add-user",
 		Short: "Add a user",
@@ -56,13 +55,7 @@ func (c *AddUser) DefineCommand(subCommands ...cmd.Command) {
 		Usage: "The username (provide password in SQLCMD_PASSWORD environment variable)",
 	})
 
-	if runtime.GOOS == "windows" {
-		c.AddFlag(cmd.FlagInfo{
-			Bool: &c.encryptPassword,
-			Name: "encrypt-password",
-			Usage: "Encode the password",
-		})
-	}
+	c.encryptPasswordFlag()
 }
 
 func (c *AddUser) run() {

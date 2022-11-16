@@ -16,7 +16,7 @@ type GetContexts struct {
 	detailed bool
 }
 
-func (c *GetContexts) DefineCommand(subCommands ...cmd.Command) {
+func (c *GetContexts) DefineCommand(...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "get-contexts",
 		Short: "Display one or many contexts from the sqlconfig file",

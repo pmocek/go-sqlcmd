@@ -17,7 +17,7 @@ type Query struct {
 	text string
 }
 
-func (c *Query) DefineCommand(subCommands ...cmd.Command) {
+func (c *Query) DefineCommand(...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "query",
 		Short: "Run a query against the current context",

@@ -103,7 +103,7 @@ func (a SQLCmdArguments) authenticationMethod(hasPassword bool) string {
 	return a.AuthenticationMethod
 }
 
-func BackCompatMode() {
+func Execute() {
 	ctx := kong.Parse(&args, kong.NoDefaultHelp())
 	if args.Help {
 		_ = ctx.PrintUsage(false)

@@ -1,15 +1,34 @@
 package cmd
 
-func New[T PtrIsInterface[Value], Value any](subCommands ...Command) T {
-	var cmd T = new(Value)
-	cmd.DefineCommand(subCommands...)
-	return cmd
+import (
+	"github.com/spf13/cobra"
+)
+
+// Initialize runs the init func after the command-line provided by the user
+// has been parsed.
+func Initialize(init func()) {
+	cobra.OnInitialize(init)
 }
 
-// Per golang design doc "an unfortunately necessary kludge":
+// New creates a Command. After New returns, call Execute() method
+// on the top-level Command
+//
+// Example:
+//   topLevel : = cmd.New[*MyCommand]()
+//
+// Example with sub-commands
+//  topLevel := cmd.New[*MyCommand](MyCommand.subCommands)
+func New[T PtrAsReceiverWrapper[CommandPtr], CommandPtr any](
+	subCommands ...Command) (cmd T) {
+	cmd = new(CommandPtr)
+	cmd.DefineCommand(subCommands...)
+	return
+}
+
+// PtrAsReceiverWrapper per golang design doc "an unfortunate necessary kludge":
 // https://go.googlesource.com/proposal/+/refs/heads/master/design/43651-type-parameters.md#pointer-method-example
 // https://www.reddit.com/r/golang/comments/uqwh5d/generics_new_value_from_pointer_type_with/
-type PtrIsInterface[T any] interface {
+type PtrAsReceiverWrapper[T any] interface {
 	Command
 	*T
 }

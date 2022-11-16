@@ -204,7 +204,7 @@ func TestFatalErr(t *testing.T) {
 		args args
 	}{
 		{"default", args{
-			errors.New("An error"),
+			errors.New("an error"),
 		}},
 	}
 	for _, tt := range tests {

@@ -16,7 +16,7 @@ type DeleteContext struct {
 	cascade bool
 }
 
-func (c *DeleteContext) DefineCommand(subCommands ...cmd.Command) {
+func (c *DeleteContext) DefineCommand(...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "delete-context",
 		Short: "Delete a context",
@@ -63,7 +63,7 @@ func (c *DeleteContext) run() {
 			}
 		}
 
-		config.DeleteContext(c.name, c.cascade)
+		config.DeleteContext(c.name)
 
 		output.Infof("Context '%v' deleted", c.name)
 	} else {

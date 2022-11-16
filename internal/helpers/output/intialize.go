@@ -29,7 +29,6 @@ func init() {
 		func(format string, a ...any) {},
 		func(hints []string) {},
 		os.Stdout,
-		os.Stderr,
 		"yaml",
 		verbosity.Info,
 	)
@@ -40,7 +39,6 @@ func Initialize(
 	traceHandler func(format string, a ...any),
 	hintHandler func(hints []string),
 	standardOutput io.WriteCloser,
-	errorOutput io.WriteCloser,
 	serializationFormat string,
 	verbosity verbosity.Enum,
 ) {
@@ -48,7 +46,6 @@ func Initialize(
 	traceCallback = traceHandler
 	hintCallback = hintHandler
 	standardWriteCloser = standardOutput
-	errorWriteCloser = errorOutput
 	loggingLevel = verbosity
 
 	trace("Initializing output as '%v'", serializationFormat)

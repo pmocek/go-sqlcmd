@@ -5,11 +5,11 @@ Helpers package abstracts the following from the application that uses these
 helpers (using dependency injection):
 
  - error handling for all non-control flow scenarios
- - trace support
+ - trace support (non-localized output)
 
 The above abstractions enable the application code (using these helpers) to not
-have to sprinkle if (err != nill) blocks (except when the application wants to
-affect application flow based an err)
+have to sprinkle if (err != nil) blocks (except when the application wants to
+affect application flow based on err)
 
 Do and Do Not:
  - Do verify parameter values and panic if the helper function would be unable
@@ -28,7 +28,7 @@ Do and Do Not:
        checkErr(err)
  - Do not have a helper package take a dependency on another helper package
    unless they are building on each other, instead inject the needed capability in the
-   helpers initialization
+   helpers' initialization
      e.g. Do not have the config helper take a dependency on the secret helper, instead
           inject the methods encrypt/decrypt to config in its initialize method, do not:
 

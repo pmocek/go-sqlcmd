@@ -12,7 +12,6 @@ import (
 )
 
 func (c *Base) AddFlag(info FlagInfo) {
-
 	// BUG(stuartpa): verify info
 
 	if info.String != nil {
@@ -158,12 +157,14 @@ func (c *Base) generateExamples() string {
 func (c *Base) run(_ *cobra.Command, args []string) {
 	if c.Info.FirstArgAlternativeForFlag != nil {
 		if len(args) > 0 {
-
-			flag, err := c.command.PersistentFlags().GetString(c.Info.FirstArgAlternativeForFlag.Flag)
+			flag, err := c.command.PersistentFlags().GetString(
+				c.Info.FirstArgAlternativeForFlag.Flag)
 			c.CheckErr(err)
-			if  flag != "" {
+			if flag != "" {
 				output.Fatal(
-					fmt.Sprintf("Both an argument and the --%v flag have been provided.  Please provide either an argument or the --%v flag",
+					fmt.Sprintf(
+						"Both an argument and the --%v flag have been provided. " +
+							"Please provide either an argument or the --%v flag",
 						c.Info.FirstArgAlternativeForFlag.Flag,
 						c.Info.FirstArgAlternativeForFlag.Flag))
 			}

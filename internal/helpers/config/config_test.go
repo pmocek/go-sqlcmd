@@ -91,7 +91,7 @@ func TestConfig(t *testing.T) {
 			GetContext("context")
 			OutputContexts(output.Struct, true)
 			OutputContexts(output.Struct, false)
-			DeleteContext("context", true)
+			DeleteContext("context")
 			addContext()
 			addContext()
 			SetCurrentContextName("context")
@@ -119,11 +119,9 @@ func TestDeleteUser(t *testing.T) {
 	type args struct {
 		name string
 	}
-	tests := []struct {
+	var tests []struct {
 		name string
 		args args
-	}{
-		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -136,12 +134,10 @@ func TestFindUniqueUserName(t *testing.T) {
 	type args struct {
 		name string
 	}
-	tests := []struct {
+	var tests []struct {
 		name               string
 		args               args
 		wantUniqueUserName string
-	}{
-		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -156,12 +152,10 @@ func TestGetUser(t *testing.T) {
 	type args struct {
 		name string
 	}
-	tests := []struct {
+	var tests []struct {
 		name     string
 		args     args
 		wantUser User
-	}{
-		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -177,11 +171,9 @@ func TestOutputUsers(t *testing.T) {
 		formatter func(interface{}) []byte
 		detailed  bool
 	}
-	tests := []struct {
+	var tests []struct {
 		name string
 		args args
-	}{
-		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -194,12 +186,10 @@ func TestUserExists(t *testing.T) {
 	type args struct {
 		name string
 	}
-	tests := []struct {
+	var tests []struct {
 		name       string
 		args       args
 		wantExists bool
-	}{
-		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -214,12 +204,10 @@ func TestUserNameExists(t *testing.T) {
 	type args struct {
 		name string
 	}
-	tests := []struct {
+	var tests []struct {
 		name       string
 		args       args
 		wantExists bool
-	}{
-		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -234,12 +222,10 @@ func Test_userOrdinal(t *testing.T) {
 	type args struct {
 		name string
 	}
-	tests := []struct {
+	var tests []struct {
 		name        string
 		args        args
 		wantOrdinal int
-	}{
-		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

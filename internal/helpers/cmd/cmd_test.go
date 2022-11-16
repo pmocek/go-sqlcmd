@@ -24,43 +24,45 @@ func (c *TopLevelCommand) DefineCommand(subCommands ...Command) {
 
 type SubCommand1 struct {
 	Base
+
+	name string
 }
 
 func (c *SubCommand1) DefineCommand(subCommands ...Command) {
 	c.Info = Info{
 		Use: "sub-command1",
 		Short: "Sub Command 1",
-		Run: c.run,
+		FirstArgAlternativeForFlag: &AlternativeForFlagInfo{
+			Flag:  "name",
+			Value: &c.name,
+		},
+		Run: func() {fmt.Println("Running: Sub Command 1")},
 	}
-	c.Base.DefineCommand()
-}
-
-func (c *SubCommand1) run() {
-	fmt.Println("Sub Command 1")
+	c.Base.DefineCommand(subCommands...)
+	c.AddFlag(FlagInfo{
+		Name:          "name",
+		String:        &c.name,
+	})
 }
 
 type SubCommand11 struct {
 	Base
 }
 
-func (c *SubCommand11) DefineCommand(subCommands ...Command) {
+func (c *SubCommand11) DefineCommand(...Command) {
 	c.Info = Info{
 		Use: "sub-command11",
 		Short: "Sub Command 11",
-		Run: c.run,
+		Run: func() {fmt.Println("Running: Sub Command 11")},
 	}
 	c.Base.DefineCommand()
-}
-
-func (c *SubCommand11) run() {
-	fmt.Println("Sub Command 11")
 }
 
 type SubCommand2 struct {
 	Base
 }
 
-func (c *SubCommand2) DefineCommand(subCommands ...Command) {
+func (c *SubCommand2) DefineCommand(...Command) {
 	c.Info = Info{
 		Use: "sub-command2",
 		Short: "Sub Command 2",
@@ -79,7 +81,6 @@ func Test_EndToEnd(t *testing.T) {
 
 	topLevel.IsSubCommand("sub-command2")
 	topLevel.IsSubCommand(	"sub-command2-alias")
-
 	topLevel.IsSubCommand("--help")
 	topLevel.IsSubCommand("completion")
 

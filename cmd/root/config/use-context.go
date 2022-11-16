@@ -15,7 +15,7 @@ type UseContext struct {
 	name string
 }
 
-func (c *UseContext) DefineCommand(subCommands ...cmd.Command) {
+func (c *UseContext) DefineCommand(...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "use-context",
 		Short: "Display one or many users from the sqlconfig file",

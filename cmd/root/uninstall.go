@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/docker"
+	"github.com/microsoft/go-sqlcmd/internal/helpers/container"
 	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
 	"path/filepath"
 	"strings"
@@ -31,7 +31,7 @@ var systemDatabases = [...]string{
 	"/var/opt/mssql/data/master.mdf",
 }
 
-func (c *Uninstall) DefineCommand(subCommands ...cmd.Command) {
+func (c *Uninstall) DefineCommand(...cmd.Command) {
 	c.Base.Info = cmd.Info{
 		Use: "uninstall",
 		Short: "Uninstall/Delete the current context",
@@ -73,7 +73,7 @@ func (c *Uninstall) run() {
 	}
 	if currentContextEndPointExists() {
 		if config.CurrentContextEndpointHasContainer() {
-			controller := docker.NewController()
+			controller := container.NewController()
 			id := config.GetContainerId()
 			endpoint, _ := config.GetCurrentContext()
 
@@ -119,7 +119,7 @@ func (c *Uninstall) run() {
 	}
 }
 
-func userDatabaseSafetyCheck(controller *docker.Controller, id string) {
+func userDatabaseSafetyCheck(controller *container.Controller, id string) {
 	files := controller.ContainerFiles(id, "*.mdf")
 	for _, databaseFile := range files {
 		if strings.HasSuffix(databaseFile, ".mdf") {

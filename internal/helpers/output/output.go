@@ -2,15 +2,15 @@
 // Licensed under the MIT license.
 
 /*
-	output.Trace("Something very low level.")
-	output.Debug("Useful debugging information.")
-	output.Info("Something noteworthy happened!")
-	output.Warn("You should probably take a look at this.")
-	output.Error("Something failed but I'm not quitting.")
+	output.Trace("Something very low level.") - not localized
+	output.Debug("Useful debugging information.") - not localized
+	output.Info("Something noteworthy happened!") - localized
+	output.Warn("You should probably take a look at this.") - localized
+	output.Error("Something failed but I'm not quitting.") - localized
 	// Calls os.Exit(1) after logging
-	output.Fatal("Bye.")
+	output.Fatal("Bye.") - localized
 	// Calls panic() after logging
-	output.Panic("I'm bailing.")
+	output.Panic("I'm bailing.") - not localized
 */
 
 package output
@@ -31,7 +31,6 @@ var loggingLevel verbosity.Enum
 var runningUnitTests bool
 
 var standardWriteCloser io.WriteCloser
-var errorWriteCloser io.WriteCloser
 
 func Struct(in interface{}) (bytes []byte) {
 	bytes = formatter.Serialize(in)
