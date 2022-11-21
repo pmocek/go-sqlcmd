@@ -266,7 +266,7 @@ func TestSqlCmdExitOnError(t *testing.T) {
 	err := runSqlCmd(t, s, []string{"select 1", "GO", ":setvar", "select 2", "GO"})
 	o := buf.buf.String()
 	assert.EqualError(t, err, "Sqlcmd: Error: Syntax error at line 3 near command ':SETVAR'", "Run should return an error")
-	assert.Equal(t, "1"+SqlcmdEol+SqlcmdEol+oneRowAffected+SqlcmdEol+"Sqlcmd: Error: Syntax error at line 3 near command ':SETVAR'."+SqlcmdEol, o, "Only first select should run")
+	assert.Equal(t, "1"+SqlcmdEol+SqlcmdEol+oneRowAffected+SqlcmdEol+"Sqlcmd: Error: Syntax error at line 3 near command ':SETVAR'"+SqlcmdEol, o, "Only first select should run")
 	assert.Equal(t, 1, s.Exitcode, "s.ExitCode for a syntax error")
 
 	s, buf = setupSqlCmdWithMemoryOutput(t)
