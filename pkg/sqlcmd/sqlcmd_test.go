@@ -67,7 +67,9 @@ func TestConnectionStringFromSqlCmd(t *testing.T) {
 	}
 }
 
-/* The following tests require a working SQL instance and rely on SqlCmd environment variables
+/*
+	The following tests require a working SQL instance and rely on SqlCmd environment variables
+
 to manage the initial connection string. The default connection when no environment variables are
 set will be to localhost using Windows auth.
 */
@@ -367,10 +369,10 @@ func TestPromptForPasswordPositive(t *testing.T) {
 	v := InitializeVariables(true)
 	s := New(console, "", v)
 	// attempt without password prompt
-	err := s.ConnectDb(&c, true)
+	err := s.ConnectDb(c, true)
 	assert.False(t, prompted, "ConnectDb with nopw=true should not prompt for password")
 	assert.Error(t, err, "ConnectDb with nopw==true and no password provided")
-	err = s.ConnectDb(&c, false)
+	err = s.ConnectDb(c, false)
 	assert.True(t, prompted, "ConnectDb with !nopw should prompt for password")
 	assert.NoError(t, err, "ConnectDb with !nopw and valid password returned from prompt")
 	if s.Connect.Password != password {
@@ -452,6 +454,54 @@ func TestDateTimeFormats(t *testing.T) {
 	}
 }
 
+func TestQueryServerPropertyReturnsColumnName(t *testing.T) {
+	s, buf := setupSqlCmdWithMemoryOutput(t)
+	s.vars.Set(SQLCMDMAXVARTYPEWIDTH, "100")
+	defer buf.Close()
+	err := runSqlCmd(t, s, []string{"select SERVERPROPERTY('EngineEdition') AS DatabaseEngineEdition", "GO"})
+	if assert.NoError(t, err, "select should succeed") {
+		assert.Contains(t, buf.buf.String(), "DatabaseEngineEdition", "Column name missing from output")
+	}
+}
+
+func TestSqlCmdOutputAndError(t *testing.T) {
+	s, outfile, errfile := setupSqlcmdWithFileErrorOutput(t)
+	defer os.Remove(outfile.Name())
+	defer os.Remove(errfile.Name())
+	s.Query = "select $(X"
+	err := s.Run(true, false)
+	if assert.NoError(t, err, "s.Run(once = true)") {
+		bytes, err := os.ReadFile(errfile.Name())
+		if assert.NoError(t, err, "os.ReadFile") {
+			assert.Equal(t, "Sqlcmd: Error: Syntax error at line 1."+SqlcmdEol, string(bytes), "Expected syntax error not received for query execution")
+		}
+	}
+	s.Query = "select '1'"
+	err = s.Run(true, false)
+	if assert.NoError(t, err, "s.Run(once = true)") {
+		bytes, err := os.ReadFile(outfile.Name())
+		if assert.NoError(t, err, "os.ReadFile") {
+			assert.Equal(t, "1"+SqlcmdEol+SqlcmdEol+"(1 row affected)"+SqlcmdEol, string(bytes), "Unexpected output for query execution")
+		}
+	}
+
+	s, outfile, errfile = setupSqlcmdWithFileErrorOutput(t)
+	defer os.Remove(outfile.Name())
+	defer os.Remove(errfile.Name())
+	dataPath := "testdata" + string(os.PathSeparator)
+	err = s.IncludeFile(dataPath+"testerrorredirection.sql", false)
+	if assert.NoError(t, err, "IncludeFile testerrorredirection.sql false") {
+		bytes, err := os.ReadFile(outfile.Name())
+		if assert.NoError(t, err, "os.ReadFile outfile") {
+			assert.Equal(t, "1"+SqlcmdEol+SqlcmdEol+"(1 row affected)"+SqlcmdEol, string(bytes), "Unexpected output for sql file execution in outfile")
+		}
+		bytes, err = os.ReadFile(errfile.Name())
+		if assert.NoError(t, err, "os.ReadFile errfile") {
+			assert.Equal(t, "Sqlcmd: Error: Syntax error at line 3."+SqlcmdEol, string(bytes), "Expected syntax error not found in errfile")
+		}
+	}
+}
+
 // runSqlCmd uses lines as input for sqlcmd instead of relying on file or console input
 func runSqlCmd(t testing.TB, s *Sqlcmd, lines []string) error {
 	t.Helper()
@@ -499,6 +549,28 @@ func setupSqlcmdWithFileOutput(t testing.TB) (*Sqlcmd, *os.File) {
 	return s, file
 }
 
+func setupSqlcmdWithFileErrorOutput(t testing.TB) (*Sqlcmd, *os.File, *os.File) {
+	t.Helper()
+	v := InitializeVariables(true)
+	v.Set(SQLCMDMAXVARTYPEWIDTH, "0")
+	s := New(nil, "", v)
+	s.Connect = newConnect(t)
+	s.Format = NewSQLCmdDefaultFormatter(true)
+	outfile, err := os.CreateTemp("", "sqlcmdout")
+	assert.NoError(t, err, "os.CreateTemp")
+	errfile, err := os.CreateTemp("", "sqlcmderr")
+	assert.NoError(t, err, "os.CreateTemp")
+	s.SetOutput(outfile)
+	s.SetError(errfile)
+	err = s.ConnectDb(nil, true)
+	if err != nil {
+		os.Remove(outfile.Name())
+		os.Remove(errfile.Name())
+	}
+	assert.NoError(t, err, "s.ConnectDB")
+	return s, outfile, errfile
+}
+
 // Assuming public Azure, use AAD when SQLCMDUSER environment variable is not set
 func canTestAzureAuth() bool {
 	server := os.Getenv(SQLCMDSERVER)
@@ -506,7 +578,7 @@ func canTestAzureAuth() bool {
 	return strings.Contains(server, ".database.windows.net") && userName == ""
 }
 
-func newConnect(t testing.TB) ConnectSettings {
+func newConnect(t testing.TB) *ConnectSettings {
 	t.Helper()
 	connect := ConnectSettings{
 		UserName:   os.Getenv(SQLCMDUSER),
@@ -518,5 +590,5 @@ func newConnect(t testing.TB) ConnectSettings {
 		t.Log("Using ActiveDirectoryDefault")
 		connect.AuthenticationMethod = azuread.ActiveDirectoryDefault
 	}
-	return connect
+	return &connect
 }

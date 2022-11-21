@@ -46,6 +46,10 @@ func TestCommandParsing(t *testing.T) {
 		{`EXIT `, "EXIT", []string{""}},
 		{`:Connect someserver -U someuser`, "CONNECT", []string{"someserver -U someuser"}},
 		{`:r c:\$(var)\file.sql`, "READFILE", []string{`c:\$(var)\file.sql`}},
+		{`:!! notepad`, "EXEC", []string{" notepad"}},
+		{`:!!notepad`, "EXEC", []string{"notepad"}},
+		{` !! dir c:\`, "EXEC", []string{` dir c:\`}},
+		{`!!dir c:\`, "EXEC", []string{`dir c:\`}},
 	}
 
 	for _, test := range commands {
@@ -169,7 +173,7 @@ func TestConnectCommand(t *testing.T) {
 	err := connectCommand(s, []string{"someserver -U someuser"}, 1)
 	assert.NoError(t, err, "connectCommand with valid arguments doesn't return an error on connect failure")
 	assert.True(t, prompted, "connectCommand with user name and no password should prompt for password")
-	assert.NotEqual(t, "someserver", s.Connect.ServerName, "On error, sqlCmd.Connect does not copy inputs")
+	assert.NotEqual(t, "someserver", s.Connect.ServerName, "On connection failure, sqlCmd.Connect does not copy inputs")
 
 	err = connectCommand(s, []string{}, 2)
 	assert.EqualError(t, err, InvalidCommandError("CONNECT", 2).Error(), ":Connect with no arguments should return an error")
@@ -242,9 +246,57 @@ func TestResolveArgumentVariables(t *testing.T) {
 	defer buf.Close()
 	s.SetError(buf)
 	for _, test := range args {
-		actual := resolveArgumentVariables(s, []rune(test.arg))
+		actual, _ := resolveArgumentVariables(s, []rune(test.arg), false)
 		assert.Equal(t, test.val, actual, "Incorrect argument parsing of "+test.arg)
 		assert.Contains(t, buf.buf.String(), test.err, "Error output mismatch for "+test.arg)
 		buf.buf.Reset()
+	}
+	actual, err := resolveArgumentVariables(s, []rune("$(var1)$(var2)"), true)
+	if assert.ErrorContains(t, err, UndefinedVariable("var2").Error(), "fail on unresolved variable") {
+		assert.Empty(t, actual, "fail on unresolved variable")
+	}
+}
+
+func TestExecCommand(t *testing.T) {
+	vars := InitializeVariables(false)
+	s := New(nil, "", vars)
+	s.vars.Set("var1", "hello")
+	buf := &memoryBuffer{buf: new(bytes.Buffer)}
+	defer buf.Close()
+	s.SetOutput(buf)
+	err := execCommand(s, []string{`echo $(var1)`}, 1)
+	if assert.NoError(t, err, "execCommand with valid arguments") {
+		assert.Equal(t, buf.buf.String(), "hello"+SqlcmdEol, "echo output should be in sqlcmd output")
+	}
+}
+
+func TestDisableSysCommandBlocksExec(t *testing.T) {
+	s, buf := setupSqlCmdWithMemoryOutput(t)
+	defer buf.Close()
+	s.Cmd.DisableSysCommands(false)
+	c := []string{"set nocount on", ":!! echo hello", "select 100", "go"}
+	err := runSqlCmd(t, s, c)
+	if assert.NoError(t, err, ":!! with warning should not raise error") {
+		assert.Contains(t, buf.buf.String(), ErrCommandsDisabled.Error()+SqlcmdEol+"100"+SqlcmdEol)
+		assert.Equal(t, 0, s.Exitcode, "ExitCode after warning")
+	}
+	buf.buf.Reset()
+	s.Cmd.DisableSysCommands(true)
+	err = runSqlCmd(t, s, c)
+	if assert.NoError(t, err, ":!! with error should not return error") {
+		assert.Contains(t, buf.buf.String(), ErrCommandsDisabled.Error()+SqlcmdEol)
+		assert.NotContains(t, buf.buf.String(), "100", "query should not run when syscommand disabled")
+		assert.Equal(t, 1, s.Exitcode, "ExitCode after error")
+	}
+}
+
+func TestEditCommand(t *testing.T) {
+	s, buf := setupSqlCmdWithMemoryOutput(t)
+	defer buf.Close()
+	s.vars.Set(SQLCMDEDITOR, "echo select 5000> ")
+	c := []string{"set nocount on", "go", "select 100", ":ed", "go"}
+	err := runSqlCmd(t, s, c)
+	if assert.NoError(t, err, ":ed should not raise error") {
+		assert.Equal(t, "1> select 5000"+SqlcmdEol+"5000"+SqlcmdEol+SqlcmdEol, buf.buf.String(), "Incorrect output from query after :ed command")
 	}
 }

@@ -32,6 +32,10 @@ var (
 	ErrNeedPassword = errors.New("need password")
 	// ErrCtrlC indicates execution was ended by ctrl-c or ctrl-break
 	ErrCtrlC = errors.New(WarningPrefix + "The last operation was terminated because the user pressed CTRL+C")
+	// ErrCommandsDisabled indicates system commands and startup script are disabled
+	ErrCommandsDisabled = &CommonSqlcmdErr{
+		message: ErrCmdDisabled,
+	}
 )
 
 const maxLineBuffer = 2 * 1024 * 1024 // 2Mb
@@ -60,9 +64,10 @@ type Sqlcmd struct {
 	out              io.WriteCloser
 	err              io.WriteCloser
 	batch            *Batch
+	echoFileLines    bool
 	// Exitcode is returned to the operating system when the process exits
 	Exitcode int
-	Connect  ConnectSettings
+	Connect  *ConnectSettings
 	vars     *Variables
 	Format   Formatter
 	Query    string
@@ -79,6 +84,7 @@ func New(l Console, workingDirectory string, vars *Variables) *Sqlcmd {
 		workingDirectory: workingDirectory,
 		vars:             vars,
 		Cmd:              newCommands(),
+		Connect:          &ConnectSettings{},
 	}
 	s.batch = NewBatch(s.scanNext, s.Cmd)
 	mssql.SetContextLogger(s)
@@ -133,7 +139,7 @@ func (s *Sqlcmd) Run(once bool, processAll bool) error {
 				args = make([]string, 0)
 				once = true
 			} else {
-				_, _ = s.GetOutput().Write([]byte(err.Error() + SqlcmdEol))
+				s.WriteError(s.GetOutput(), err)
 			}
 		}
 		if cmd != nil {
@@ -143,9 +149,12 @@ func (s *Sqlcmd) Run(once bool, processAll bool) error {
 				break
 			}
 			if err != nil {
-				_, _ = s.GetOutput().Write([]byte(err.Error() + SqlcmdEol))
+				s.WriteError(s.GetOutput(), err)
 				lastError = err
 			}
+		}
+		if err == ErrCtrlC {
+			os.Exit(0)
 		}
 		if err != nil && err != io.EOF && s.Connect.ExitOnError {
 			// If the error were due to a SQL error, the GO command handler
@@ -206,6 +215,19 @@ func (s *Sqlcmd) SetError(e io.WriteCloser) {
 	s.err = e
 }
 
+// WriteError writes the error on specified stream
+func (s *Sqlcmd) WriteError(stream io.Writer, err error) {
+	if serr, ok := err.(SqlcmdError); ok {
+		if s.GetError() != os.Stdout {
+			_, _ = s.GetError().Write([]byte(serr.Error() + SqlcmdEol))
+		} else {
+			_, _ = os.Stderr.Write([]byte(serr.Error() + SqlcmdEol))
+		}
+	} else {
+		_, _ = stream.Write([]byte(err.Error() + SqlcmdEol))
+	}
+}
+
 // ConnectDb opens a connection to the database with the given modifications to the connection
 // nopw == true means don't prompt for a password if the auth type requires it
 // if connect is nil, ConnectDb uses the current connection. If non-nil and the connection succeeds,
@@ -213,12 +235,12 @@ func (s *Sqlcmd) SetError(e io.WriteCloser) {
 func (s *Sqlcmd) ConnectDb(connect *ConnectSettings, nopw bool) error {
 	newConnection := connect != nil
 	if connect == nil {
-		connect = &s.Connect
+		connect = s.Connect
 	}
 
 	var connector driver.Connector
 	useAad := !connect.sqlAuthentication() && !connect.integratedAuthentication()
-	if connect.requiresPassword() && !nopw && connect.Password == "" {
+	if connect.RequiresPassword() && !nopw && connect.Password == "" {
 		var err error
 		if connect.Password, err = s.promptPassword(); err != nil {
 			return err
@@ -259,7 +281,7 @@ func (s *Sqlcmd) ConnectDb(connect *ConnectSettings, nopw bool) error {
 		s.vars.Set(SQLCMDUSER, u.Username)
 	}
 	if newConnection {
-		s.Connect = *connect
+		s.Connect = connect
 	}
 	if s.batch != nil {
 		s.batch.batchline = 1
@@ -294,6 +316,7 @@ func (s *Sqlcmd) IncludeFile(path string, processAll bool) error {
 	buf := make([]byte, maxLineBuffer)
 	scanner.Buffer(buf, maxLineBuffer)
 	curLine := s.batch.read
+	echoFileLines := s.echoFileLines
 	s.batch.read = func() (string, error) {
 		if !scanner.Scan() {
 			err := scanner.Err()
@@ -302,14 +325,20 @@ func (s *Sqlcmd) IncludeFile(path string, processAll bool) error {
 			}
 			return "", err
 		}
-		return scanner.Text(), nil
+		t := scanner.Text()
+		if echoFileLines {
+			_, _ = s.GetOutput().Write([]byte(s.Prompt() + t + SqlcmdEol))
+		}
+		return t, nil
 	}
 	err = s.Run(false, processAll)
 	s.batch.read = curLine
-	if s.batch.State() == "=" {
-		s.batch.batchline = 1
-	} else {
-		s.batch.batchline = b + 1
+	if !s.echoFileLines {
+		if s.batch.State() == "=" {
+			s.batch.batchline = 1
+		} else {
+			s.batch.batchline = b + 1
+		}
 	}
 	return err
 }
@@ -361,7 +390,7 @@ func setupCloseHandler(s *Sqlcmd) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		_, _ = s.GetOutput().Write([]byte(ErrCtrlC.Error() + SqlcmdEol))
+		s.WriteError(s.GetOutput(), ErrCtrlC)
 		os.Exit(0)
 	}()
 }

@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/alecthomas/kong"
+	"github.com/microsoft/go-mssqldb/azuread"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -85,6 +86,12 @@ func TestValidCommandLineToArgsConversion(t *testing.T) {
 		{[]string{"-u"}, func(args SQLCmdArguments) bool {
 			return args.UnicodeOutputFile
 		}},
+		{[]string{"--version"}, func(args SQLCmdArguments) bool {
+			return args.Version
+		}},
+		{[]string{"-s", "|", "-w", "10", "-W"}, func(args SQLCmdArguments) bool {
+			return args.TrimSpaces && args.ColumnSeparator == "|" && *args.ScreenWidth == 10
+		}},
 	}
 
 	for _, test := range commands {
@@ -114,6 +121,7 @@ func TestInvalidCommandLine(t *testing.T) {
 		{[]string{"-F", "what"}, "--format must be one of \"horiz\",\"horizontal\",\"vert\",\"vertical\" but got \"what\""},
 		{[]string{"-r", "5"}, `--errors-to-stderr must be one of "-1","0","1" but got '\x05'`},
 		{[]string{"-h-4"}, "test: '-h -4': header value must be either -1 or a value between 1 and 2147483647"},
+		{[]string{"-w", "6"}, "test: '-w 6': value must be greater than 8 and less than 65536."},
 	}
 
 	for _, test := range commands {
@@ -256,8 +264,8 @@ func TestQueryAndExit(t *testing.T) {
 }
 
 // Test to verify fix for issue: https://github.com/microsoft/go-sqlcmd/issues/98
-//   1. Verify when -b is passed in (ExitOnError), we don't always get an error (even when input is good)
-//   2, Verify when the input is actually bad, we do get an error
+//  1. Verify when -b is passed in (ExitOnError), we don't always get an error (even when input is good)
+//     2, Verify when the input is actually bad, we do get an error
 func TestExitOnError(t *testing.T) {
 	args = newArguments()
 	args.InputFile = []string{"testdata/select100.sql"}
@@ -326,6 +334,78 @@ func TestMissingInputFile(t *testing.T) {
 	assert.Error(t, err, "run")
 	assert.Contains(t, err.Error(), "Error occurred while opening or operating on file", "Unexpected error: "+err.Error())
 	assert.Equal(t, 1, exitCode, "exitCode")
+}
+
+func TestConditionsForPasswordPrompt(t *testing.T) {
+
+	type test struct {
+		authenticationMethod string
+		inputFile            []string
+		username             string
+		pwd                  string
+		expectedResult       bool
+	}
+	tests := []test{
+		// Positive Testcases
+		{sqlcmd.SqlPassword, []string{""}, "someuser", "", true},
+		{sqlcmd.NotSpecified, []string{"testdata/someFile.sql"}, "someuser", "", true},
+		{azuread.ActiveDirectoryPassword, []string{""}, "someuser", "", true},
+		{azuread.ActiveDirectoryPassword, []string{"testdata/someFile.sql"}, "someuser", "", true},
+		{azuread.ActiveDirectoryServicePrincipal, []string{""}, "someuser", "", true},
+		{azuread.ActiveDirectoryServicePrincipal, []string{"testdata/someFile.sql"}, "someuser", "", true},
+		{azuread.ActiveDirectoryApplication, []string{""}, "someuser", "", true},
+		{azuread.ActiveDirectoryApplication, []string{"testdata/someFile.sql"}, "someuser", "", true},
+
+		//Negative Testcases
+		{sqlcmd.NotSpecified, []string{""}, "", "", false},
+		{sqlcmd.NotSpecified, []string{"testdata/someFile.sql"}, "", "", false},
+		{azuread.ActiveDirectoryDefault, []string{""}, "someuser", "", false},
+		{azuread.ActiveDirectoryDefault, []string{"testdata/someFile.sql"}, "someuser", "", false},
+		{azuread.ActiveDirectoryInteractive, []string{""}, "someuser", "", false},
+		{azuread.ActiveDirectoryInteractive, []string{"testdata/someFile.sql"}, "someuser", "", false},
+		{azuread.ActiveDirectoryManagedIdentity, []string{""}, "someuser", "", false},
+		{azuread.ActiveDirectoryManagedIdentity, []string{"testdata/someFile.sql"}, "someuser", "", false},
+	}
+
+	for _, testcase := range tests {
+		t.Log(testcase.authenticationMethod, testcase.inputFile, testcase.username, testcase.pwd, testcase.expectedResult)
+		args := newArguments()
+		args.DisableCmdAndWarn = true
+		args.InputFile = testcase.inputFile
+		args.UserName = testcase.username
+		vars := sqlcmd.InitializeVariables(!args.DisableCmdAndWarn)
+		setVars(vars, &args)
+		var connectConfig sqlcmd.ConnectSettings
+		setConnect(&connectConfig, &args, vars)
+		connectConfig.AuthenticationMethod = testcase.authenticationMethod
+		connectConfig.Password = testcase.pwd
+		assert.Equal(t, testcase.expectedResult, isConsoleInitializationRequired(&connectConfig, &args), "Unexpected test result encountered for console initialization")
+		assert.Equal(t, testcase.expectedResult, connectConfig.RequiresPassword() && connectConfig.Password == "", "Unexpected test result encountered for password prompt conditions")
+	}
+}
+
+func TestStartupScript(t *testing.T) {
+	o, err := os.CreateTemp("", "sqlcmdmain")
+	assert.NoError(t, err, "os.CreateTemp")
+	defer os.Remove(o.Name())
+	defer o.Close()
+	args = newArguments()
+	args.OutputFile = o.Name()
+	args.Query = "set nocount on"
+	if canTestAzureAuth() {
+		args.UseAad = true
+	}
+	vars := sqlcmd.InitializeVariables(true)
+	setVars(vars, &args)
+	vars.Set(sqlcmd.SQLCMDINI, "testdata/select100.sql")
+	vars.Set(sqlcmd.SQLCMDMAXVARTYPEWIDTH, "0")
+	exitCode, err := run(vars, &args)
+	assert.NoError(t, err, "run")
+	assert.Equal(t, 0, exitCode, "exitCode")
+	bytes, err := os.ReadFile(o.Name())
+	if assert.NoError(t, err, "os.ReadFile") {
+		assert.Equal(t, "100"+sqlcmd.SqlcmdEol+sqlcmd.SqlcmdEol+oneRowAffected+sqlcmd.SqlcmdEol, string(bytes), "Incorrect output from run")
+	}
 }
 
 // Assuming public Azure, use AAD when SQLCMDUSER environment variable is not set

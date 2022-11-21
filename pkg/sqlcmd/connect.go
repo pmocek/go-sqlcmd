@@ -65,7 +65,7 @@ func (connect ConnectSettings) sqlAuthentication() bool {
 		(!connect.UseTrustedConnection && connect.authenticationMethod() == NotSpecified && connect.UserName != "")
 }
 
-func (connect ConnectSettings) requiresPassword() bool {
+func (connect ConnectSettings) RequiresPassword() bool {
 	requiresPassword := connect.sqlAuthentication()
 	if !requiresPassword {
 		switch connect.authenticationMethod() {

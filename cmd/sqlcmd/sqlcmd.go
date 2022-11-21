@@ -5,6 +5,7 @@
 package sqlcmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -13,6 +14,8 @@ import (
 	"github.com/microsoft/go-sqlcmd/pkg/console"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
 )
+
+var version = "Local-build" // overridden in pipeline builds with: -ldflags="-X main.version=$(VersionTag)"
 
 // SQLCmdArguments defines the command line arguments for sqlcmd
 // The exhaustive list is at https://docs.microsoft.com/sql/tools/sqlcmd-utility?view=sql-server-ver15
@@ -52,6 +55,12 @@ type SQLCmdArguments struct {
 	ErrorsToStderr              int               `short:"r" help:"Redirects the error message output to the screen (stderr). A value of 0 means messages with severity >= 11 will b redirected. A value of 1 means all error message output including PRINT is redirected." enum:"-1,0,1" default:"-1"`
 	Headers                     int               `short:"h" help:"Specifies the number of rows to print between the column headings. Use -h-1 to specify that headers not be printed."`
 	UnicodeOutputFile           bool              `short:"u" help:"Specifies that all output files are encoded with little-endian Unicode"`
+	Version                     bool              `help:"Show the sqlcmd version information"`
+	ColumnSeparator             string            `short:"s" help:"Specifies the column separator character. Sets the SQLCMDCOLSEP variable."`
+	ScreenWidth                 *int              `short:"w" help:"Specifies the screen width for output. Sets the SQLCMDCOLWIDTH variable."`
+	TrimSpaces                  bool              `short:"W" help:"Remove trailing spaces from a column."`
+	MultiSubnetFailover         bool              `short:"M" help:"Provided for backward compatibility. Sqlcmd always optimizes detection of the active replica of a SQL Failover Cluster."`
+	Password                    string            `short:"P" help:"Obsolete. The initial passwords must be set using the SQLCMDPASSWORD environment variable or entered at the password prompt."`
 	// Keep Help at the end of the list
 	Help bool `short:"?" help:"Show syntax summary."`
 }
@@ -64,6 +73,12 @@ func (a *SQLCmdArguments) Validate() error {
 	// Ignore 0 even though it's technically an invalid input
 	if a.Headers < -1 {
 		return fmt.Errorf(`'-h %d': header value must be either -1 or a value between 1 and 2147483647`, a.Headers)
+	}
+	if a.ScreenWidth != nil && (*a.ScreenWidth < 9 || *a.ScreenWidth > 65535) {
+		return fmt.Errorf(`'-w %d': value must be greater than 8 and less than 65536.`, *a.ScreenWidth)
+	}
+	if a.Password != "" {
+		return fmt.Errorf(`'-P' is obsolete. The initial passwords must be set using the SQLCMDPASSWORD environment variable or entered at the password prompt.`)
 	}
 	return nil
 }
@@ -105,6 +120,10 @@ func (a SQLCmdArguments) authenticationMethod(hasPassword bool) string {
 
 func Execute() {
 	ctx := kong.Parse(&args, kong.NoDefaultHelp())
+	if args.Version {
+		ctx.Printf("%v", version)
+		os.Exit(0)
+	}
 	if args.Help {
 		_ = ctx.PrintUsage(false)
 		os.Exit(0)
@@ -148,11 +167,21 @@ func setVars(vars *sqlcmd.Variables, args *SQLCmdArguments) {
 			}
 			return ""
 		},
-		sqlcmd.SQLCMDUSER:              func(a *SQLCmdArguments) string { return a.UserName },
-		sqlcmd.SQLCMDSTATTIMEOUT:       func(a *SQLCmdArguments) string { return "" },
-		sqlcmd.SQLCMDHEADERS:           func(a *SQLCmdArguments) string { return fmt.Sprint(a.Headers) },
-		sqlcmd.SQLCMDCOLSEP:            func(a *SQLCmdArguments) string { return "" },
-		sqlcmd.SQLCMDCOLWIDTH:          func(a *SQLCmdArguments) string { return "" },
+		sqlcmd.SQLCMDUSER:        func(a *SQLCmdArguments) string { return a.UserName },
+		sqlcmd.SQLCMDSTATTIMEOUT: func(a *SQLCmdArguments) string { return "" },
+		sqlcmd.SQLCMDHEADERS:     func(a *SQLCmdArguments) string { return fmt.Sprint(a.Headers) },
+		sqlcmd.SQLCMDCOLSEP: func(a *SQLCmdArguments) string {
+			if a.ColumnSeparator != "" {
+				return string(a.ColumnSeparator[0])
+			}
+			return ""
+		},
+		sqlcmd.SQLCMDCOLWIDTH: func(a *SQLCmdArguments) string {
+			if a.ScreenWidth != nil {
+				return fmt.Sprint(*a.ScreenWidth)
+			}
+			return ""
+		},
 		sqlcmd.SQLCMDMAXVARTYPEWIDTH:   func(a *SQLCmdArguments) string { return "" },
 		sqlcmd.SQLCMDMAXFIXEDTYPEWIDTH: func(a *SQLCmdArguments) string { return "" },
 		sqlcmd.SQLCMDFORMAT:            func(a *SQLCmdArguments) string { return a.Format },
@@ -201,22 +230,32 @@ func setConnect(connect *sqlcmd.ConnectSettings, args *SQLCmdArguments, vars *sq
 	connect.ErrorSeverityLevel = args.ErrorSeverityLevel
 }
 
+func isConsoleInitializationRequired(connect *sqlcmd.ConnectSettings, args *SQLCmdArguments) bool {
+	iactive := args.InputFile == nil && args.Query == ""
+	return iactive || connect.RequiresPassword()
+}
+
 func run(vars *sqlcmd.Variables, args *SQLCmdArguments) (int, error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return 1, err
 	}
 
-	iactive := args.InputFile == nil && args.Query == ""
+	var connectConfig sqlcmd.ConnectSettings
+	setConnect(&connectConfig, args, vars)
 	var line sqlcmd.Console = nil
-	if iactive {
+	if isConsoleInitializationRequired(&connectConfig, args) {
 		line = console.NewConsole("")
 		defer line.Close()
 	}
 
 	s := sqlcmd.New(line, wd, vars)
 	s.UnicodeOutputFile = args.UnicodeOutputFile
-	setConnect(&s.Connect, args, vars)
+
+	if args.DisableCmdAndWarn {
+		s.Cmd.DisableSysCommands(false)
+	}
+
 	if args.BatchTerminator != "GO" {
 		err = s.Cmd.SetBatchTerminator(args.BatchTerminator)
 		if err != nil {
@@ -227,8 +266,8 @@ func run(vars *sqlcmd.Variables, args *SQLCmdArguments) (int, error) {
 		return 1, err
 	}
 
-	setConnect(&s.Connect, args, vars)
-	s.Format = sqlcmd.NewSQLCmdDefaultFormatter(false)
+	s.Connect = &connectConfig
+	s.Format = sqlcmd.NewSQLCmdDefaultFormatter(args.TrimSpaces)
 	if args.OutputFile != "" {
 		err = s.RunCommand(s.Cmd["OUT"], []string{args.OutputFile})
 		if err != nil {
@@ -242,33 +281,50 @@ func run(vars *sqlcmd.Variables, args *SQLCmdArguments) (int, error) {
 		if args.ErrorsToStderr >= 0 {
 			s.PrintError = func(msg string, severity uint8) bool {
 				if severity >= stderrSeverity {
-					_, _ = os.Stderr.Write([]byte(msg + sqlcmd.SqlcmdEol))
+					s.WriteError(os.Stderr, errors.New(msg+sqlcmd.SqlcmdEol))
 					return true
 				}
 				return false
 			}
 		}
 	}
-	once := false
-	if args.InitialQuery != "" {
-		s.Query = args.InitialQuery
-	} else if args.Query != "" {
-		once = true
-		s.Query = args.Query
-	}
+
 	// connect using no overrides
-	err = s.ConnectDb(nil, !iactive)
+	err = s.ConnectDb(nil, line == nil)
 	if err != nil {
 		return 1, err
 	}
-	if iactive || s.Query != "" {
-		err = s.Run(once, false)
-	} else {
-		for f := range args.InputFile {
-			if err = s.IncludeFile(args.InputFile[f], true); err != nil {
-				_, _ = os.Stderr.Write([]byte(err.Error() + sqlcmd.SqlcmdEol))
-				s.Exitcode = 1
-				break
+
+	script := vars.StartupScriptFile()
+	if !args.DisableCmdAndWarn && len(script) > 0 {
+		f, fileErr := os.Open(script)
+		if fileErr != nil {
+			s.WriteError(s.GetError(), sqlcmd.InvalidVariableValue(sqlcmd.SQLCMDINI, script))
+		} else {
+			_ = f.Close()
+			// IncludeFile won't return an error for a SQL error, but ExitCode will be non-zero if -b was passed on the commandline
+			err = s.IncludeFile(script, true)
+		}
+	}
+
+	if err == nil && s.Exitcode == 0 {
+		once := false
+		if args.InitialQuery != "" {
+			s.Query = args.InitialQuery
+		} else if args.Query != "" {
+			once = true
+			s.Query = args.Query
+		}
+		iactive := args.InputFile == nil && args.Query == ""
+		if iactive || s.Query != "" {
+			err = s.Run(once, false)
+		} else {
+			for f := range args.InputFile {
+				if err = s.IncludeFile(args.InputFile[f], true); err != nil {
+					s.WriteError(s.GetError(), err)
+					s.Exitcode = 1
+					break
+				}
 			}
 		}
 	}

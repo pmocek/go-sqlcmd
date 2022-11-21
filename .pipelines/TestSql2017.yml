@@ -1,5 +1,5 @@
 variables:
-  # AZURE_CLIENT_SECRET and SQLPASSWORD must be defined as secret variables in the pipeline. 
+  # AZURE_CLIENT_SECRET and SQLPASSWORD must be defined as secret variables in the pipeline.
   # AZURE_TENANT_ID and AZURE_CLIENT_ID are not expected to be secret variables, just regular variables
   AZURECLIENTSECRET: $(AZURE_CLIENT_SECRET)
   PASSWORD: $(SQLPASSWORD)
@@ -20,14 +20,14 @@ steps:
       RunName: 'SQL2017'
       SQLCMDUSER: sa
       SQLPASSWORD: $(PASSWORD)
-      
+
   - template: include-runtests-linux.yml
     parameters:
       RunName: 'SQLDB'
       # AZURESERVER must be defined as a variable in the pipeline
       SQLCMDSERVER: $(AZURESERVER)
       AZURECLIENTSECRET: $(AZURECLIENTSECRET)
-      
+
   - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
     displayName: Merge coverage data
     inputs:
@@ -39,7 +39,7 @@ steps:
       tag: '$(build.buildnumber)_#$(build.buildid)_$(Build.SourceBranchName)' # Optional tag or build version.
   - task: PublishCodeCoverageResults@1
     inputs:
-      codeCoverageTool: Cobertura 
+      codeCoverageTool: Cobertura
       pathToSources: '$(Build.SourcesDirectory)'
       summaryFileLocation: $(Build.SourcesDirectory)/coverage/*.xml
       reportDirectory: $(Build.SourcesDirectory)/coverage
@@ -48,4 +48,6 @@ steps:
     continueOnError: true
     env:
       disable.coverage.autogenerate: 'true'
-  
+
+  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+    displayName: ‘Component Detection’
