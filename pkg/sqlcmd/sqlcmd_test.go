@@ -105,7 +105,7 @@ func TestSqlCmdQueryAndExit(t *testing.T) {
 		s.SetOutput(nil)
 		bytes, err := os.ReadFile(file.Name())
 		if assert.NoError(t, err, "os.ReadFile") {
-			assert.Equal(t, "Sqlcmd: Error: Syntax error at line 1."+SqlcmdEol, string(bytes), "Incorrect output from Run")
+			assert.Equal(t, "Sqlcmd: Error: Syntax error at line 1"+SqlcmdEol, string(bytes), "Incorrect output from Run")
 		}
 	}
 }
@@ -265,7 +265,7 @@ func TestSqlCmdExitOnError(t *testing.T) {
 	s.Connect.ExitOnError = true
 	err := runSqlCmd(t, s, []string{"select 1", "GO", ":setvar", "select 2", "GO"})
 	o := buf.buf.String()
-	assert.EqualError(t, err, "Sqlcmd: Error: Syntax error at line 3 near command ':SETVAR'.", "Run should return an error")
+	assert.EqualError(t, err, "Sqlcmd: Error: Syntax error at line 3 near command ':SETVAR'", "Run should return an error")
 	assert.Equal(t, "1"+SqlcmdEol+SqlcmdEol+oneRowAffected+SqlcmdEol+"Sqlcmd: Error: Syntax error at line 3 near command ':SETVAR'."+SqlcmdEol, o, "Only first select should run")
 	assert.Equal(t, 1, s.Exitcode, "s.ExitCode for a syntax error")
 
@@ -473,7 +473,7 @@ func TestSqlCmdOutputAndError(t *testing.T) {
 	if assert.NoError(t, err, "s.Run(once = true)") {
 		bytes, err := os.ReadFile(errfile.Name())
 		if assert.NoError(t, err, "os.ReadFile") {
-			assert.Equal(t, "Sqlcmd: Error: Syntax error at line 1."+SqlcmdEol, string(bytes), "Expected syntax error not received for query execution")
+			assert.Equal(t, "Sqlcmd: Error: Syntax error at line 1"+SqlcmdEol, string(bytes), "Expected syntax error not received for query execution")
 		}
 	}
 	s.Query = "select '1'"
@@ -497,7 +497,7 @@ func TestSqlCmdOutputAndError(t *testing.T) {
 		}
 		bytes, err = os.ReadFile(errfile.Name())
 		if assert.NoError(t, err, "os.ReadFile errfile") {
-			assert.Equal(t, "Sqlcmd: Error: Syntax error at line 3."+SqlcmdEol, string(bytes), "Expected syntax error not found in errfile")
+			assert.Equal(t, "Sqlcmd: Error: Syntax error at line 3"+SqlcmdEol, string(bytes), "Expected syntax error not found in errfile")
 		}
 	}
 }
