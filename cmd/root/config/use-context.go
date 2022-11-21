@@ -4,9 +4,9 @@
 package config
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/config"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 )
 
 type UseContext struct {
@@ -16,27 +16,27 @@ type UseContext struct {
 }
 
 func (c *UseContext) DefineCommand(...cmd.Command) {
-	c.Base.Info = cmd.Info{
-		Use: "use-context",
+	c.Base.Options = cmd.Options{
+		Use:   "use-context",
 		Short: "Display one or many users from the sqlconfig file",
 		Examples: []cmd.ExampleInfo{
 			{
 				Description: "Use the context for the user@mssql sql instance",
-				Steps: []string{"sqlcmd config use-context user@mssql"},
+				Steps:       []string{"sqlcmd config use-context user@mssql"},
 			},
 		},
 		Aliases: []string{"use", "change-context", "set-context"},
-		Run: c.run,
+		Run:     c.run,
 
 		FirstArgAlternativeForFlag: &cmd.AlternativeForFlagInfo{Flag: "name", Value: &c.name},
 	}
 
 	c.Base.DefineCommand()
 
-	c.AddFlag(cmd.FlagInfo{
+	c.AddFlag(cmd.FlagOptions{
 		String: &c.name,
-		Name: "name",
-		Usage: "Name of context to set as current context"})
+		Name:   "name",
+		Usage:  "Name of context to set as current context"})
 }
 
 func (c *UseContext) run() {

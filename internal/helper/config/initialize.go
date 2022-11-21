@@ -4,10 +4,10 @@
 package config
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/file"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/net"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
+	"github.com/microsoft/go-sqlcmd/internal/helper/file"
+	"github.com/microsoft/go-sqlcmd/internal/helper/net"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/secret"
 	"os"
 	"path/filepath"
 )
@@ -31,7 +31,7 @@ func init() {
 		secret.Encode,
 		secret.Decode,
 		net.IsLocalPortAvailable,
-		file.CreateEmptyFileIfNotExists,
+		file.CreateEmptyIfNotExists,
 		configFile,
 	)
 }

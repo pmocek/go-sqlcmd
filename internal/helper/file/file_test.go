@@ -1,13 +1,25 @@
-package file
+package file_test
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/folder"
+	"github.com/microsoft/go-sqlcmd/internal/helper/file"
+	"github.com/microsoft/go-sqlcmd/internal/helper/folder"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
-func TestCreateEmptyFileIfNotExists(t *testing.T) {
+func ExampleCreateEmptyIfNotExists() {
+	filename := filepath.Join(os.TempDir(), "foo.txt")
+
+	file.CreateEmptyIfNotExists(filename)
+}
+
+func TestFileExamples(t *testing.T) {
+	ExampleCreateEmptyIfNotExists()
+}
+
+func TestCreateEmptyIfNotExists(t *testing.T) {
 	filename := "foo.txt"
 	folderName := "folder"
 
@@ -39,7 +51,7 @@ func TestCreateEmptyFileIfNotExists(t *testing.T) {
 				}()
 			}
 
-			CreateEmptyFileIfNotExists(tt.args.filename)
+			file.CreateEmptyIfNotExists(tt.args.filename)
 		})
 	}
 }
@@ -69,7 +81,7 @@ func TestExists(t *testing.T) {
 				}()
 			}
 
-			if gotExists := Exists(tt.args.filename); gotExists != tt.wantExists {
+			if gotExists := file.Exists(tt.args.filename); gotExists != tt.wantExists {
 				t.Errorf("Exists() = %v, want %v", gotExists, tt.wantExists)
 			}
 		})
@@ -77,11 +89,11 @@ func TestExists(t *testing.T) {
 }
 
 func cleanup(folderName string, filename string) {
-	if Exists(folderName) {
+	if file.Exists(folderName) {
 		folder.RemoveAll(folderName)
 	}
 
-	if Exists(filename) {
-		Remove(filename)
+	if file.Exists(filename) {
+		file.Remove(filename)
 	}
 }

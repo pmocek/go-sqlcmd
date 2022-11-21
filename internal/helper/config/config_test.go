@@ -2,7 +2,7 @@ package config
 
 import (
 	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 	"reflect"
 	"strings"
 	"testing"
@@ -250,20 +250,20 @@ func TestAddContextWithContainerPanic(t *testing.T) {
 		name string
 		args args
 	}{
-		{ 	name: "AddContextWithContainerDefensePanics",
-			args: args{ "", "image", 1433, "id", "user", "password", false}},
-		{ 	name: "AddContextWithContainerDefensePanics",
-			args: args{ "context", "", 1433, "id", "user", "password", false}},
-		{ 	name: "AddContextWithContainerDefensePanics",
-			args: args{ "context", "image", 1433, "", "user", "password", false}},
-		{ 	name: "AddContextWithContainerDefensePanics",
-			args: args{ "context", "image", 0, "id", "user", "password", false}},
-		{ 	name: "AddContextWithContainerDefensePanics",
-			args: args{ "context", "image", 1433, "id", "", "password", false}},
-		{ 	name: "AddContextWithContainerDefensePanics",
-			args: args{ "context", "image", 1433, "id", "user", "", false}},
+		{name: "AddContextWithContainerDefensePanics",
+			args: args{"", "image", 1433, "id", "user", "password", false}},
+		{name: "AddContextWithContainerDefensePanics",
+			args: args{"context", "", 1433, "id", "user", "password", false}},
+		{name: "AddContextWithContainerDefensePanics",
+			args: args{"context", "image", 1433, "", "user", "password", false}},
+		{name: "AddContextWithContainerDefensePanics",
+			args: args{"context", "image", 0, "id", "user", "password", false}},
+		{name: "AddContextWithContainerDefensePanics",
+			args: args{"context", "image", 1433, "id", "", "password", false}},
+		{name: "AddContextWithContainerDefensePanics",
+			args: args{"context", "image", 1433, "id", "user", "", false}},
 	}
-		for _, tt := range tests {
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
 			defer func() {

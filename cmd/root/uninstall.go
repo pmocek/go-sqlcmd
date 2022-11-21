@@ -5,10 +5,10 @@ package root
 
 import (
 	"fmt"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/container"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/config"
+	"github.com/microsoft/go-sqlcmd/internal/helper/container"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 	"path/filepath"
 	"strings"
 )
@@ -32,35 +32,35 @@ var systemDatabases = [...]string{
 }
 
 func (c *Uninstall) DefineCommand(...cmd.Command) {
-	c.Base.Info = cmd.Info{
-		Use: "uninstall",
+	c.Base.Options = cmd.Options{
+		Use:   "uninstall",
 		Short: "Uninstall/Delete the current context",
 		Examples: []cmd.ExampleInfo{
 			{
 				Description: "Uninstall/Delete the current context (includes the endpoint and user)",
-				Steps: []string{`sqlcmd uninstall`}},
+				Steps:       []string{`sqlcmd uninstall`}},
 			{
 				Description: "Uninstall/Delete the current context, no user prompt",
-				Steps: []string{`sqlcmd uninstall --yes`}},
+				Steps:       []string{`sqlcmd uninstall --yes`}},
 			{
 				Description: "Uninstall/Delete the current context, no user prompt and override safety check for user databases",
-				Steps: []string{`sqlcmd uninstall --yes --force`}},
+				Steps:       []string{`sqlcmd uninstall --yes --force`}},
 		},
 		Aliases: []string{"delete", "drop"},
-		Run: c.run,
+		Run:     c.run,
 	}
 
 	c.Base.DefineCommand()
 
-	c.AddFlag(cmd.FlagInfo{
-		Bool: &c.yes,
-		Name: "yes",
+	c.AddFlag(cmd.FlagOptions{
+		Bool:  &c.yes,
+		Name:  "yes",
 		Usage: "Quiet mode (do not stop for user input to confirm the operation)",
 	})
 
-	c.AddFlag(cmd.FlagInfo{
-		Bool: &c.force,
-		Name: "force",
+	c.AddFlag(cmd.FlagOptions{
+		Bool:  &c.force,
+		Name:  "force",
 		Usage: "Complete the operation even if non-system (user) database files are present",
 	})
 }

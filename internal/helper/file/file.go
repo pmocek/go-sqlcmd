@@ -4,12 +4,12 @@
 package file
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/folder"
+	"github.com/microsoft/go-sqlcmd/internal/helper/folder"
 	"os"
 	"path/filepath"
 )
 
-func CreateEmptyFileIfNotExists(filename string) {
+func CreateEmptyIfNotExists(filename string) {
 	if filename == "" {
 		panic("filename must not be empty")
 	}

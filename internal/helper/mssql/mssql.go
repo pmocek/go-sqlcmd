@@ -49,6 +49,7 @@ func Connect(
 func Query(s *sqlcmd.Sqlcmd, text string) {
 	s.Query = text
 	s.SetOutput(os.Stdout)
+	s.SetError(os.Stderr)
 	err := s.Run(true, false)
 	checkErr(err)
 }

@@ -4,9 +4,9 @@
 package config
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/config"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 )
 
 type DeleteContext struct {
@@ -17,8 +17,8 @@ type DeleteContext struct {
 }
 
 func (c *DeleteContext) DefineCommand(...cmd.Command) {
-	c.Base.Info = cmd.Info{
-		Use: "delete-context",
+	c.Base.Options = cmd.Options{
+		Use:   "delete-context",
 		Short: "Delete a context",
 		Examples: []cmd.ExampleInfo{
 			{
@@ -35,16 +35,16 @@ func (c *DeleteContext) DefineCommand(...cmd.Command) {
 
 	c.Base.DefineCommand()
 
-	c.AddFlag(cmd.FlagInfo{
+	c.AddFlag(cmd.FlagOptions{
 		String: &c.name,
-		Name: "name",
-		Usage: "Name of context to delete"})
+		Name:   "name",
+		Usage:  "Name of context to delete"})
 
-	c.AddFlag(cmd.FlagInfo{
-		Bool: &c.cascade,
-		Name: "cascade",
+	c.AddFlag(cmd.FlagOptions{
+		Bool:        &c.cascade,
+		Name:        "cascade",
 		DefaultBool: true,
-		Usage: "Delete the context's endpoint and user as well"})
+		Usage:       "Delete the context's endpoint and user as well"})
 }
 
 func (c *DeleteContext) run() {

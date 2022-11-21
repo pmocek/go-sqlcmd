@@ -4,34 +4,34 @@
 package config
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/config"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 )
 
 type GetUsers struct {
 	cmd.Base
 
-	name string
+	name     string
 	detailed bool
 }
 
 func (c *GetUsers) DefineCommand(...cmd.Command) {
-	c.Base.Info = cmd.Info{
-		Use: "get-users",
+	c.Base.Options = cmd.Options{
+		Use:   "get-users",
 		Short: "Display one or many users from the sqlconfig file",
 		Examples: []cmd.ExampleInfo{
 			{
 				Description: "List all the users in your sqlconfig file",
-				Steps: []string{"sqlcmd config get-users"},
+				Steps:       []string{"sqlcmd config get-users"},
 			},
 			{
 				Description: "List all the users in your sqlconfig file",
-				Steps: []string{"sqlcmd config get-users --detailed"},
+				Steps:       []string{"sqlcmd config get-users --detailed"},
 			},
 			{
 				Description: "Describe one user in your sqlconfig file",
-				Steps: []string{"sqlcmd config get-users user1"},
+				Steps:       []string{"sqlcmd config get-users user1"},
 			},
 		},
 		Run: c.run,
@@ -41,14 +41,14 @@ func (c *GetUsers) DefineCommand(...cmd.Command) {
 
 	c.Base.DefineCommand()
 
-	c.AddFlag(cmd.FlagInfo{
+	c.AddFlag(cmd.FlagOptions{
 		String: &c.name,
-		Name: "name",
-		Usage: "User name to view details of"})
+		Name:   "name",
+		Usage:  "User name to view details of"})
 
-	c.AddFlag(cmd.FlagInfo{
-		Bool: &c.detailed,
-		Name: "detailed",
+	c.AddFlag(cmd.FlagOptions{
+		Bool:  &c.detailed,
+		Name:  "detailed",
 		Usage: "Include user details"})
 }
 

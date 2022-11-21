@@ -6,7 +6,7 @@ package root
 import (
 	"github.com/microsoft/go-sqlcmd/cmd/root/config"
 	"github.com/microsoft/go-sqlcmd/cmd/root/install"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
 )
 
 func SubCommands() []cmd.Command {

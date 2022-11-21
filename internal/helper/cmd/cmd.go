@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Initialize runs the init func after the command-line provided by the user
+// Initialize runs the init func() after the command-line provided by the user
 // has been parsed.
 func Initialize(init func()) {
 	cobra.OnInitialize(init)
@@ -15,6 +15,7 @@ func Initialize(init func()) {
 //
 // Example:
 //   topLevel : = cmd.New[*MyCommand]()
+//   topLevel.Execute()
 //
 // Example with sub-commands
 //  topLevel := cmd.New[*MyCommand](MyCommand.subCommands)

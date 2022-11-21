@@ -1,15 +1,15 @@
-package helpers
+package helper
 
 /*
-Helpers package abstracts the following from the application that uses these
-helpers (using dependency injection):
+Helper packages abstract the following from the application (using
+dependency injection):
 
- - error handling for all non-control flow scenarios
+ - error handling (for non-control flow)
  - trace support (non-localized output)
 
-The above abstractions enable the application code (using these helpers) to not
-have to sprinkle if (err != nil) blocks (except when the application wants to
-affect application flow based on err)
+The above abstractions enable application code to not have to sprinkle
+if (err != nil) blocks (except when the application wants to affect application
+flow based on err)
 
 Do and Do Not:
  - Do verify parameter values and panic if the helper function would be unable
@@ -36,7 +36,7 @@ Do and Do Not:
 
        import (
          "github.com/microsoft/go-sqlcmd/cmd/helpers/secret"
-         . "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
+         "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
        )
 
      Do instead:
@@ -47,7 +47,6 @@ Do and Do Not:
        var decryptCallback func(cipherText string) (secret string)
 
        func Initialize(
-       encryptHandler func(plainText string)(cipherText string),
+       encryptHandler func(plainText string) (cipherText string),
        decryptHandler func(cipherText string) (secret string),
-
 */

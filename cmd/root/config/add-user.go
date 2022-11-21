@@ -2,10 +2,10 @@ package config
 
 import (
 	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/config"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/secret"
 	"os"
 )
 
@@ -19,8 +19,8 @@ type AddUser struct {
 }
 
 func (c *AddUser) DefineCommand(...cmd.Command) {
-	c.Base.Info = cmd.Info{
-		Use: "add-user",
+	c.Base.Options = cmd.Options{
+		Use:   "add-user",
 		Short: "Add a user",
 		Examples: []cmd.ExampleInfo{
 			{
@@ -35,24 +35,24 @@ func (c *AddUser) DefineCommand(...cmd.Command) {
 
 	c.Base.DefineCommand()
 
-	c.AddFlag(cmd.FlagInfo{
-		String: &c.name,
-		Name: "name",
+	c.AddFlag(cmd.FlagOptions{
+		String:        &c.name,
+		Name:          "name",
 		DefaultString: "user",
-		Usage: "Display name for the user (this is not the username)",
+		Usage:         "Display name for the user (this is not the username)",
 	})
 
-	c.AddFlag(cmd.FlagInfo{
-		String: &c.authType,
-		Name: "auth-type",
+	c.AddFlag(cmd.FlagOptions{
+		String:        &c.authType,
+		Name:          "auth-type",
 		DefaultString: "basic",
-		Usage: "Authentication type this user will use (basic | other)",
+		Usage:         "Authentication type this user will use (basic | other)",
 	})
 
-	c.AddFlag(cmd.FlagInfo{
+	c.AddFlag(cmd.FlagOptions{
 		String: &c.username,
-		Name: "username",
-		Usage: "The username (provide password in SQLCMD_PASSWORD environment variable)",
+		Name:   "username",
+		Usage:  "The username (provide password in SQLCMD_PASSWORD environment variable)",
 	})
 
 	c.encryptPasswordFlag()

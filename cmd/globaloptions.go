@@ -1,6 +1,6 @@
 package cmd
 
-type GlobalOptionsType struct {
+type GlobalOptions struct {
 	TrustServerCertificate bool
 	DatabaseName           string
 	UseTrustedConnection   bool
@@ -16,4 +16,4 @@ type GlobalOptionsType struct {
 	DriverLogLevel         int
 }
 
-var GlobalOptions = &GlobalOptionsType{}
+var globalOptions = &GlobalOptions{}

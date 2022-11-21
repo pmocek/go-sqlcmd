@@ -1,7 +1,7 @@
-package helpers
+package helper
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/pal"
+	"github.com/microsoft/go-sqlcmd/internal/helper/pal"
 	"testing"
 )
 

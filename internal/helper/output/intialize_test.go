@@ -1,7 +1,7 @@
 package output
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output/verbosity"
 	"io"
 	"os"
 	"strings"

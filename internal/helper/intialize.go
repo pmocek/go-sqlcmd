@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package helpers
+package helper
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/container"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/file"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/mssql"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/net"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/pal"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
+	"github.com/microsoft/go-sqlcmd/internal/helper/config"
+	"github.com/microsoft/go-sqlcmd/internal/helper/container"
+	"github.com/microsoft/go-sqlcmd/internal/helper/file"
+	"github.com/microsoft/go-sqlcmd/internal/helper/mssql"
+	"github.com/microsoft/go-sqlcmd/internal/helper/net"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output/verbosity"
+	"github.com/microsoft/go-sqlcmd/internal/helper/pal"
+	"github.com/microsoft/go-sqlcmd/internal/helper/secret"
 	"os"
 )
 
@@ -46,7 +46,7 @@ func Initialize(
 		secret.Encode,
 		secret.Decode,
 		net.IsLocalPortAvailable,
-		file.CreateEmptyFileIfNotExists,
+		file.CreateEmptyIfNotExists,
 		sqlconfigFilename,
 	)
 	container.Initialize(info.ErrorHandler, info.TraceHandler)

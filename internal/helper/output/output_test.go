@@ -2,7 +2,7 @@ package output
 
 import (
 	"errors"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output/verbosity"
 	"testing"
 )
 

@@ -10,11 +10,11 @@ type TopLevelCommand struct {
 }
 
 func (c *TopLevelCommand) DefineCommand(subCommands ...Command) {
-	c.Info = Info{
-		Use: "top-level",
+	c.Options = Options{
+		Use:   "top-level",
 		Short: "Hello-World",
 		Examples: []ExampleInfo{
-			{	Description: "First example",
+			{Description: "First example",
 				Steps: []string{"This is the example"}},
 		},
 	}
@@ -29,19 +29,20 @@ type SubCommand1 struct {
 }
 
 func (c *SubCommand1) DefineCommand(subCommands ...Command) {
-	c.Info = Info{
-		Use: "sub-command1",
+	c.Options = Options{
+		Use:   "sub-command1",
 		Short: "Sub Command 1",
 		FirstArgAlternativeForFlag: &AlternativeForFlagInfo{
 			Flag:  "name",
 			Value: &c.name,
 		},
-		Run: func() {fmt.Println("Running: Sub Command 1")},
+		Run: func() { fmt.Println("Running: Sub Command 1") },
 	}
 	c.Base.DefineCommand(subCommands...)
-	c.AddFlag(FlagInfo{
-		Name:          "name",
-		String:        &c.name,
+	c.AddFlag(FlagOptions{
+		Name:   "name",
+		String: &c.name,
+		Usage:  "usage",
 	})
 }
 
@@ -50,10 +51,10 @@ type SubCommand11 struct {
 }
 
 func (c *SubCommand11) DefineCommand(...Command) {
-	c.Info = Info{
-		Use: "sub-command11",
+	c.Options = Options{
+		Use:   "sub-command11",
 		Short: "Sub Command 11",
-		Run: func() {fmt.Println("Running: Sub Command 11")},
+		Run:   func() { fmt.Println("Running: Sub Command 11") },
 	}
 	c.Base.DefineCommand()
 }
@@ -63,14 +64,13 @@ type SubCommand2 struct {
 }
 
 func (c *SubCommand2) DefineCommand(...Command) {
-	c.Info = Info{
-		Use: "sub-command2",
-		Short: "Sub Command 2",
+	c.Options = Options{
+		Use:     "sub-command2",
+		Short:   "Sub Command 2",
 		Aliases: []string{"sub-command2-alias"},
 	}
 	c.Base.DefineCommand()
 }
-
 
 func Test_EndToEnd(t *testing.T) {
 	subCmd11 := New[*SubCommand11]()
@@ -80,41 +80,47 @@ func Test_EndToEnd(t *testing.T) {
 	topLevel := New[*TopLevelCommand](subCmd1, subCmd2)
 
 	topLevel.IsSubCommand("sub-command2")
-	topLevel.IsSubCommand(	"sub-command2-alias")
+	topLevel.IsSubCommand("sub-command2-alias")
 	topLevel.IsSubCommand("--help")
 	topLevel.IsSubCommand("completion")
 
 	var s string
-	topLevel.AddFlag(FlagInfo{
+	topLevel.AddFlag(FlagOptions{
 		String: &s,
-		Name: "string",
+		Name:   "string",
+		Usage:  "usage",
 	})
-	topLevel.AddFlag(FlagInfo{
-		String: &s,
+	topLevel.AddFlag(FlagOptions{
+		String:    &s,
 		Shorthand: "s",
-		Name: "string2",
+		Name:      "string2",
+		Usage:     "usage",
 	})
 
 	var i int
-	topLevel.AddFlag(FlagInfo{
-		Int: &i,
-		Name: "int",
+	topLevel.AddFlag(FlagOptions{
+		Int:   &i,
+		Name:  "int",
+		Usage: "usage",
 	})
-	topLevel.AddFlag(FlagInfo{
-		Int: &i,
+	topLevel.AddFlag(FlagOptions{
+		Int:       &i,
 		Shorthand: "i",
-		Name: "int2",
+		Name:      "int2",
+		Usage:     "usage",
 	})
 
 	var b bool
-	topLevel.AddFlag(FlagInfo{
-		Bool: &b,
-		Name: "bool",
+	topLevel.AddFlag(FlagOptions{
+		Bool:  &b,
+		Name:  "bool",
+		Usage: "usage",
 	})
-	topLevel.AddFlag(FlagInfo{
-		Bool: &b,
+	topLevel.AddFlag(FlagOptions{
+		Bool:      &b,
 		Shorthand: "b",
-		Name: "bool2",
+		Name:      "bool2",
+		Usage:     "usage",
 	})
 
 	topLevel.ArgsForUnitTesting([]string{"--help"})

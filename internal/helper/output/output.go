@@ -4,7 +4,7 @@
 /*
 	output.Trace("Something very low level.") - not localized
 	output.Debug("Useful debugging information.") - not localized
-	output.Info("Something noteworthy happened!") - localized
+	output.Options("Something noteworthy happened!") - localized
 	output.Warn("You should probably take a look at this.") - localized
 	output.Error("Something failed but I'm not quitting.") - localized
 	// Calls os.Exit(1) after logging
@@ -17,8 +17,8 @@ package output
 
 import (
 	"fmt"
-	. "github.com/microsoft/go-sqlcmd/internal/helpers/output/formatter"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
+	. "github.com/microsoft/go-sqlcmd/internal/helper/output/formatter"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output/verbosity"
 	"github.com/microsoft/go-sqlcmd/pkg/sqlcmd"
 	"github.com/pkg/errors"
 	"io"
@@ -41,7 +41,7 @@ func Struct(in interface{}) (bytes []byte) {
 func Tracef(format string, a ...any) {
 	if loggingLevel >= verbosity.Trace {
 		format = ensureEol(format)
-		printf("TRACE: " + format, a...)
+		printf("TRACE: "+format, a...)
 	}
 }
 
@@ -74,7 +74,7 @@ func ensureEol(format string) string {
 func Debugf(format string, a ...any) {
 	if loggingLevel >= verbosity.Debug {
 		format = ensureEol(format)
-		printf("DEBUG: " + format, a...)
+		printf("DEBUG: "+format, a...)
 	}
 }
 

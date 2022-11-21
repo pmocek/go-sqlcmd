@@ -5,9 +5,9 @@ package cmd
 
 import (
 	"github.com/microsoft/go-sqlcmd/cmd/root"
-	"github.com/microsoft/go-sqlcmd/internal/helpers"
-	command "github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper"
+	command "github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 )
 
 var loggingLevel int
@@ -21,7 +21,7 @@ var rootCmd command.Command
 // like '-v 4' which sets the logging level to maximum etc.
 func init() {
 	command.Initialize(func() {
-		helpers.Initialize(
+		helper.Initialize(
 			checkErr,
 			displayHints,
 			configFilename,

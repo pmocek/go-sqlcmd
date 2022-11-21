@@ -4,9 +4,9 @@
 package config
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/config"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 )
 
 type DeleteUser struct {
@@ -16,8 +16,8 @@ type DeleteUser struct {
 }
 
 func (c *DeleteUser) DefineCommand(...cmd.Command) {
-	c.Base.Info = cmd.Info{
-		Use: "delete-user",
+	c.Base.Options = cmd.Options{
+		Use:   "delete-user",
 		Short: "Delete a user",
 		Examples: []cmd.ExampleInfo{
 			{
@@ -33,10 +33,10 @@ func (c *DeleteUser) DefineCommand(...cmd.Command) {
 
 	c.Base.DefineCommand()
 
-	c.AddFlag(cmd.FlagInfo{
+	c.AddFlag(cmd.FlagOptions{
 		String: &c.name,
-		Name: "name",
-		Usage: "Name of user to delete"})
+		Name:   "name",
+		Usage:  "Name of user to delete"})
 }
 
 func (c *DeleteUser) run() {

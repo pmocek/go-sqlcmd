@@ -3,11 +3,11 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/microsoft/go-sqlcmd/internal/helpers"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/pal"
+	"github.com/microsoft/go-sqlcmd/internal/helper"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/config"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/pal"
 	"os"
 	"strings"
 	"testing"
@@ -19,7 +19,10 @@ var useCached = ""
 
 func TestCommandLineHelp(t *testing.T) {
 	setup()
-	tests := []struct {name string; args struct {args []string}}{
+	tests := []struct {
+		name string
+		args struct{ args []string }
+	}{
 		{"default", split("--help")},
 	}
 	run(t, tests)
@@ -27,7 +30,10 @@ func TestCommandLineHelp(t *testing.T) {
 
 func TestNegCommandLines(t *testing.T) {
 	setup()
-	tests := []struct {name string; args struct {args []string}}{
+	tests := []struct {
+		name string
+		args struct{ args []string }
+	}{
 		{"neg-config-use-context-double-name",
 			split("config use-context badbad --name andbad")},
 		{"neg-config-use-context-bad-name",
@@ -44,7 +50,10 @@ func TestNegCommandLines(t *testing.T) {
 
 func TestConfigContexts(t *testing.T) {
 	setup()
-	tests := []struct {name string; args struct {args []string}}{
+	tests := []struct {
+		name string
+		args struct{ args []string }
+	}{
 		{"neg-config-add-context-no-endpoint",
 			split("config add-context")},
 		{"config-add-endpoint",
@@ -91,7 +100,10 @@ func TestConfigContexts(t *testing.T) {
 
 func TestConfigUsers(t *testing.T) {
 	setup()
-	tests := []struct {name string; args struct {args []string}}{
+	tests := []struct {
+		name string
+		args struct{ args []string }
+	}{
 		{"neg-config-get-users-bad-user",
 			split("config get-users badbad")},
 		{"config-add-user",
@@ -123,7 +135,7 @@ func TestLocalContext(t *testing.T) {
 	setup()
 	tests := []struct {
 		name string
-		args struct {args []string}
+		args struct{ args []string }
 	}{
 		{"neg-config-delete-endpoint-no-name",
 			split("config delete-endpoint")},
@@ -153,7 +165,7 @@ func TestGetTags(t *testing.T) {
 	setup()
 	tests := []struct {
 		name string
-		args struct {args []string}
+		args struct{ args []string }
 	}{
 		{"get-tags",
 			split("install mssql get-tags")},
@@ -166,7 +178,7 @@ func TestMssqlInstall(t *testing.T) {
 	setup()
 	tests := []struct {
 		name string
-		args struct {args []string}
+		args struct{ args []string }
 	}{
 		{"install",
 			split(fmt.Sprintf("install mssql%v --user-database my-database --accept-eula --encrypt-password", useCached))},
@@ -186,7 +198,7 @@ func TestMssqlInstall(t *testing.T) {
 			split("uninstall")},*/
 		{"uninstall",
 			split("uninstall --yes --force")},
-			}
+	}
 
 	run(t, tests)
 }
@@ -274,7 +286,7 @@ func setup() {
 		useCached = ""
 	}
 
-	helpers.Initialize(
+	helper.Initialize(
 		func(err error) {
 			if err != nil {
 				panic(err)

@@ -3,7 +3,7 @@
 
 package config
 
-import "github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
+import "github.com/microsoft/go-sqlcmd/internal/helper/cmd"
 
 func SubCommands() []cmd.Command {
 	return []cmd.Command{

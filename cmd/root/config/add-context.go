@@ -3,9 +3,9 @@ package config
 import (
 	"fmt"
 	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/config"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 )
 
 type AddContext struct {
@@ -17,33 +17,33 @@ type AddContext struct {
 }
 
 func (c *AddContext) DefineCommand(...cmd.Command) {
-	c.Base.Info = cmd.Info{
-		Use: "add-context",
+	c.Base.Options = cmd.Options{
+		Use:   "add-context",
 		Short: "Add a context",
 		Examples: []cmd.ExampleInfo{
 			{
 				Description: "Add a default context",
-				Steps: []string{"sqlcmd config add-context --name my-context"}},
+				Steps:       []string{"sqlcmd config add-context --name my-context"}},
 		},
 		Run: c.run}
 
 	c.Base.DefineCommand()
 
-	c.AddFlag(cmd.FlagInfo{
-		String: &c.name,
-		Name: "name",
+	c.AddFlag(cmd.FlagOptions{
+		String:        &c.name,
+		Name:          "name",
 		DefaultString: "context",
-		Usage: "Display name for the context"})
+		Usage:         "Display name for the context"})
 
-	c.AddFlag(cmd.FlagInfo{
+	c.AddFlag(cmd.FlagOptions{
 		String: &c.endpointName,
-		Name: "endpoint",
-		Usage: "Name of endpoint this context will use, use `sqlcmd config get-endpoints` to see list"})
+		Name:   "endpoint",
+		Usage:  "Name of endpoint this context will use, use `sqlcmd config get-endpoints` to see list"})
 
-	c.AddFlag(cmd.FlagInfo{
-			String: &c.userName,
-			Name: "user",
-			Usage: "Name of user this context will use, use `sqlcmd config get-users` to see list"})
+	c.AddFlag(cmd.FlagOptions{
+		String: &c.userName,
+		Name:   "user",
+		Usage:  "Name of user this context will use, use `sqlcmd config get-users` to see list"})
 }
 
 func (c *AddContext) run() {

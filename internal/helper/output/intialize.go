@@ -5,8 +5,8 @@ package output
 
 import (
 	"fmt"
-	. "github.com/microsoft/go-sqlcmd/internal/helpers/output/formatter"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output/verbosity"
+	. "github.com/microsoft/go-sqlcmd/internal/helper/output/formatter"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output/verbosity"
 	"io"
 	"os"
 )
@@ -20,7 +20,7 @@ func init() {
 		}
 	}
 	formatter = &Yaml{Base: Base{
-		StandardOutput: standardWriteCloser,
+		StandardOutput:       standardWriteCloser,
 		ErrorHandlerCallback: errorHandler,
 	}}
 
@@ -53,15 +53,15 @@ func Initialize(
 	switch serializationFormat {
 	case "json":
 		formatter = &Json{Base: Base{
-			StandardOutput: standardWriteCloser,
+			StandardOutput:       standardWriteCloser,
 			ErrorHandlerCallback: errorHandler}}
 	case "yaml":
 		formatter = &Yaml{Base: Base{
-			StandardOutput: standardWriteCloser,
+			StandardOutput:       standardWriteCloser,
 			ErrorHandlerCallback: errorHandler}}
 	case "xml":
 		formatter = &Xml{Base: Base{
-			StandardOutput: standardWriteCloser,
+			StandardOutput:       standardWriteCloser,
 			ErrorHandlerCallback: errorHandler}}
 	default:
 		panic(fmt.Sprintf("Format '%v' not supported", serializationFormat))

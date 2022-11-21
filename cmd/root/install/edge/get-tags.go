@@ -4,9 +4,9 @@
 package edge
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/container"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/container"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 )
 
 type GetTags struct {
@@ -14,7 +14,7 @@ type GetTags struct {
 }
 
 func (c *GetTags) DefineCommand(...cmd.Command) {
-	c.Base.Info = cmd.Info{
+	c.Base.Options = cmd.Options{
 		Use:   "get-tags",
 		Short: "Get tags available for mssql edge install",
 		Examples: []cmd.ExampleInfo{

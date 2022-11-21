@@ -4,8 +4,8 @@
 package cmd
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/pal"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/pal"
 )
 
 type Root struct {
@@ -13,13 +13,13 @@ type Root struct {
 }
 
 func (c *Root) DefineCommand(subCommands ...cmd.Command) {
-	c.Base.Info = cmd.Info{
-		Use: "sqlcmd",
+	c.Base.Options = cmd.Options{
+		Use:   "sqlcmd",
 		Short: "sqlcmd: a command-line interface for the #SQLFamily",
 		Examples: []cmd.ExampleInfo{
 			{
 				Description: "Run a query",
-				Steps: []string{`sqlcmd query "SELECT @@SERVERNAME"`}}},
+				Steps:       []string{`sqlcmd query "SELECT @@SERVERNAME"`}}},
 	}
 
 	c.Base.DefineCommand(subCommands...)
@@ -27,51 +27,51 @@ func (c *Root) DefineCommand(subCommands ...cmd.Command) {
 }
 
 func (c *Root) addGlobalFlags() {
-	c.AddFlag(cmd.FlagInfo{
-		Bool: &GlobalOptions.TrustServerCertificate,
-		Name: "trust-server-certificate",
+	c.AddFlag(cmd.FlagOptions{
+		Bool:      &globalOptions.TrustServerCertificate,
+		Name:      "trust-server-certificate",
 		Shorthand: "C",
-		Usage: "Whether to trust the certificate presented by the endpoint for encryption",
+		Usage:     "Whether to trust the certificate presented by the endpoint for encryption",
 	})
 
-	c.AddFlag(cmd.FlagInfo{
-		String: &GlobalOptions.DatabaseName,
-		Name: "database-name",
+	c.AddFlag(cmd.FlagOptions{
+		String:    &globalOptions.DatabaseName,
+		Name:      "database-name",
 		Shorthand: "d",
-		Usage: "The initial database for the connection",
+		Usage:     "The initial database for the connection",
 	})
 
-	c.AddFlag(cmd.FlagInfo{
-		Bool: &GlobalOptions.UseTrustedConnection,
-		Name: "use-trusted-connection",
+	c.AddFlag(cmd.FlagOptions{
+		Bool:      &globalOptions.UseTrustedConnection,
+		Name:      "use-trusted-connection",
 		Shorthand: "E",
-		Usage: "Whether to use integrated security",
+		Usage:     "Whether to use integrated security",
 	})
 
 	configFilename = pal.FilenameInUserHomeDotDirectory(
 		".sqlcmd",
 		"sqlconfig")
 
-	c.AddFlag(cmd.FlagInfo{
-		String: &configFilename,
+	c.AddFlag(cmd.FlagOptions{
+		String:        &configFilename,
 		DefaultString: configFilename,
-		Name: "sqlconfig",
-		Usage: "Configuration file",
+		Name:          "sqlconfig",
+		Usage:         "Configuration file",
 	})
 
-	c.AddFlag(cmd.FlagInfo{
-		String: &outputType,
+	c.AddFlag(cmd.FlagOptions{
+		String:        &outputType,
 		DefaultString: "yaml",
-		Name: "output",
-		Shorthand: "o",
-		Usage: "output type (yaml, json or xml)",
+		Name:          "output",
+		Shorthand:     "o",
+		Usage:         "output type (yaml, json or xml)",
 	})
 
-	c.AddFlag(cmd.FlagInfo{
-		Int: &loggingLevel,
+	c.AddFlag(cmd.FlagOptions{
+		Int:        &loggingLevel,
 		DefaultInt: 2,
-		Name: "verbosity",
-		Shorthand: "v",
-		Usage: "Log level, error = 0, warn = 1, info = 2, debug = 3, trace = 4",
+		Name:       "verbosity",
+		Shorthand:  "v",
+		Usage:      "Log level, error = 0, warn = 1, info = 2, debug = 3, trace = 4",
 	})
 }

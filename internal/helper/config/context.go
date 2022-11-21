@@ -7,14 +7,15 @@ import (
 	"errors"
 	"fmt"
 	. "github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 	"strconv"
 )
 
 func AddContext(context Context) {
 	if !EndpointExists(context.Endpoint) {
 		output.FatalfWithHintExamples([][]string{
-			{"Add the endpoint", fmt.Sprintf("sqlcmd config add-endpoint --name %v", context.Endpoint)},
+			{"Add the endpoint", fmt.Sprintf(
+				"sqlcmd config add-endpoint --name %v", context.Endpoint)},
 		}, "Endpoint '%v' does not exist", context.Endpoint)
 	}
 	context.Name = FindUniqueContextName(context.Name, *context.User)

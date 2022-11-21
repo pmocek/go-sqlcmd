@@ -5,63 +5,77 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 	"github.com/spf13/cobra"
 
 	"strings"
 )
 
-func (c *Base) AddFlag(info FlagInfo) {
-	// BUG(stuartpa): verify info
+func (c *Base) AddFlag(options FlagOptions) {
+	if options.Name == "" {
+		panic("Must provide name")
+	}
+	if options.Usage == "" {
+		panic("Must provide usage")
+	}
 
-	if info.String != nil {
-		if info.Shorthand == "" {
+	if options.String != nil {
+		if options.Bool != nil || options.Int != nil {
+			panic("Only provide one type")
+		}
+		if options.Shorthand == "" {
 			c.command.PersistentFlags().StringVar(
-				info.String,
-				info.Name,
-				info.DefaultString,
-				info.Usage)
+				options.String,
+				options.Name,
+				options.DefaultString,
+				options.Usage)
 		} else {
 			c.command.PersistentFlags().StringVarP(
-				info.String,
-				info.Name,
-				info.Shorthand,
-				info.DefaultString,
-				info.Usage)
+				options.String,
+				options.Name,
+				options.Shorthand,
+				options.DefaultString,
+				options.Usage)
 		}
 	}
 
-	if info.Int != nil {
-		if info.Shorthand == "" {
+	if options.Int != nil {
+		if options.String != nil || options.Bool != nil {
+			panic("Only provide one type")
+		}
+		if options.Shorthand == "" {
 			c.command.PersistentFlags().IntVar(
-				info.Int,
-				info.Name,
-				info.DefaultInt,
-				info.Usage)
+				options.Int,
+				options.Name,
+				options.DefaultInt,
+				options.Usage)
 		} else {
 			c.command.PersistentFlags().IntVarP(
-				info.Int,
-				info.Name,
-				info.Shorthand,
-				info.DefaultInt,
-				info.Usage)
+				options.Int,
+				options.Name,
+				options.Shorthand,
+				options.DefaultInt,
+				options.Usage)
 		}
 	}
 
-	if info.Bool != nil {
-		if info.Shorthand == "" {
+	if options.Bool != nil {
+		if options.String != nil || options.Int != nil {
+			panic("Only provide one type")
+		}
+		if options.Shorthand == "" {
 			c.command.PersistentFlags().BoolVar(
-				info.Bool,
-				info.Name,
-				info.DefaultBool,
-				info.Usage)
+				options.Bool,
+				options.Name,
+				options.DefaultBool,
+				options.Usage)
 		} else {
 			c.command.PersistentFlags().BoolVarP(
-				info.Bool,
-				info.Name,
-				info.Shorthand,
-				info.DefaultBool,
-				info.Usage)
+				options.Bool,
+				options.Name,
+				options.Shorthand,
+				options.DefaultBool,
+				options.Usage)
 		}
 	}
 }
@@ -71,24 +85,24 @@ func (c *Base) ArgsForUnitTesting(args []string) {
 }
 
 func (c *Base) DefineCommand(subCommands ...Command) {
-	if c.Info.Use == "" {
+	if c.Options.Use == "" {
 		panic("Must implement command definition")
 	}
 
-	if c.Info.Long == "" {
-		c.Info.Long = c.Info.Short
+	if c.Options.Long == "" {
+		c.Options.Long = c.Options.Short
 	}
 
 	c.command = cobra.Command{
-		Use: c.Info.Use,
-		Short: c.Info.Short,
-		Long: c.Info.Long,
-		Aliases: c.Info.Aliases,
+		Use:     c.Options.Use,
+		Short:   c.Options.Short,
+		Long:    c.Options.Long,
+		Aliases: c.Options.Aliases,
 		Example: c.generateExamples(),
-		Run: c.run,
+		Run:     c.run,
 	}
 
-	if c.Info.FirstArgAlternativeForFlag != nil {
+	if c.Options.FirstArgAlternativeForFlag != nil {
 		c.command.Args = cobra.MaximumNArgs(1)
 	} else {
 		c.command.Args = cobra.MaximumNArgs(0)
@@ -144,7 +158,7 @@ func (c *Base) addSubCommands(commands []Command) {
 func (c *Base) generateExamples() string {
 	var sb strings.Builder
 
-	for _, e := range c.Info.Examples {
+	for _, e := range c.Options.Examples {
 		sb.WriteString(fmt.Sprintf("# %v\n", e.Description))
 		for _, s := range e.Steps {
 			sb.WriteString(fmt.Sprintf("  %v\n", s))
@@ -155,27 +169,27 @@ func (c *Base) generateExamples() string {
 }
 
 func (c *Base) run(_ *cobra.Command, args []string) {
-	if c.Info.FirstArgAlternativeForFlag != nil {
+	if c.Options.FirstArgAlternativeForFlag != nil {
 		if len(args) > 0 {
 			flag, err := c.command.PersistentFlags().GetString(
-				c.Info.FirstArgAlternativeForFlag.Flag)
+				c.Options.FirstArgAlternativeForFlag.Flag)
 			c.CheckErr(err)
 			if flag != "" {
 				output.Fatal(
 					fmt.Sprintf(
-						"Both an argument and the --%v flag have been provided. " +
+						"Both an argument and the --%v flag have been provided. "+
 							"Please provide either an argument or the --%v flag",
-						c.Info.FirstArgAlternativeForFlag.Flag,
-						c.Info.FirstArgAlternativeForFlag.Flag))
+						c.Options.FirstArgAlternativeForFlag.Flag,
+						c.Options.FirstArgAlternativeForFlag.Flag))
 			}
-			if c.Info.FirstArgAlternativeForFlag.Value == nil {
-				panic ("Must set Value")
+			if c.Options.FirstArgAlternativeForFlag.Value == nil {
+				panic("Must set Value")
 			}
-			*c.Info.FirstArgAlternativeForFlag.Value = args[0]
+			*c.Options.FirstArgAlternativeForFlag.Value = args[0]
 		}
 	}
 
-	if c.Info.Run != nil {
-		c.Info.Run()
+	if c.Options.Run != nil {
+		c.Options.Run()
 	}
 }

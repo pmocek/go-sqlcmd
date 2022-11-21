@@ -5,11 +5,11 @@ package config
 
 import (
 	"fmt"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/config"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/pal"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/secret"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/config"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/pal"
+	"github.com/microsoft/go-sqlcmd/internal/helper/secret"
 )
 
 type ConnectionStrings struct {
@@ -17,8 +17,8 @@ type ConnectionStrings struct {
 }
 
 func (c *ConnectionStrings) DefineCommand(...cmd.Command) {
-	c.Base.Info = cmd.Info{
-		Use: "connection-strings",
+	c.Base.Options = cmd.Options{
+		Use:   "connection-strings",
 		Short: "Display connections strings for the current context",
 		Examples: []cmd.ExampleInfo{
 			{
@@ -28,7 +28,7 @@ func (c *ConnectionStrings) DefineCommand(...cmd.Command) {
 					"sqlcmd config cs"},
 			},
 		},
-		Run: c.run,
+		Run:     c.run,
 		Aliases: []string{"cs"},
 	}
 
@@ -38,7 +38,7 @@ func (c *ConnectionStrings) DefineCommand(...cmd.Command) {
 func (c *ConnectionStrings) run() {
 	// connectionStringFormats borrowed from "portal.azure.com" "connection strings" pane
 	var connectionStringFormats = map[string]string{
-		"ADO.NET": "Server=tcp:%s,%d;Initial Catalog=%s;Persist Security Info=False;User ID=%s;Password=%s;MultipleActiveResultSets=False;Encode=True;TrustServerCertificate=False;Connection Timeout=30;",
+		"ADO.NET": "Server=tcp:%s,%d;Initial Catalog=%s;Persist Security Options=False;User ID=%s;Password=%s;MultipleActiveResultSets=False;Encode=True;TrustServerCertificate=False;Connection Timeout=30;",
 		"JDBC":    "jdbc:sqlserver://%s:%d;database=%s;user=%s;password=%s;encrypt=true;trustServerCertificate=false;loginTimeout=30;",
 		"ODBC":    "Driver={ODBC Driver 13 for SQL Server};Server=tcp:%s,%d;Database=%s;Uid=%s;Pwd=%s;Encode=yes;TrustServerCertificate=no;Connection Timeout=30;",
 	}

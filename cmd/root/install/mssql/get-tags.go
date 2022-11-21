@@ -4,9 +4,9 @@
 package mssql
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helpers/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/container"
-	"github.com/microsoft/go-sqlcmd/internal/helpers/output"
+	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/helper/container"
+	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 )
 
 type GetTags struct {
@@ -14,17 +14,17 @@ type GetTags struct {
 }
 
 func (c *GetTags) DefineCommand(...cmd.Command) {
-	c.Base.Info = cmd.Info{
-		Use: "get-tags",
+	c.Base.Options = cmd.Options{
+		Use:   "get-tags",
 		Short: "Get tags available for mssql install",
 		Examples: []cmd.ExampleInfo{
 			{
 				Description: "List tags",
-				Steps: []string{"sqlcmd install mssql get-tags"},
+				Steps:       []string{"sqlcmd install mssql get-tags"},
 			},
 		},
 		Aliases: []string{"gt", "lt"},
-		Run: c.run,
+		Run:     c.run,
 	}
 
 	c.Base.DefineCommand()

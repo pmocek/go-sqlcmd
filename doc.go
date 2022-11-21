@@ -18,5 +18,13 @@ To follow the flow of this code:
     handling and trace (non-localized) logging (as can be seen from the `import`
     for each command (in /cmd/root/...).
 
-The helpers, have 100% code coverage.
- */
+The code follows the Go Style Guide
+
+  - https://google.github.io/styleguide/go/
+  - https://go.dev/doc/effective_go
+  - https://github.com/golang-standards/project-layout
+
+Exceptions to Go Style Guide:
+
+  - None
+*/
