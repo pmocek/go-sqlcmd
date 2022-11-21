@@ -100,7 +100,7 @@ type CommandError struct {
 }
 
 func (e *CommandError) Error() string {
-	return ErrorPrefix + fmt.Sprintf("Syntax error at line %d near command '%s'", e.LineNumber, e.Command)
+	return ErrorPrefix + fmt.Sprintf("Syntax error at line %d near command '%s.'", e.LineNumber, e.Command)
 }
 
 func (e *CommandError) IsSqlcmdErr() bool {

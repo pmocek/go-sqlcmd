@@ -67,11 +67,10 @@ func TestConnectionStringFromSqlCmd(t *testing.T) {
 	}
 }
 
-/*
-	The following tests require a working SQL instance and rely on SqlCmd environment variables
-
+/* The following tests require a working SQL instance and rely on SqlCmd environment variables
 to manage the initial connection string. The default connection when no environment variables are
 set will be to localhost using Windows auth.
+
 */
 func TestSqlCmdConnectDb(t *testing.T) {
 	v := InitializeVariables(true)
@@ -136,7 +135,6 @@ func TestIncludeFileNoExecutions(t *testing.T) {
 			s.SetOutput(nil)
 			bytes, err := os.ReadFile(file.Name())
 			if assert.NoError(t, err, "os.ReadFile") {
-				assert.Equal(t, "100"+SqlcmdEol+SqlcmdEol+oneRowAffected+SqlcmdEol+"string"+SqlcmdEol+SqlcmdEol+oneRowAffected+SqlcmdEol+"100"+SqlcmdEol+SqlcmdEol+oneRowAffected+SqlcmdEol, string(bytes), "Incorrect output from Run")
 				assert.Equal(t, "100"+SqlcmdEol+SqlcmdEol+oneRowAffected+SqlcmdEol+"string"+SqlcmdEol+SqlcmdEol+oneRowAffected+SqlcmdEol+"100"+SqlcmdEol+SqlcmdEol+oneRowAffected+SqlcmdEol, string(bytes), "Incorrect output from Run")
 			}
 		}
@@ -265,8 +263,8 @@ func TestSqlCmdExitOnError(t *testing.T) {
 	s.Connect.ExitOnError = true
 	err := runSqlCmd(t, s, []string{"select 1", "GO", ":setvar", "select 2", "GO"})
 	o := buf.buf.String()
-	assert.EqualError(t, err, "Sqlcmd: Error: Syntax error at line 3 near command ':SETVAR'", "Run should return an error")
-	assert.Equal(t, "1"+SqlcmdEol+SqlcmdEol+oneRowAffected+SqlcmdEol+"Sqlcmd: Error: Syntax error at line 3 near command ':SETVAR'"+SqlcmdEol, o, "Only first select should run")
+	assert.EqualError(t, err, "Sqlcmd: Error: Syntax error at line 3 near command ':SETVAR'.", "Run should return an error")
+	assert.Equal(t, "1"+SqlcmdEol+SqlcmdEol+oneRowAffected+SqlcmdEol+"Sqlcmd: Error: Syntax error at line 3 near command ':SETVAR'."+SqlcmdEol, o, "Only first select should run")
 	assert.Equal(t, 1, s.Exitcode, "s.ExitCode for a syntax error")
 
 	s, buf = setupSqlCmdWithMemoryOutput(t)

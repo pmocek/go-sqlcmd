@@ -1,34 +1,15 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-package util
+package sqlcmd
 
 import (
 	"strconv"
 	"strings"
 )
 
-// errorPrefix is the prefix for all sqlcmd-generated errors
-const errorPrefix = "Sqlcmd: Error: "
-
-// argumentError is related to command line switch validation not handled by kong
-type argumentError struct {
-	Parameter string
-	Rule      string
-}
-
-func (e *argumentError) Error() string {
-	return errorPrefix + e.Rule
-}
-
-// InvalidServerName indicates the SQLCMDSERVER variable has an incorrect format
-var InvalidServerName = argumentError{
-	Parameter: "server",
-	Rule:      "server must be of the form [tcp]:server[[/instance]|[,port]]",
-}
-
 // splitServer extracts connection parameters from a server name input
-func SplitServer(serverName string) (string, string, uint64, error) {
+func splitServer(serverName string) (string, string, uint64, error) {
 	instance := ""
 	port := uint64(0)
 	if strings.HasPrefix(serverName, "tcp:") {
@@ -62,7 +43,7 @@ func SplitServer(serverName string) (string, string, uint64, error) {
 }
 
 // padRight appends c instances of s to builder
-func PadRight(builder *strings.Builder, c int64, s string) *strings.Builder {
+func padRight(builder *strings.Builder, c int64, s string) *strings.Builder {
 	var i int64
 	for ; i < c; i++ {
 		builder.WriteString(s)
@@ -71,7 +52,7 @@ func PadRight(builder *strings.Builder, c int64, s string) *strings.Builder {
 }
 
 // padLeft prepends c instances of s to builder
-func PadLeft(builder *strings.Builder, c int64, s string) *strings.Builder {
+func padLeft(builder *strings.Builder, c int64, s string) *strings.Builder {
 	newBuilder := new(strings.Builder)
 	newBuilder.Grow(builder.Len())
 	var i int64
@@ -82,7 +63,7 @@ func PadLeft(builder *strings.Builder, c int64, s string) *strings.Builder {
 	return newBuilder
 }
 
-func Contains(arr []string, s string) bool {
+func contains(arr []string, s string) bool {
 	for _, a := range arr {
 		if a == s {
 			return true

@@ -68,7 +68,7 @@ type SQLCmdArguments struct {
 // Validate accounts for settings not described by Kong attributes
 func (a *SQLCmdArguments) Validate() error {
 	if a.PacketSize != 0 && (a.PacketSize < 512 || a.PacketSize > 32767) {
-		return fmt.Errorf(`'-a %d': Packet size has to be a number between 512 and 32767`, a.PacketSize)
+		return fmt.Errorf(`'-a %d': Packet size has to be a number between 512 and 32767.`, a.PacketSize)
 	}
 	// Ignore 0 even though it's technically an invalid input
 	if a.Headers < -1 {

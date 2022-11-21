@@ -12,7 +12,6 @@ import (
 
 	"github.com/google/uuid"
 	mssql "github.com/microsoft/go-mssqldb"
-	"github.com/microsoft/go-sqlcmd/internal/util"
 )
 
 const (
@@ -183,7 +182,7 @@ func (f *sqlCmdFormatterType) addVerticalRow(values []string) {
 			builder := new(strings.Builder)
 			name := f.columnDetails[i].col.Name()
 			builder.WriteString(name)
-			builder = util.PadRight(builder, int64(f.maxColNameLen-len(name)+1), " ")
+			builder = padRight(builder, int64(f.maxColNameLen-len(name)+1), " ")
 			f.writeOut(builder.String())
 		}
 		f.printColumnValue(v, i)
@@ -229,20 +228,20 @@ func (f *sqlCmdFormatterType) printColumnHeadings() {
 				// special case for unnamed columns when using -W
 				// print a single -
 				rightPad = 1
-				sep = util.PadRight(sep, 1, "-")
+				sep = padRight(sep, 1, "-")
 			} else {
-				sep = util.PadRight(sep, nameLen, "-")
+				sep = padRight(sep, nameLen, "-")
 			}
 		} else {
 			length := min64(c.displayWidth, maxPadWidth)
 			if nameLen < length {
 				rightPad = length - nameLen
 			}
-			sep = util.PadRight(sep, length, "-")
+			sep = padRight(sep, length, "-")
 		}
-		names = util.PadRight(names, leftPad, " ")
+		names = padRight(names, leftPad, " ")
 		names.WriteString(c.col.Name()[:min64(nameLen, c.displayWidth)])
-		names = util.PadRight(names, rightPad, " ")
+		names = padRight(names, rightPad, " ")
 		if i != len(f.columnDetails)-1 {
 			names.WriteString(f.colsep)
 			sep.WriteString(f.colsep)
@@ -539,9 +538,9 @@ func (f *sqlCmdFormatterType) printColumnValue(val string, col int) {
 				padding := c.displayWidth - min64(c.displayWidth, int64(len(r)))
 				if padding > 0 {
 					if c.leftJustify {
-						s = util.PadRight(s, padding, " ")
+						s = padRight(s, padding, " ")
 					} else {
-						s = util.PadLeft(s, padding, " ")
+						s = padLeft(s, padding, " ")
 					}
 				}
 			}

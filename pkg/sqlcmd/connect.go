@@ -8,7 +8,6 @@ import (
 	"net/url"
 
 	"github.com/microsoft/go-mssqldb/azuread"
-	"github.com/microsoft/go-sqlcmd/internal/util"
 )
 
 // ConnectSettings specifies the settings for connections
@@ -78,7 +77,7 @@ func (connect ConnectSettings) RequiresPassword() bool {
 
 // ConnectionString returns the go-mssql connection string to use for queries
 func (connect ConnectSettings) ConnectionString() (connectionString string, err error) {
-	serverName, instance, port, err := util.SplitServer(connect.ServerName)
+	serverName, instance, port, err := splitServer(connect.ServerName)
 	if serverName == "" {
 		serverName = "."
 	}

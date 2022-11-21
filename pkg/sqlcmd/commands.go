@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/alecthomas/kong"
-	"github.com/microsoft/go-sqlcmd/internal/util"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
@@ -35,7 +34,7 @@ type Command struct {
 type Commands map[string]*Command
 
 func newCommands() Commands {
-	// Commands is the set of DefineCommand implementations
+	// Commands is the set of Command implementations
 	return map[string]*Command{
 		"EXIT": {
 			regex:  regexp.MustCompile(`(?im)^[\t ]*?:?EXIT(?:[ \t]*(\(?.*\)?$)|$)`),
@@ -327,7 +326,7 @@ func listVarCommand(s *Sqlcmd, args []string, line uint) error {
 	vars := s.vars.All()
 	keys := make([]string, 0, len(vars))
 	for k := range vars {
-		if !util.Contains(builtinVariables, k) {
+		if !contains(builtinVariables, k) {
 			keys = append(keys, k)
 		}
 	}
@@ -487,7 +486,7 @@ func resolveArgumentVariables(s *Sqlcmd, arg []rune, failOnUnresolved bool) (str
 						b.WriteString(string(arg[i : vl+1]))
 					}
 				}
-				i += ((vl - i) + 1)
+				i += (vl - i) + 1
 			} else {
 				if b != nil {
 					b.WriteString("$(")
