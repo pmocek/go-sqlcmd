@@ -1,9 +1,12 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package config
 
-import "github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+import "github.com/microsoft/go-sqlcmd/internal/cmdparser"
 
 func (c *AddUser) encryptPasswordFlag() {
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		Bool:  &c.encryptPassword,
 		Name:  "encrypt-password",
 		Usage: "Encode the password",

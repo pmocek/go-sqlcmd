@@ -4,18 +4,18 @@
 package root
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
 )
 
 type Install struct {
-	cmd.Base
+	cmdparser.Cmd
 }
 
-func (c *Install) DefineCommand(subCommands ...cmd.Command) {
-	c.Base.Options = cmd.Options{
+func (c *Install) DefineCommand(subCommands ...cmdparser.Command) {
+	c.Cmd.Options = cmdparser.Options{
 		Use:     "install",
 		Short:   "Install/Create #SQLFamily and Tools",
 		Aliases: []string{"create"},
 	}
-	c.Base.DefineCommand(subCommands...)
+	c.Cmd.DefineCommand(subCommands...)
 }

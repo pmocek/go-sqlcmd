@@ -5,32 +5,37 @@ package cmd
 
 import (
 	"github.com/microsoft/go-sqlcmd/cmd/root"
-	"github.com/microsoft/go-sqlcmd/internal/helper"
-	command "github.com/microsoft/go-sqlcmd/internal/helper/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helper/output"
+	"github.com/microsoft/go-sqlcmd/internal"
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
+	"github.com/microsoft/go-sqlcmd/internal/config"
+	"github.com/microsoft/go-sqlcmd/internal/output"
 )
 
 var loggingLevel int
 var outputType string
 var configFilename string
-var rootCmd command.Command
+var rootCmd cmdparser.Command
 
-// init initializes the command-line interface. The func passed into
-// command.Initialize is called after the command-line from the user has been
+// Initialize initializes the command-line interface. The func passed into
+// cmdparser.Initialize is called after the command-line from the user has been
 // parsed, so the helpers are initialized with the values from the command-line
 // like '-v 4' which sets the logging level to maximum etc.
-func init() {
-	command.Initialize(func() {
-		helper.Initialize(
-			checkErr,
-			displayHints,
-			configFilename,
-			outputType,
-			loggingLevel,
-		)
-	})
+func Initialize() {
+	cmdparser.Initialize(initialize)
+	rootCmd = cmdparser.New[*Root](root.SubCommands()...)
+}
 
-	rootCmd = command.New[*Root](root.SubCommands()...)
+func initialize() {
+	options := internal.InitializeOptions{
+		ErrorHandler: checkErr,
+		HintHandler:  displayHints,
+		OutputType:   "yaml",
+		LoggingLevel: 2,
+	}
+
+	config.SetFileName(configFilename)
+	config.Load()
+	internal.Initialize(options)
 }
 
 // Execute runs the application based on the command-line

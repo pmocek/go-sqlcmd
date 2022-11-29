@@ -4,23 +4,23 @@
 package config
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helper/config"
-	"github.com/microsoft/go-sqlcmd/internal/helper/output"
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
+	"github.com/microsoft/go-sqlcmd/internal/config"
+	"github.com/microsoft/go-sqlcmd/internal/output"
 )
 
 type GetEndpoints struct {
-	cmd.Base
+	cmdparser.Cmd
 
 	name     string
 	detailed bool
 }
 
-func (c *GetEndpoints) DefineCommand(...cmd.Command) {
-	c.Base.Options = cmd.Options{
+func (c *GetEndpoints) DefineCommand(...cmdparser.Command) {
+	c.Cmd.Options = cmdparser.Options{
 		Use:   "get-endpoints",
 		Short: "Display one or many endpoints from the sqlconfig file",
-		Examples: []cmd.ExampleInfo{
+		Examples: []cmdparser.ExampleInfo{
 			{
 				Description: "List all the endpoints in your sqlconfig file",
 				Steps:       []string{"sqlcmd config get-endpoints"}},
@@ -32,17 +32,17 @@ func (c *GetEndpoints) DefineCommand(...cmd.Command) {
 				Steps:       []string{"sqlcmd config get-endpoints my-endpoint"}},
 		},
 		Run:                        c.run,
-		FirstArgAlternativeForFlag: &cmd.AlternativeForFlagInfo{Flag: "name", Value: &c.name},
+		FirstArgAlternativeForFlag: &cmdparser.AlternativeForFlagInfo{Flag: "name", Value: &c.name},
 	}
 
-	c.Base.DefineCommand()
+	c.Cmd.DefineCommand()
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		String: &c.name,
 		Name:   "name",
 		Usage:  "Endpoint name to view details of"})
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		Bool:  &c.detailed,
 		Name:  "detailed",
 		Usage: "Include endpoint details"})

@@ -5,22 +5,23 @@ package config
 
 import (
 	"fmt"
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helper/config"
-	"github.com/microsoft/go-sqlcmd/internal/helper/output"
+
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
+	"github.com/microsoft/go-sqlcmd/internal/config"
+	"github.com/microsoft/go-sqlcmd/internal/output"
 )
 
 type DeleteEndpoint struct {
-	cmd.Base
+	cmdparser.Cmd
 
 	name string
 }
 
-func (c *DeleteEndpoint) DefineCommand(...cmd.Command) {
-	c.Base.Options = cmd.Options{
+func (c *DeleteEndpoint) DefineCommand(...cmdparser.Command) {
+	c.Cmd.Options = cmdparser.Options{
 		Use:   "delete-endpoint",
 		Short: "Delete an endpoint",
-		Examples: []cmd.ExampleInfo{
+		Examples: []cmdparser.ExampleInfo{
 			{
 				Description: "Delete an endpoint",
 				Steps: []string{
@@ -30,12 +31,12 @@ func (c *DeleteEndpoint) DefineCommand(...cmd.Command) {
 		},
 		Run: c.run,
 
-		FirstArgAlternativeForFlag: &cmd.AlternativeForFlagInfo{Flag: "name", Value: &c.name},
+		FirstArgAlternativeForFlag: &cmdparser.AlternativeForFlagInfo{Flag: "name", Value: &c.name},
 	}
 
-	c.Base.DefineCommand()
+	c.Cmd.DefineCommand()
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		String: &c.name,
 		Name:   "name",
 		Usage:  "Name of endpoint to delete"})

@@ -18,9 +18,9 @@ type AssetDetails struct {
 }
 
 type Endpoint struct {
-	*AssetDetails `mapstructure:"asset,omitempty" yaml:"asset,omitempty"`
-	EndpointDetails   `mapstructure:"endpoint" yaml:"endpoint"`
-	Name              string `mapstructure:"name"`
+	*AssetDetails   `mapstructure:"asset,omitempty" yaml:"asset,omitempty"`
+	EndpointDetails `mapstructure:"endpoint" yaml:"endpoint"`
+	Name            string `mapstructure:"name"`
 }
 
 type ContextDetails struct {

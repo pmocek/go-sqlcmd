@@ -4,23 +4,23 @@
 package config
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helper/config"
-	"github.com/microsoft/go-sqlcmd/internal/helper/output"
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
+	"github.com/microsoft/go-sqlcmd/internal/config"
+	"github.com/microsoft/go-sqlcmd/internal/output"
 )
 
 type GetUsers struct {
-	cmd.Base
+	cmdparser.Cmd
 
 	name     string
 	detailed bool
 }
 
-func (c *GetUsers) DefineCommand(...cmd.Command) {
-	c.Base.Options = cmd.Options{
+func (c *GetUsers) DefineCommand(...cmdparser.Command) {
+	c.Cmd.Options = cmdparser.Options{
 		Use:   "get-users",
 		Short: "Display one or many users from the sqlconfig file",
-		Examples: []cmd.ExampleInfo{
+		Examples: []cmdparser.ExampleInfo{
 			{
 				Description: "List all the users in your sqlconfig file",
 				Steps:       []string{"sqlcmd config get-users"},
@@ -36,17 +36,17 @@ func (c *GetUsers) DefineCommand(...cmd.Command) {
 		},
 		Run: c.run,
 
-		FirstArgAlternativeForFlag: &cmd.AlternativeForFlagInfo{Flag: "name", Value: &c.name},
+		FirstArgAlternativeForFlag: &cmdparser.AlternativeForFlagInfo{Flag: "name", Value: &c.name},
 	}
 
-	c.Base.DefineCommand()
+	c.Cmd.DefineCommand()
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		String: &c.name,
 		Name:   "name",
 		Usage:  "User name to view details of"})
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		Bool:  &c.detailed,
 		Name:  "detailed",
 		Usage: "Include user details"})

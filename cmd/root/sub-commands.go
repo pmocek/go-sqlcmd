@@ -6,14 +6,14 @@ package root
 import (
 	"github.com/microsoft/go-sqlcmd/cmd/root/config"
 	"github.com/microsoft/go-sqlcmd/cmd/root/install"
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
 )
 
-func SubCommands() []cmd.Command {
-	return []cmd.Command{
-		cmd.New[*Config](config.SubCommands()...),
-		cmd.New[*Query](),
-		cmd.New[*Install](install.SubCommands...),
-		cmd.New[*Uninstall](),
+func SubCommands() []cmdparser.Command {
+	return []cmdparser.Command{
+		cmdparser.New[*Config](config.SubCommands()...),
+		cmdparser.New[*Query](),
+		cmdparser.New[*Install](install.SubCommands...),
+		cmdparser.New[*Uninstall](),
 	}
 }

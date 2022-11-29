@@ -4,17 +4,17 @@
 package root
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
 )
 
 type Config struct {
-	cmd.Base
+	cmdparser.Cmd
 }
 
-func (c *Config) DefineCommand(subCommands ...cmd.Command) {
-	c.Base.Options = cmd.Options{
+func (c *Config) DefineCommand(subCommands ...cmdparser.Command) {
+	c.Cmd.Options = cmdparser.Options{
 		Use:   "config",
 		Short: `Modify sqlconfig files using subcommands like "sqlcmd config use-context mssql"`,
 	}
-	c.Base.DefineCommand(subCommands...)
+	c.Cmd.DefineCommand(subCommands...)
 }

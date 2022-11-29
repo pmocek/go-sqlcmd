@@ -5,16 +5,17 @@ package root
 
 import (
 	"fmt"
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helper/config"
-	"github.com/microsoft/go-sqlcmd/internal/helper/container"
-	"github.com/microsoft/go-sqlcmd/internal/helper/output"
 	"path/filepath"
 	"strings"
+
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
+	"github.com/microsoft/go-sqlcmd/internal/config"
+	"github.com/microsoft/go-sqlcmd/internal/container"
+	"github.com/microsoft/go-sqlcmd/internal/output"
 )
 
 type Uninstall struct {
-	cmd.Base
+	cmdparser.Cmd
 
 	force bool
 	yes   bool
@@ -31,11 +32,11 @@ var systemDatabases = [...]string{
 	"/var/opt/mssql/data/master.mdf",
 }
 
-func (c *Uninstall) DefineCommand(...cmd.Command) {
-	c.Base.Options = cmd.Options{
+func (c *Uninstall) DefineCommand(...cmdparser.Command) {
+	c.Cmd.Options = cmdparser.Options{
 		Use:   "uninstall",
 		Short: "Uninstall/Delete the current context",
-		Examples: []cmd.ExampleInfo{
+		Examples: []cmdparser.ExampleInfo{
 			{
 				Description: "Uninstall/Delete the current context (includes the endpoint and user)",
 				Steps:       []string{`sqlcmd uninstall`}},
@@ -50,15 +51,15 @@ func (c *Uninstall) DefineCommand(...cmd.Command) {
 		Run:     c.run,
 	}
 
-	c.Base.DefineCommand()
+	c.Cmd.DefineCommand()
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		Bool:  &c.yes,
 		Name:  "yes",
 		Usage: "Quiet mode (do not stop for user input to confirm the operation)",
 	})
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		Bool:  &c.force,
 		Name:  "force",
 		Usage: "Complete the operation even if non-system (user) database files are present",
@@ -80,7 +81,7 @@ func (c *Uninstall) run() {
 			var input string
 			if !c.yes {
 				output.Infof(
-					"Current context is '%s'. Do you want to continue? (Y/N)",
+					"Current context is %q. Do you want to continue? (Y/N)",
 					config.GetCurrentContextName(),
 				)
 				_, err := fmt.Scanln(&input)

@@ -1,39 +1,51 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package cmd
 
 import (
 	"errors"
 	"fmt"
-	"github.com/microsoft/go-sqlcmd/internal/helper"
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helper/config"
-	"github.com/microsoft/go-sqlcmd/internal/helper/output"
-	"github.com/microsoft/go-sqlcmd/internal/helper/pal"
 	"os"
+	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/microsoft/go-sqlcmd/cmd/root"
+	"github.com/microsoft/go-sqlcmd/internal"
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
+	"github.com/microsoft/go-sqlcmd/internal/config"
+	"github.com/microsoft/go-sqlcmd/internal/output"
+	"github.com/microsoft/go-sqlcmd/internal/pal"
 )
 
 // Set to true to run unit tests without a network connection
 var offlineMode = false
 var useCached = ""
+var encryptPassword = ""
+
+type test struct {
+	name string
+	args struct{ args []string }
+}
+
+func init() {
+	if runtime.GOOS == "windows" {
+		encryptPassword = " --encrypt-password"
+	}
+}
 
 func TestCommandLineHelp(t *testing.T) {
-	setup()
-	tests := []struct {
-		name string
-		args struct{ args []string }
-	}{
+	setup(t.Name())
+	tests := []test{
 		{"default", split("--help")},
 	}
 	run(t, tests)
 }
 
 func TestNegCommandLines(t *testing.T) {
-	setup()
-	tests := []struct {
-		name string
-		args struct{ args []string }
-	}{
+	setup(t.Name())
+	tests := []test{
 		{"neg-config-use-context-double-name",
 			split("config use-context badbad --name andbad")},
 		{"neg-config-use-context-bad-name",
@@ -49,11 +61,8 @@ func TestNegCommandLines(t *testing.T) {
 }
 
 func TestConfigContexts(t *testing.T) {
-	setup()
-	tests := []struct {
-		name string
-		args struct{ args []string }
-	}{
+	setup(t.Name())
+	tests := []test{
 		{"neg-config-add-context-no-endpoint",
 			split("config add-context")},
 		{"config-add-endpoint",
@@ -70,8 +79,8 @@ func TestConfigContexts(t *testing.T) {
 			split("config get-endpoints --detailed")},
 		{"config-add-context",
 			split("config add-context --endpoint endpoint")},
-		{"uninstall-but-context-has-no-container",
-			split("uninstall --force --yes")},
+		/*{"uninstall-but-context-has-no-container",
+		split("uninstall --force --yes")},*/
 		{"config-add-endpoint",
 			split("config add-endpoint")},
 		{"config-add-context",
@@ -93,17 +102,18 @@ func TestConfigContexts(t *testing.T) {
 
 		{"cleanup",
 			split("config delete-endpoint endpoint2")},
+		{"cleanup",
+			split("config delete-endpoint endpoint3")},
+		{"cleanup",
+			split("config delete-context context2")},
 	}
 
 	run(t, tests)
 }
 
 func TestConfigUsers(t *testing.T) {
-	setup()
-	tests := []struct {
-		name string
-		args struct{ args []string }
-	}{
+	setup(t.Name())
+	tests := []test{
 		{"neg-config-get-users-bad-user",
 			split("config get-users badbad")},
 		{"config-add-user",
@@ -132,11 +142,9 @@ func TestConfigUsers(t *testing.T) {
 }
 
 func TestLocalContext(t *testing.T) {
-	setup()
-	tests := []struct {
-		name string
-		args struct{ args []string }
-	}{
+	setup(t.Name())
+
+	tests := []test{
 		{"neg-config-delete-endpoint-no-name",
 			split("config delete-endpoint")},
 		{"config-add-endpoint",
@@ -154,19 +162,19 @@ func TestLocalContext(t *testing.T) {
 
 		{"neg-config-add-user-bad-auth-type",
 			split("config add-user --username foobar --auth-type badbad")},
-		{"neg-config-add-user-bad-use-encrypted",
-			split("config add-user --username foobar --auth-type other --encrypt-password")},
+	}
+
+	if len(encryptPassword) > 2 { // are we on a platform that supports encryption
+		tests = append(tests, test{"neg-config-add-user-bad-use-encrypted",
+			split(fmt.Sprintf("config add-user --username foobar --auth-type other%v", encryptPassword))})
 	}
 
 	run(t, tests)
 }
 
 func TestGetTags(t *testing.T) {
-	setup()
-	tests := []struct {
-		name string
-		args struct{ args []string }
-	}{
+	setup(t.Name())
+	tests := []test{
 		{"get-tags",
 			split("install mssql get-tags")},
 	}
@@ -175,13 +183,10 @@ func TestGetTags(t *testing.T) {
 }
 
 func TestMssqlInstall(t *testing.T) {
-	setup()
-	tests := []struct {
-		name string
-		args struct{ args []string }
-	}{
+	setup(t.Name())
+	tests := []test{
 		{"install",
-			split(fmt.Sprintf("install mssql%v --user-database my-database --accept-eula --encrypt-password", useCached))},
+			split(fmt.Sprintf("install mssql%v --user-database my-database --accept-eula%v", useCached, encryptPassword))},
 		{"config-current-context",
 			split("config current-context")},
 		{"config-connection-strings",
@@ -207,7 +212,7 @@ func runTests(t *testing.T, tt struct {
 	name string
 	args struct{ args []string }
 }) {
-	cmd := cmd.New[*Root]()
+	cmd := cmdparser.New[*Root](root.SubCommands()...)
 	cmd.ArgsForUnitTesting(tt.args.args)
 
 	t.Logf("Running: %v", tt.args.args)
@@ -235,6 +240,7 @@ func Test_displayHints(t *testing.T) {
 }
 
 func TestIsValidRootCommand(t *testing.T) {
+	Initialize()
 	IsValidSubCommand("install")
 	IsValidSubCommand("create")
 	IsValidSubCommand("nope")
@@ -257,10 +263,7 @@ func Test_checkErr(t *testing.T) {
 	checkErr(errors.New("Expected error"))
 }
 
-func run(t *testing.T, tests []struct {
-	name string
-	args struct{ args []string }
-}) {
+func run(t *testing.T, tests []test) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) { runTests(t, tt) })
 	}
@@ -271,36 +274,36 @@ func run(t *testing.T, tests []struct {
 func verifyConfigIsEmpty(t *testing.T) {
 	if !config.IsEmpty() {
 		bytes := output.Struct(config.GetRedactedConfig(true))
-		t.Error(fmt.Sprintf(
-			"Config is not empty.\n%s\nConfig file used:%s",
+		t.Errorf("Config is not empty. Content of config file:\n%s\nConfig file used:%s",
 			string(bytes),
-			config.GetConfigFileUsed(),
-		))
+			config.GetConfigFileUsed())
 		t.Fail()
 	}
 }
 
-func setup() {
+func setup(testName string) {
 	useCached = " --cached"
 	if !offlineMode {
 		useCached = ""
 	}
 
-	helper.Initialize(
-		func(err error) {
-			if err != nil {
-				panic(err)
-			}
-		},
-		displayHints,
-		pal.FilenameInUserHomeDotDirectory(
-			".sqlcmd",
-			"sqlconfig-test-cmd-line",
-		),
-		"yaml",
-		4,
-	)
+	errorHandler := func(err error) {
+		if err != nil {
+			panic(err)
+		}
+	}
 
+	options := internal.InitializeOptions{
+		ErrorHandler: errorHandler,
+		HintHandler:  displayHints,
+		OutputType:   "yaml",
+		LoggingLevel: 4,
+	}
+	internal.Initialize(options)
+	config.SetFileName(pal.FilenameInUserHomeDotDirectory(
+		".sqlcmd",
+		"sqlconfig-"+testName,
+	))
 	config.Clean()
 }
 

@@ -3,8 +3,8 @@
 
 package mssql
 
-import "github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+import "github.com/microsoft/go-sqlcmd/internal/cmdparser"
 
-var SubCommands = []cmd.Command{
-	cmd.New[*GetTags](),
+var SubCommands = []cmdparser.Command{
+	cmdparser.New[*GetTags](),
 }

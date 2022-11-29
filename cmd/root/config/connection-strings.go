@@ -5,22 +5,23 @@ package config
 
 import (
 	"fmt"
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helper/config"
-	"github.com/microsoft/go-sqlcmd/internal/helper/output"
-	"github.com/microsoft/go-sqlcmd/internal/helper/pal"
-	"github.com/microsoft/go-sqlcmd/internal/helper/secret"
+
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
+	"github.com/microsoft/go-sqlcmd/internal/config"
+	"github.com/microsoft/go-sqlcmd/internal/output"
+	"github.com/microsoft/go-sqlcmd/internal/pal"
+	"github.com/microsoft/go-sqlcmd/internal/secret"
 )
 
 type ConnectionStrings struct {
-	cmd.Base
+	cmdparser.Cmd
 }
 
-func (c *ConnectionStrings) DefineCommand(...cmd.Command) {
-	c.Base.Options = cmd.Options{
+func (c *ConnectionStrings) DefineCommand(...cmdparser.Command) {
+	c.Cmd.Options = cmdparser.Options{
 		Use:   "connection-strings",
 		Short: "Display connections strings for the current context",
-		Examples: []cmd.ExampleInfo{
+		Examples: []cmdparser.ExampleInfo{
 			{
 				Description: "List connection strings for all client drivers",
 				Steps: []string{
@@ -32,7 +33,7 @@ func (c *ConnectionStrings) DefineCommand(...cmd.Command) {
 		Aliases: []string{"cs"},
 	}
 
-	c.Base.DefineCommand()
+	c.Cmd.DefineCommand()
 }
 
 func (c *ConnectionStrings) run() {

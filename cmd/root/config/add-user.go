@@ -1,16 +1,20 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package config
 
 import (
-	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helper/config"
-	"github.com/microsoft/go-sqlcmd/internal/helper/output"
-	"github.com/microsoft/go-sqlcmd/internal/helper/secret"
 	"os"
+
+	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
+	"github.com/microsoft/go-sqlcmd/internal/config"
+	"github.com/microsoft/go-sqlcmd/internal/output"
+	"github.com/microsoft/go-sqlcmd/internal/secret"
 )
 
 type AddUser struct {
-	cmd.Base
+	cmdparser.Cmd
 
 	name            string
 	authType        string
@@ -18,11 +22,11 @@ type AddUser struct {
 	encryptPassword bool
 }
 
-func (c *AddUser) DefineCommand(...cmd.Command) {
-	c.Base.Options = cmd.Options{
+func (c *AddUser) DefineCommand(...cmdparser.Command) {
+	c.Cmd.Options = cmdparser.Options{
 		Use:   "add-user",
 		Short: "Add a user",
-		Examples: []cmd.ExampleInfo{
+		Examples: []cmdparser.ExampleInfo{
 			{
 				Description: "Add a user",
 				Steps: []string{
@@ -33,23 +37,23 @@ func (c *AddUser) DefineCommand(...cmd.Command) {
 		Run: c.run,
 	}
 
-	c.Base.DefineCommand()
+	c.Cmd.DefineCommand()
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		String:        &c.name,
 		Name:          "name",
 		DefaultString: "user",
 		Usage:         "Display name for the user (this is not the username)",
 	})
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		String:        &c.authType,
 		Name:          "auth-type",
 		DefaultString: "basic",
 		Usage:         "Authentication type this user will use (basic | other)",
 	})
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		String: &c.username,
 		Name:   "username",
 		Usage:  "The username (provide password in SQLCMD_PASSWORD environment variable)",

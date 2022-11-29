@@ -4,36 +4,26 @@
 package install
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
 )
 
 type Mssql struct {
-	cmd.Base
+	cmdparser.Cmd
 	MssqlBase
-
-	tag             string
-	registry        string
-	repo            string
-	installType     string
-	acceptEula      bool
-	contextName     string
-	defaultDatabase string
 }
 
-func (c *Mssql) DefineCommand(subCommands ...cmd.Command) {
+func (c *Mssql) DefineCommand(subCommands ...cmdparser.Command) {
 	const repo = "mssql/server"
 
-	c.Base.Options = cmd.Options{
+	c.Cmd.Options = cmdparser.Options{
 		Use:   "mssql",
 		Short: "Install SQL Server",
-		Examples: []cmd.ExampleInfo{{
+		Examples: []cmdparser.ExampleInfo{{
 			Description: "Install SQL Server in a container",
 			Steps:       []string{"sqlcmd install mssql"}}},
 		Run: c.MssqlBase.Run,
 	}
 
-	c.Base.DefineCommand(subCommands...)
+	c.Cmd.DefineCommand(subCommands...)
 	c.AddFlags(c.AddFlag, repo, "mssql")
-
-	return
 }

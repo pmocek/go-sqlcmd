@@ -1,46 +1,50 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package config
 
 import (
 	"fmt"
+
 	"github.com/microsoft/go-sqlcmd/cmd/sqlconfig"
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
-	"github.com/microsoft/go-sqlcmd/internal/helper/config"
-	"github.com/microsoft/go-sqlcmd/internal/helper/output"
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
+	"github.com/microsoft/go-sqlcmd/internal/config"
+	"github.com/microsoft/go-sqlcmd/internal/output"
 )
 
 type AddContext struct {
-	cmd.Base
+	cmdparser.Cmd
 
 	name         string
 	endpointName string
 	userName     string
 }
 
-func (c *AddContext) DefineCommand(...cmd.Command) {
-	c.Base.Options = cmd.Options{
+func (c *AddContext) DefineCommand(...cmdparser.Command) {
+	c.Cmd.Options = cmdparser.Options{
 		Use:   "add-context",
 		Short: "Add a context",
-		Examples: []cmd.ExampleInfo{
+		Examples: []cmdparser.ExampleInfo{
 			{
 				Description: "Add a default context",
 				Steps:       []string{"sqlcmd config add-context --name my-context"}},
 		},
 		Run: c.run}
 
-	c.Base.DefineCommand()
+	c.Cmd.DefineCommand()
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		String:        &c.name,
 		Name:          "name",
 		DefaultString: "context",
 		Usage:         "Display name for the context"})
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		String: &c.endpointName,
 		Name:   "endpoint",
 		Usage:  "Name of endpoint this context will use, use `sqlcmd config get-endpoints` to see list"})
 
-	c.AddFlag(cmd.FlagOptions{
+	c.AddFlag(cmdparser.FlagOptions{
 		String: &c.userName,
 		Name:   "user",
 		Usage:  "Name of user this context will use, use `sqlcmd config get-users` to see list"})

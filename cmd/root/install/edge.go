@@ -4,34 +4,26 @@
 package install
 
 import (
-	"github.com/microsoft/go-sqlcmd/internal/helper/cmd"
+	"github.com/microsoft/go-sqlcmd/internal/cmdparser"
 )
 
 type Edge struct {
-	cmd.Base
+	cmdparser.Cmd
 	MssqlBase
-
-	tag             string
-	registry        string
-	repo            string
-	installType     string
-	acceptEula      bool
-	contextName     string
-	defaultDatabase string
 }
 
-func (c *Edge) DefineCommand(subCommands ...cmd.Command) {
+func (c *Edge) DefineCommand(subCommands ...cmdparser.Command) {
 	const repo = "azure-sql-edge"
 
-	c.Base.Options = cmd.Options{
+	c.Cmd.Options = cmdparser.Options{
 		Use:   "mssql-edge",
 		Short: "Install SQL Server Edge",
-		Examples: []cmd.ExampleInfo{{
+		Examples: []cmdparser.ExampleInfo{{
 			Description: "Install SQL Server Edge in a container",
 			Steps:       []string{"sqlcmd install mssql-edge"}}},
 		Run: c.MssqlBase.Run,
 	}
 
-	c.Base.DefineCommand(subCommands...)
+	c.Cmd.DefineCommand(subCommands...)
 	c.AddFlags(c.AddFlag, repo, "edge")
 }
